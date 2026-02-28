@@ -107,6 +107,13 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   <section id="home" class="hero-section">
     <div class="hero-bg-pattern"></div>
     <div class="hero-particles"></div>
+    
+    <!-- Decorative floating shapes -->
+    <div class="hero-floating-shapes">
+      <div class="float-shape float-shape-1"></div>
+      <div class="float-shape float-shape-2"></div>
+      <div class="float-shape float-shape-3"></div>
+    </div>
 
     <div class="container position-relative" style="z-index:2;padding-top:20px;">
       <div class="row align-items-center g-5">
@@ -195,8 +202,13 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   </section>
 
   <!-- CATEGORIES SECTION -->
-  <section id="categories" class="categories-section">
-    <div class="container">
+  <section id="categories" class="categories-section" style="position:relative;overflow:hidden;">
+    <div class="section-floating-shapes">
+      <div class="float-shape float-shape-1"></div>
+      <div class="float-shape float-shape-2"></div>
+      <div class="float-shape float-shape-3"></div>
+    </div>
+    <div class="container" style="position:relative;z-index:2;">
       <div class="text-center mb-5 animate-on-scroll">
         <div class="section-label justify-content-center"><span></span>Browse by Category<span></span></div>
         <h2 class="section-title">What Would You Like to Explore?</h2>
@@ -223,8 +235,13 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   </section>
 
   <!-- FEATURED LISTINGS -->
-  <section id="featured" style="background:var(--gray-50);">
-    <div class="container">
+  <section id="featured" style="background:var(--gray-50);position:relative;overflow:hidden;">
+    <div class="section-floating-shapes">
+      <div class="float-shape float-shape-1"></div>
+      <div class="float-shape float-shape-2"></div>
+      <div class="float-shape float-shape-3"></div>
+    </div>
+    <div class="container" style="position:relative;z-index:2;">
       <div class="d-flex align-items-end justify-content-between mb-5">
         <div class="animate-on-scroll">
           <div class="section-label">Featured Destinations</div>
@@ -279,8 +296,13 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   </section>
 
   <!-- MAP TEASER SECTION -->
-  <section id="map-teaser" class="map-section">
-    <div class="container">
+  <section id="map-teaser" class="map-section" style="position:relative;overflow:hidden;">
+    <div class="section-floating-shapes">
+      <div class="float-shape float-shape-1"></div>
+      <div class="float-shape float-shape-2"></div>
+      <div class="float-shape float-shape-3"></div>
+    </div>
+    <div class="container" style="position:relative;z-index:2;">
       <div class="row align-items-center g-5 mb-4">
         <div class="col-lg-6 animate-on-scroll">
           <div class="section-label">Interactive Map</div>
@@ -311,8 +333,13 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   </section>
 
   <!-- EVENTS SECTION -->
-  <section id="events" class="events-section">
-    <div class="container">
+  <section id="events" class="events-section" style="position:relative;overflow:hidden;">
+    <div class="section-floating-shapes">
+      <div class="float-shape float-shape-1"></div>
+      <div class="float-shape float-shape-2"></div>
+      <div class="float-shape float-shape-3"></div>
+    </div>
+    <div class="container" style="position:relative;z-index:2;">
       <div class="d-flex align-items-end justify-content-between mb-5">
         <div class="animate-on-scroll">
           <div class="section-label">Upcoming Events</div>
@@ -355,8 +382,13 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   </section>
 
   <!-- STATS SECTION -->
-  <section class="stats-section">
-    <div class="container">
+  <section class="stats-section" style="position:relative;overflow:hidden;">
+    <div class="section-floating-shapes">
+      <div class="float-shape float-shape-1"></div>
+      <div class="float-shape float-shape-2"></div>
+      <div class="float-shape float-shape-3"></div>
+    </div>
+    <div class="container" style="position:relative;z-index:2;">
       <div class="row g-0">
         <div class="col-6 col-md-3">
           <div class="stat-card animate-on-scroll">
@@ -395,8 +427,13 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   </section>
 
   <!-- ABOUT SECTION -->
-  <section id="about" class="about-strip">
-    <div class="container">
+  <section id="about" class="about-strip" style="position:relative;overflow:hidden;">
+    <div class="section-floating-shapes">
+      <div class="float-shape float-shape-1"></div>
+      <div class="float-shape float-shape-2"></div>
+      <div class="float-shape float-shape-3"></div>
+    </div>
+    <div class="container" style="position:relative;z-index:2;">
       <div class="row align-items-center g-5">
         <div class="col-lg-5 animate-on-scroll">
           <div class="about-img-wrap">
@@ -454,8 +491,13 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   </section>
 
   <!-- CONTACT SECTION -->
-  <section id="contact" class="contact-section">
-    <div class="container">
+  <section id="contact" class="contact-section" style="position:relative;overflow:hidden;">
+    <div class="section-floating-shapes">
+      <div class="float-shape float-shape-1"></div>
+      <div class="float-shape float-shape-2"></div>
+      <div class="float-shape float-shape-3"></div>
+    </div>
+    <div class="container" style="position:relative;z-index:2;">
       <div class="text-center mb-5 animate-on-scroll">
         <div class="section-label justify-content-center"><span></span>Get In Touch<span></span></div>
         <h2 class="section-title">Contact San Enrique LGU</h2>
