@@ -1775,3 +1775,105 @@ section {
     background: rgba(255, 255, 255, 0.22);
     color: white;
 }
+
+/* ---- LIVE SEARCH DROPDOWN ---- */
+.search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 10px;
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-xl);
+    max-height: 350px;
+    overflow-y: auto;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: var(--transition);
+    text-align: left;
+    border: 1px solid var(--gray-100);
+}
+
+.search-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.search-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--gray-50);
+    text-decoration: none;
+    transition: var(--transition);
+    color: var(--text);
+}
+
+.search-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.search-dropdown-item:hover,
+.search-dropdown-item.active {
+    background: var(--off-white);
+    transform: translateX(5px);
+    padding-left: 20px;
+    padding-right: 12px;
+}
+
+.search-dropdown-img {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.search-dropdown-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.search-dropdown-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: 'Playfair Display', serif;
+}
+
+.search-dropdown-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.search-empty {
+    padding: 30px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.search-empty i {
+    font-size: 2.5rem;
+    color: var(--gray-200);
+    margin-bottom: 12px;
+}
+
+.search-empty h5 {
+    color: var(--primary);
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+}

@@ -10,17 +10,17 @@
 
     // ── Config ──────────────────────────────────────────
     const POLL_INTERVAL = 30000;   // 30 seconds
-    const API_URL       = (function () {
+    const API_URL = (function () {
         // Works whether the script is loaded from root or a sub-folder
         const base = document.querySelector('meta[name="site-base"]');
         return base ? base.content.replace(/\/$/, '') + '/api/changes.php'
-                    : '/san-enrique/api/changes.php';
+            : '/san-enrique/api/changes.php';
     })();
 
     // ── State ────────────────────────────────────────────
     let knownTimestamp = null;
-    let toastShown     = false;
-    let timer          = null;
+    let toastShown = false;
+    let timer = null;
 
     // ── Toast markup ─────────────────────────────────────
     function createToast() {

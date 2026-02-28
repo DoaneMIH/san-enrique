@@ -1,18 +1,21 @@
 <?php
 session_start();
 
-function isLoggedIn() {
+function isLoggedIn()
+{
     return isset($_SESSION['admin_id']) && !empty($_SESSION['admin_id']);
 }
 
-function requireLogin() {
+function requireLogin()
+{
     if (!isLoggedIn()) {
         header('Location: ' . BASE_URL . '/admin/login.php');
         exit;
     }
 }
 
-function login($username, $password) {
+function login($username, $password)
+{
     $db = getDB();
     $username = $db->real_escape_string($username);
     $result = $db->query("SELECT * FROM admins WHERE username = '$username' OR email = '$username' LIMIT 1");
@@ -29,13 +32,15 @@ function login($username, $password) {
     return false;
 }
 
-function logout() {
+function logout()
+{
     session_destroy();
     header('Location: ' . BASE_URL . '/admin/login.php');
     exit;
 }
 
-function currentAdmin() {
+function currentAdmin()
+{
     return [
         'id' => $_SESSION['admin_id'] ?? null,
         'name' => $_SESSION['admin_name'] ?? '',

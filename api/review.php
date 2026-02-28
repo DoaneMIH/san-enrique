@@ -8,9 +8,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$listing_id = (int)($_POST['listing_id'] ?? 0);
+$listing_id = (int) ($_POST['listing_id'] ?? 0);
 $reviewer_name = sanitize($_POST['reviewer_name'] ?? 'Anonymous');
-$rating = (int)($_POST['rating'] ?? 0);
+$rating = (int) ($_POST['rating'] ?? 0);
 $comment = sanitize($_POST['comment'] ?? '');
 
 if (!$listing_id || $rating < 1 || $rating > 5 || empty($comment)) {

@@ -7,19 +7,22 @@ define('MUNICIPALITY', 'San Enrique, Iloilo');
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/auth.php';
 
-function getCategories() {
+function getCategories()
+{
     $db = getDB();
     $result = $db->query("SELECT * FROM categories ORDER BY name");
     return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
 
-function getFeaturedListings($limit = 6) {
+function getFeaturedListings($limit = 6)
+{
     $db = getDB();
     $result = $db->query("SELECT l.*, c.name as category_name, c.icon, c.color, c.slug as cat_slug FROM listings l JOIN categories c ON l.category_id = c.id WHERE l.is_featured = 1 AND l.status = 'active' LIMIT $limit");
     return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
 
-function getAllListings($category_slug = '', $search = '', $limit = 20, $offset = 0) {
+function getAllListings($category_slug = '', $search = '', $limit = 20, $offset = 0)
+{
     $db = getDB();
     $where = ["l.status = 'active'"];
     if ($category_slug) {
@@ -35,7 +38,8 @@ function getAllListings($category_slug = '', $search = '', $limit = 20, $offset 
     return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
 
-function getListing($slug) {
+function getListing($slug)
+{
     $db = getDB();
     $slug = $db->real_escape_string($slug);
     $result = $db->query("SELECT l.*, c.name as category_name, c.icon, c.color FROM listings l JOIN categories c ON l.category_id = c.id WHERE l.slug = '$slug' AND l.status = 'active' LIMIT 1");
@@ -47,16 +51,19 @@ function getListing($slug) {
     return null;
 }
 
-function getUpcomingEvents($limit = 3) {
+function getUpcomingEvents($limit = 3)
+{
     $db = getDB();
     $result = $db->query("SELECT * FROM events WHERE status = 'active' AND event_date >= CURDATE() ORDER BY event_date ASC LIMIT $limit");
     return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
 
-function getAllListingsForMap() {
+function getAllListingsForMap()
+{
     $db = getDB();
     $result = $db->query("SELECT l.id, l.name, l.latitude, l.longitude, l.address, l.slug, l.featured_image, c.name as category_name, c.icon, c.color, c.slug as cat_slug FROM listings l JOIN categories c ON l.category_id = c.id WHERE l.status = 'active' AND l.latitude IS NOT NULL AND l.longitude IS NOT NULL");
-    if (!$result) return [];
+    if (!$result)
+        return [];
     $rows = $result->fetch_all(MYSQLI_ASSOC);
     // Resolve image paths to absolute URLs so JS map markers work correctly
     foreach ($rows as &$row) {
@@ -65,7 +72,8 @@ function getAllListingsForMap() {
     return $rows;
 }
 
-function getStats() {
+function getStats()
+{
     $db = getDB();
     $stats = [];
     $stats['listings'] = $db->query("SELECT COUNT(*) as c FROM listings WHERE status='active'")->fetch_assoc()['c'];
@@ -75,7 +83,8 @@ function getStats() {
     return $stats;
 }
 
-function placeholderImage($name = 'Place', $w = 600, $h = 400) {
+function placeholderImage($name = 'Place', $w = 600, $h = 400)
+{
     return "https://placehold.co/{$w}x{$h}/2d6a4f/ffffff?text=" . urlencode($name);
 }
 
@@ -86,9 +95,12 @@ function placeholderImage($name = 'Place', $w = 600, $h = 400) {
  *   uploads/listings/file.jpg      (alternative form)
  *   https://external.com/img.jpg   (external URL - left as-is)
  */
-function listingImage($img, $name = 'Place', $w = 600, $h = 400) {
-    if (!$img) return placeholderImage($name, $w, $h);
-    if (strpos($img, 'http://') === 0 || strpos($img, 'https://') === 0) return $img;
+function listingImage($img, $name = 'Place', $w = 600, $h = 400)
+{
+    if (!$img)
+        return placeholderImage($name, $w, $h);
+    if (strpos($img, 'http://') === 0 || strpos($img, 'https://') === 0)
+        return $img;
     // Strip leading ../ so we always get a clean root-relative path
     $clean = preg_replace('#^(\.\./)+#', '', $img);
     $clean = ltrim($clean, '/');

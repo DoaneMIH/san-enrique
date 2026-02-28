@@ -3,9 +3,10 @@ define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'san_enrique_tourism');
-define('GOOGLE_MAPS_API_KEY', 'YOUR OWN API');
+define('GOOGLE_MAPS_API_KEY', 'Your Public Key');
 
-function getDB() {
+function getDB()
+{
     static $conn = null;
     if ($conn === null) {
         $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
@@ -17,7 +18,8 @@ function getDB() {
     return $conn;
 }
 
-function sanitize($data) {
+function sanitize($data)
+{
     $db = getDB();
     return $db->real_escape_string(htmlspecialchars(trim($data)));
 }
