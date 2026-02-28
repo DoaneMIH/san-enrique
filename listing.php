@@ -121,6 +121,67 @@ $categories = getCategories();
           alt="<?= htmlspecialchars($listing['name']) ?>" class="listing-detail-img mb-4"
           onerror="this.src='https://placehold.co/1200x600/1b4332/ffffff?text=<?= urlencode($listing['name']) ?>'">
 
+        <!-- Gallery Photos -->
+        <?php
+          $galleryPhotos = json_decode($listing['gallery'] ?? '[]', true) ?: [];
+          if (!empty($galleryPhotos)):
+        ?>
+        <div class="listing-info-box mb-4">
+          <h3 style="font-size:1.1rem;color:var(--primary);margin-bottom:1rem;">
+            <i class="fas fa-images me-2" style="color:var(--accent);"></i> Photo Gallery
+          </h3>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;">
+            <?php foreach ($galleryPhotos as $i => $gPhoto): ?>
+            <div style="border-radius:10px;overflow:hidden;aspect-ratio:4/3;cursor:pointer;"
+                 onclick="openLightbox(<?= $i ?>)">
+              <img src="<?= htmlspecialchars(listingImage($gPhoto, $listing['name'], 400, 300)) ?>"
+                   alt="<?= htmlspecialchars($listing['name']) ?> photo <?= $i+1 ?>"
+                   style="width:100%;height:100%;object-fit:cover;transition:transform .3s;"
+                   onmouseover="this.style.transform='scale(1.05)'"
+                   onmouseout="this.style.transform='scale(1)'"
+                   onerror="this.src='https://placehold.co/400x300/1b4332/ffffff?text=Photo'">
+            </div>
+            <?php endforeach; ?>
+          </div>
+        </div>
+
+        <!-- Lightbox -->
+        <div id="galleryLightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column;">
+          <button onclick="closeLightbox()" style="position:absolute;top:18px;right:22px;background:none;border:none;color:white;font-size:1.8rem;cursor:pointer;line-height:1;">&#10005;</button>
+          <button onclick="prevPhoto()" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);border:none;color:white;font-size:1.6rem;width:44px;height:44px;border-radius:50%;cursor:pointer;">&#8249;</button>
+          <img id="lightboxImg" src="" alt="" style="max-width:90vw;max-height:82vh;object-fit:contain;border-radius:8px;">
+          <div id="lightboxCaption" style="color:rgba(255,255,255,.6);font-size:0.82rem;margin-top:10px;"></div>
+          <button onclick="nextPhoto()" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);border:none;color:white;font-size:1.6rem;width:44px;height:44px;border-radius:50%;cursor:pointer;">&#8250;</button>
+        </div>
+        <script>
+          var galleryPhotos = <?= json_encode(array_map(fn($p) => listingImage($p, $listing['name'], 1200, 800), $galleryPhotos)) ?>;
+          var lightboxIdx = 0;
+          function openLightbox(i) {
+            lightboxIdx = i;
+            showLightboxPhoto();
+            document.getElementById('galleryLightbox').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+          }
+          function closeLightbox() {
+            document.getElementById('galleryLightbox').style.display = 'none';
+            document.body.style.overflow = '';
+          }
+          function showLightboxPhoto() {
+            document.getElementById('lightboxImg').src = galleryPhotos[lightboxIdx];
+            document.getElementById('lightboxCaption').textContent = (lightboxIdx + 1) + ' / ' + galleryPhotos.length;
+          }
+          function prevPhoto() { lightboxIdx = (lightboxIdx - 1 + galleryPhotos.length) % galleryPhotos.length; showLightboxPhoto(); }
+          function nextPhoto() { lightboxIdx = (lightboxIdx + 1) % galleryPhotos.length; showLightboxPhoto(); }
+          document.addEventListener('keydown', function(e) {
+            if (document.getElementById('galleryLightbox').style.display === 'flex') {
+              if (e.key === 'ArrowLeft') prevPhoto();
+              if (e.key === 'ArrowRight') nextPhoto();
+              if (e.key === 'Escape') closeLightbox();
+            }
+          });
+        </script>
+        <?php endif; ?>
+
         <!-- Description -->
         <div class="listing-info-box mb-4">
           <h3 style="font-size:1.3rem;color:var(--primary);margin-bottom:1rem;">About this Place</h3>

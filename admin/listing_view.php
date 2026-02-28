@@ -405,6 +405,45 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
             <?php endif; ?>
           </div>
 
+          <!-- Gallery -->
+          <?php
+            $galleryPhotos = json_decode($listing['gallery'] ?? '[]', true) ?: [];
+          ?>
+          <?php if (!empty($galleryPhotos)): ?>
+          <div class="lv-card">
+            <div class="lv-card-title" style="justify-content:space-between;">
+              <span><i class="fas fa-images" style="color:var(--accent);"></i> Photo Gallery</span>
+              <span style="font-size:0.78rem;color:var(--text-muted);font-weight:500;"><?= count($galleryPhotos) ?> photo<?= count($galleryPhotos) !== 1 ? 's' : '' ?></span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;">
+              <?php foreach ($galleryPhotos as $gi => $gPhoto):
+                $gClean = preg_replace('#^(\.\./)+#', '', $gPhoto);
+                $gUrl   = BASE_URL . '/' . ltrim($gClean, '/');
+              ?>
+              <div style="position:relative;border-radius:8px;overflow:hidden;aspect-ratio:4/3;border:1px solid var(--border);">
+                <img src="<?= htmlspecialchars($gUrl) ?>"
+                     style="width:100%;height:100%;object-fit:cover;display:block;"
+                     onerror="this.src='https://placehold.co/130x98/1b4332/fff?text=IMG'">
+                <form method="POST" action="gallery_delete.php" style="position:absolute;top:4px;right:4px;"
+                      onsubmit="return confirm('Remove this photo from the gallery?');">
+                  <input type="hidden" name="listing_id" value="<?= $listing['id'] ?>">
+                  <input type="hidden" name="photo_path" value="<?= htmlspecialchars($gPhoto, ENT_QUOTES) ?>">
+                  <button type="submit"
+                    style="background:rgba(220,38,38,.85);color:white;border:none;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:0.65rem;display:flex;align-items:center;justify-content:center;"
+                    title="Remove photo">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </form>
+              </div>
+              <?php endforeach; ?>
+            </div>
+            <div style="margin-top:0.75rem;font-size:0.78rem;color:var(--text-muted);">
+              <i class="fas fa-info-circle me-1"></i>
+              To add more photos or remove all, use <a href="listings.php?action=edit&id=<?= $listing['id'] ?>" style="color:var(--accent);">Edit Listing</a>.
+            </div>
+          </div>
+          <?php endif; ?>
+
           <!-- Amenities -->
           <?php if ($listing['amenities']): ?>
             <div class="lv-card">

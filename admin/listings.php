@@ -56,6 +56,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   }
 
+  // ── Gallery upload (multiple photos) ────────────────────────────────────
+  $galleryPaths = json_decode($editListing['gallery'] ?? '[]', true) ?: [];
+  // Remove any photos the admin deleted via the hidden remove inputs
+  $toRemove = $_POST['remove_gallery'] ?? [];
+  foreach ($toRemove as $removePath) {
+    $removePath = sanitize($removePath);
+    if (strpos($removePath, '../uploads/listings/') === 0 && file_exists($removePath)) {
+      unlink($removePath);
+    }
+    $galleryPaths = array_filter($galleryPaths, fn($p) => $p !== $removePath);
+  }
+  $galleryPaths = array_values($galleryPaths);
+  // Save newly uploaded gallery files
+  if (!empty($_FILES['gallery_upload']['name'][0])) {
+    $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+    foreach ($_FILES['gallery_upload']['tmp_name'] as $k => $tmp) {
+      if ($_FILES['gallery_upload']['error'][$k] !== UPLOAD_ERR_OK) continue;
+      $origName = $_FILES['gallery_upload']['name'][$k];
+      $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+      if (!in_array($ext, $allowed)) continue;
+      if ($_FILES['gallery_upload']['size'][$k] > 5 * 1024 * 1024) continue;
+      $newName  = 'gallery_' . time() . '_' . mt_rand(1000, 9999) . '_' . $k . '.' . $ext;
+      $destPath = $uploadDir . $newName;
+      if (move_uploaded_file($tmp, $destPath)) {
+        $galleryPaths[] = '../uploads/listings/' . $newName;
+      }
+    }
+  }
+  $galleryJson = $db->real_escape_string(json_encode(array_values($galleryPaths)));
+  // ─────────────────────────────────────────────────────────────────────────
+
   // Auto-generate slug
   $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $name));
   $slug = trim($slug, '-');
@@ -68,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $slug = "$baseSlug-$i";
       $i++;
     }
-    $sql = "INSERT INTO listings (category_id, name, slug, description, address, barangay, contact, email, website, latitude, longitude, featured_image, operating_hours, entrance_fee, amenities, status, is_featured) VALUES ($category_id, '$name', '$slug', '$description', '$address', '$barangay', '$contact', '$email', '$website', $lat, $lng, '$img', '$hours', '$fee', '$amenities', '$status', $featured)";
+    $sql = "INSERT INTO listings (category_id, name, slug, description, address, barangay, contact, email, website, latitude, longitude, featured_image, gallery, operating_hours, entrance_fee, amenities, status, is_featured) VALUES ($category_id, '$name', '$slug', '$description', '$address', '$barangay', '$contact', '$email', '$website', $lat, $lng, '$img', '$galleryJson', '$hours', '$fee', '$amenities', '$status', $featured)";
     if ($db->query($sql)) {
       $message = 'Listing added successfully!';
       $action = 'list';
@@ -84,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $slug = "$baseSlug-$i";
       $i++;
     }
-    $sql = "UPDATE listings SET category_id=$category_id, name='$name', slug='$slug', description='$description', address='$address', barangay='$barangay', contact='$contact', email='$email', website='$website', latitude=$lat, longitude=$lng, featured_image='$img', operating_hours='$hours', entrance_fee='$fee', amenities='$amenities', status='$status', is_featured=$featured WHERE id=$editId";
+    $sql = "UPDATE listings SET category_id=$category_id, name='$name', slug='$slug', description='$description', address='$address', barangay='$barangay', contact='$contact', email='$email', website='$website', latitude=$lat, longitude=$lng, featured_image='$img', gallery='$galleryJson', operating_hours='$hours', entrance_fee='$fee', amenities='$amenities', status='$status', is_featured=$featured WHERE id=$editId";
     if ($db->query($sql)) {
       $message = 'Listing updated successfully!';
       $action = 'list';
@@ -419,6 +450,55 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
                   </div>
                 </div>
 
+                <!-- Gallery Photos Upload -->
+                <div class="col-12">
+                  <label class="admin-label">
+                    <i class="fas fa-images me-1" style="color:var(--accent);"></i> Gallery Photos
+                    <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);margin-left:6px;">(up to 10 additional photos)</span>
+                  </label>
+                  <?php
+                    $existingGallery = json_decode($editListing['gallery'] ?? '[]', true) ?: [];
+                  ?>
+                  <!-- Existing gallery thumbnails with remove buttons -->
+                  <?php if (!empty($existingGallery)): ?>
+                  <div id="existingGalleryWrap" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+                    <?php foreach ($existingGallery as $gImg): ?>
+                    <?php
+                      $gClean = preg_replace('#^(\.\./)+#', '', $gImg);
+                      $gUrl   = BASE_URL . '/' . ltrim($gClean, '/');
+                    ?>
+                    <div class="gallery-thumb-wrap" style="position:relative;width:100px;height:80px;border-radius:8px;overflow:hidden;border:2px solid var(--border);">
+                      <img src="<?= htmlspecialchars($gUrl) ?>" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='https://placehold.co/100x80/1b4332/fff?text=IMG'">
+                      <button type="button" onclick="removeGalleryPhoto(this, '<?= htmlspecialchars($gImg, ENT_QUOTES) ?>')"
+                        style="position:absolute;top:3px;right:3px;background:rgba(220,38,38,.85);color:white;border:none;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:0.7rem;display:flex;align-items:center;justify-content:center;" title="Remove">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    <?php endforeach; ?>
+                  </div>
+                  <div id="removedGalleryInputs"></div>
+                  <?php endif; ?>
+                  <!-- New gallery file picker -->
+                  <div id="galleryUploadZone"
+                    style="border:2px dashed var(--border);border-radius:12px;padding:1.5rem 1rem;text-align:center;cursor:pointer;background:var(--content-bg);position:relative;transition:all .2s;"
+                    onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--accent-pale)'"
+                    onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--content-bg)'">
+                    <input type="file" name="gallery_upload[]" id="galleryInput" multiple
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;"
+                      onchange="handleGallerySelect(this)">
+                    <i class="fas fa-images" style="font-size:2rem;color:var(--gray-300);display:block;margin-bottom:.5rem;"></i>
+                    <div style="font-size:.87rem;color:var(--text-muted);font-weight:700;">Click to select multiple photos</div>
+                    <div style="font-size:.75rem;color:var(--gray-400);margin-top:3px;">JPG, PNG, WEBP or GIF &mdash; max 5 MB each</div>
+                  </div>
+                  <!-- Preview area for newly picked gallery files -->
+                  <div id="galleryPreviewRow" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;"></div>
+                  <div style="margin-top:.5rem;font-size:.78rem;color:var(--text-muted);">
+                    <i class="fas fa-info-circle me-1"></i>
+                    These photos appear as a gallery on the public listing page.
+                  </div>
+                </div>
+
                 <!-- GPS Coordinates -->
                 <div class="col-12">
                   <label class="admin-label"><i class="fas fa-map-pin me-1" style="color:var(--accent);"></i> GPS
@@ -571,6 +651,41 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
         initAdminMapPicker(lat, lng);
       }
     <?php endif; ?>
+
+    // ── Gallery helpers ─────────────────────────────────────────────────────
+    function handleGallerySelect(input) {
+      const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      const preview = document.getElementById('galleryPreviewRow');
+      Array.from(input.files).forEach(file => {
+        if (!allowed.includes(file.type)) return;
+        if (file.size > 5 * 1024 * 1024) {
+          Swal.fire({ icon: 'error', title: 'Too Large', text: file.name + ' exceeds 5 MB.', confirmButtonColor: '#1b4332' });
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const wrap = document.createElement('div');
+          wrap.style.cssText = 'position:relative;width:100px;height:80px;border-radius:8px;overflow:hidden;border:2px solid var(--accent);';
+          wrap.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;">'
+            + '<span style="position:absolute;bottom:2px;left:0;right:0;text-align:center;font-size:0.6rem;color:white;background:rgba(0,0,0,.5);padding:1px 2px;">New</span>';
+          preview.appendChild(wrap);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    function removeGalleryPhoto(btn, path) {
+      const wrap = btn.closest('.gallery-thumb-wrap');
+      const container = document.getElementById('removedGalleryInputs') || document.createElement('div');
+      const inp = document.createElement('input');
+      inp.type = 'hidden';
+      inp.name = 'remove_gallery[]';
+      inp.value = path;
+      container.appendChild(inp);
+      if (!document.getElementById('removedGalleryInputs')) {
+        document.getElementById('existingGalleryWrap').after(container);
+      }
+      wrap.remove();
+    }
   </script>
 
 
