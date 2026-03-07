@@ -38,20 +38,643 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Custom CSS -->
   <link rel="stylesheet" href="assets/css/style.css">
+
+  <!-- ═══════════ UX ENHANCEMENT CSS ═══════════ -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ── Root overrides ────────────────────────── */
+    :root {
+      --glass-bg: rgba(255,255,255,0.12);
+      --glass-border: rgba(255,255,255,0.25);
+      --glass-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      --glass-blur: blur(14px);
+      --green-deep: #0d2b1e;
+      --green-mid: #1b4332;
+      --green-light: #40916c;
+      --gold: #d4a017;
+      --gold-light: #f0c040;
+      /* --off-white: #f8faf8b2; */
+    }
+
+    /* ── HERO: full-screen nature parallax ─────── */
+    .hero-section {
+      min-height: 100vh !important;
+      background:
+        linear-gradient(160deg, rgba(13,43,30,0.82) 0%, rgba(27,67,50,0.65) 50%, rgba(64,145,108,0.45) 100%),
+        url('https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=80') center/cover no-repeat fixed !important;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: 80px 0 80px !important;
+    }
+    .hero-section::before {
+      content:'';
+      position:absolute;inset:0;
+      background: radial-gradient(ellipse at 70% 50%, rgba(64,145,108,0.18) 0%, transparent 65%);
+      z-index:1;pointer-events:none;
+    }
+    .hero-section::after {
+      content:'';
+      position:absolute;bottom:0;left:0;right:0;height:120px;
+      background:linear-gradient(to bottom,transparent,var(--off-white,#f8faf8));
+      z-index:1;pointer-events:none;
+    }
+    .hero-bg-pattern,.hero-particles,.hero-floating-shapes,.float-shape {
+      display:none !important;
+    }
+
+    /* ── Animated headline ─────────────────────── */
+    .hero-title {
+      font-family:'Cormorant Garamond',serif !important;
+      font-size: clamp(2.6rem,6vw,4.8rem) !important;
+      font-weight: 700 !important;
+      color: #fff !important;
+      line-height: 1.1 !important;
+      letter-spacing: -0.01em;
+      animation: heroFadeUp 1s cubic-bezier(.2,0,.2,1) both;
+    }
+    .hero-title .highlight {
+      background: linear-gradient(90deg,#f0c040,#52b788);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-clip:text;
+      position:relative;
+    }
+    .hero-subtitle {
+      color: rgba(255,255,255,0.82) !important;
+      font-family:'Outfit',sans-serif;
+      font-size:1.08rem !important;
+      animation: heroFadeUp 1s .2s cubic-bezier(.2,0,.2,1) both;
+    }
+    .hero-badge {
+      animation: heroFadeUp 1s .05s cubic-bezier(.2,0,.2,1) both;
+      background: var(--glass-bg) !important;
+      backdrop-filter: var(--glass-blur) !important;
+      border: 1px solid var(--glass-border) !important;
+      color: #fff !important;
+    }
+    .hero-actions {
+      animation: heroFadeUp 1s .35s cubic-bezier(.2,0,.2,1) both;
+    }
+    .hero-stats {
+      animation: heroFadeUp 1s .5s cubic-bezier(.2,0,.2,1) both;
+    }
+
+    /* ── Floating particles ─────────────────────── */
+    .hero-section .particles-canvas {
+      position:absolute;inset:0;z-index:1;pointer-events:none;
+    }
+
+    /* ── Map preview glass card ─────────────────── */
+    .hero-map-preview {
+      animation: heroFadeUp 1s .25s cubic-bezier(.2,0,.2,1) both;
+    }
+    .hero-map-preview iframe {
+      border-radius: 20px !important;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1) !important;
+    }
+
+    @keyframes heroFadeUp {
+      from { opacity:0; transform:translateY(32px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ── SEARCH BAR glass ───────────────────────── */
+    .search-hero-bar {
+      background: #fff !important;
+      backdrop-filter: none !important;
+      border: none !important;
+      border-radius: 16px !important;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18) !important;
+    }
+    .search-hero-bar input { color: var(--text, #1a2e1a) !important; }
+    .search-hero-bar input::placeholder { color: #9aab9a !important; }
+
+    /* ── CATEGORY CARDS: glassmorphism ──────────── */
+    .category-card {
+      background: rgba(255,255,255,0.75) !important;
+      backdrop-filter: blur(12px) !important;
+      border: 1px solid rgba(255,255,255,0.6) !important;
+      border-radius: 22px !important;
+      box-shadow: 0 4px 20px rgba(27,67,50,0.08), 0 1px 4px rgba(0,0,0,0.04) !important;
+      transition: transform .35s cubic-bezier(.2,0,.2,1), box-shadow .35s cubic-bezier(.2,0,.2,1), background .35s !important;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+    }
+    .category-card::before {
+      content:'';
+      position:absolute;inset:0;
+      background: linear-gradient(135deg, rgba(82,183,136,0.08) 0%, transparent 60%);
+      opacity:0;transition:opacity .35s;border-radius:22px;
+    }
+    .category-card:hover {
+      transform: translateY(-10px) scale(1.03) !important;
+      box-shadow: 0 20px 60px rgba(27,67,50,0.18), 0 4px 12px rgba(0,0,0,0.08) !important;
+      background: rgba(255,255,255,0.95) !important;
+    }
+    .category-card:hover::before { opacity:1; }
+    .cat-icon {
+      width: 68px !important; height: 68px !important;
+      border-radius: 18px !important;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      transition: transform .35s cubic-bezier(.2,0,.2,1);
+    }
+    .category-card:hover .cat-icon { transform: scale(1.12) rotate(-4deg); }
+    .cat-name {
+      font-family:'Outfit',sans-serif !important;
+      font-weight:600 !important;
+      font-size:0.88rem !important;
+      color: var(--green-mid) !important;
+    }
+    .cat-count {
+      font-size:0.75rem !important;
+      color: var(--green-light) !important;
+      font-weight:600 !important;
+    }
+
+    /* ── FEATURED LISTING CARDS: glassmorphism ─── */
+    .listing-card {
+      border-radius: 20px !important;
+      overflow: hidden;
+      background: rgba(255,255,255,0.82) !important;
+      backdrop-filter: blur(10px) !important;
+      border: 1px solid rgba(255,255,255,0.55) !important;
+      box-shadow: 0 4px 24px rgba(27,67,50,0.1), 0 1px 3px rgba(0,0,0,0.05) !important;
+      transition: transform .4s cubic-bezier(.2,0,.2,1), box-shadow .4s !important;
+    }
+    .listing-card:hover {
+      transform: translateY(-12px) !important;
+      box-shadow: 0 28px 70px rgba(27,67,50,0.2), 0 6px 16px rgba(0,0,0,0.1) !important;
+    }
+    .listing-card-img {
+      position:relative;overflow:hidden;height:220px;
+    }
+    .listing-card-img img {
+      width:100%;height:100%;object-fit:cover;
+      transition: transform .6s cubic-bezier(.2,0,.2,1) !important;
+    }
+    .listing-card:hover .listing-card-img img {
+      transform: scale(1.08) !important;
+    }
+    .listing-card-img::after {
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(to top, rgba(13,43,30,0.55) 0%, transparent 50%);
+      pointer-events:none;
+    }
+    .listing-card-body {
+      background: transparent !important;
+    }
+    .listing-card-title {
+      font-family:'Cormorant Garamond',serif !important;
+      font-size:1.22rem !important;
+      font-weight:700 !important;
+      color: var(--green-mid) !important;
+    }
+    .btn-card {
+      background: linear-gradient(135deg, var(--green-mid), var(--green-light)) !important;
+      color:#fff !important;
+      border-radius:10px !important;
+      font-weight:600 !important;
+      transition:opacity .2s, transform .2s !important;
+      display:inline-flex;align-items:center;gap:6px;
+    }
+    .btn-card:hover { opacity:.88; transform:translateX(3px); }
+
+    /* ── EVENT CARDS ────────────────────────────── */
+    .event-card {
+      background: rgba(255,255,255,0.8) !important;
+      backdrop-filter: blur(12px) !important;
+      border: 1px solid rgba(255,255,255,0.55) !important;
+      border-radius: 20px !important;
+      box-shadow: 0 4px 20px rgba(27,67,50,0.09) !important;
+      transition: transform .35s, box-shadow .35s !important;
+    }
+    .event-card:hover {
+      transform: translateY(-8px) !important;
+      box-shadow: 0 20px 50px rgba(27,67,50,0.16) !important;
+    }
+
+    /* ── STATS SECTION: glass tiles ─────────────── */
+    .stats-section {
+      background:
+        linear-gradient(135deg, rgba(13,43,30,0.92) 0%, rgba(27,67,50,0.88) 100%),
+        url('https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=1200&q=70') center/cover no-repeat !important;
+    }
+    .stat-card {
+      background: var(--glass-bg) !important;
+      backdrop-filter: var(--glass-blur) !important;
+      border: 1px solid var(--glass-border) !important;
+      box-shadow: var(--glass-shadow) !important;
+      border-radius:0 !important;
+      transition: background .3s !important;
+    }
+    .stat-card:hover { background: rgba(255,255,255,0.2) !important; }
+    .stat-icon { color: var(--gold-light) !important; }
+    .stat-number { color: #fff !important; }
+    .stat-title { color: rgba(255,255,255,0.75) !important; }
+
+    /* ── NAVBAR: glassmorphism on scroll ─────────── */
+    .navbar-main {
+      background: rgba(13,43,30,0.55) !important;
+      backdrop-filter: blur(20px) !important;
+      border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+      transition: background .4s, box-shadow .4s !important;
+    }
+    .navbar-main.scrolled {
+      background: rgba(13,43,30,0.92) !important;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.25) !important;
+    }
+    .brand-name, .brand-sub { color:#fff !important; }
+    .nav-link-main { color:rgba(255,255,255,0.85) !important; }
+    .nav-link-main:hover, .nav-link-main.active { color:#fff !important; }
+
+    /* ── ABOUT SECTION image wrap ───────────────── */
+    .about-img-wrap img {
+      border-radius:24px !important;
+      box-shadow:0 20px 60px rgba(0,0,0,0.2) !important;
+      transition:transform .5s !important;
+    }
+    .about-img-wrap:hover img { transform:scale(1.02) rotate(0.5deg); }
+    .about-highlight {
+      background: rgba(255,255,255,0.88) !important;
+      backdrop-filter: blur(12px) !important;
+      border: 1px solid rgba(255,255,255,0.6) !important;
+      border-radius: 16px !important;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12) !important;
+    }
+
+    /* ── CONTACT FORM glass ──────────────────────── */
+    .contact-form-wrap {
+      background: rgba(255,255,255,0.85) !important;
+      backdrop-filter: blur(16px) !important;
+      border: 1px solid rgba(255,255,255,0.6) !important;
+      border-radius:24px !important;
+      box-shadow: 0 8px 40px rgba(27,67,50,0.12) !important;
+    }
+    .contact-info-card {
+      background: linear-gradient(160deg, rgba(13,43,30,0.9), rgba(27,67,50,0.85)) !important;
+      backdrop-filter:blur(12px) !important;
+      border: 1px solid rgba(255,255,255,0.15) !important;
+      border-radius:24px !important;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18) !important;
+    }
+
+    /* ── Section backgrounds — nature photo parallax ── */
+
+    /* Categories: soft aerial rice-field overhead */
+    .categories-section {
+      background:
+        linear-gradient(180deg, rgba(240,247,242,0.92) 0%, rgba(220,240,228,0.88) 100%),
+        url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1400&q=75') center/cover no-repeat fixed !important;
+      position: relative;
+    }
+
+    /* Featured: tropical forest canopy, dark overlay so cards pop */
+    #featured {
+      background:
+        linear-gradient(160deg, rgba(10,30,18,0.78) 0%, rgba(22,55,38,0.72) 50%, rgba(40,90,60,0.68) 100%),
+        url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=1600&q=80') center/cover no-repeat fixed !important;
+    }
+    /* Section title & subtitle contrast fix for dark bg */
+    #featured .section-title { color: #fff !important; text-shadow: 0 2px 12px rgba(0,0,0,0.4); }
+    #featured .section-label { color: var(--gold-light, #f0c040) !important; }
+    #featured .section-subtitle { color: rgba(255,255,255,0.75) !important; }
+    #featured .btn-outline-main {
+      color:#fff !important; border-color:rgba(255,255,255,0.45) !important;
+    }
+    #featured .btn-outline-main:hover { background:rgba(255,255,255,0.12) !important; }
+
+    /* Events: golden hour beach / water */
+    .events-section {
+      background:
+        linear-gradient(160deg, rgba(10,25,18,0.80) 0%, rgba(18,48,32,0.75) 55%, rgba(35,75,50,0.70) 100%),
+        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80') center/cover no-repeat fixed !important;
+    }
+    .events-section .section-title { color:#fff !important; text-shadow:0 2px 12px rgba(0,0,0,0.35); }
+    .events-section .section-label { color: var(--gold-light, #f0c040) !important; }
+    .events-section .section-subtitle { color:rgba(255,255,255,0.72) !important; }
+
+    /* About: light — rice fields / pastoral */
+    .about-strip {
+      background:
+        linear-gradient(160deg, rgba(248,253,248,0.94) 0%, rgba(230,245,235,0.90) 100%),
+        url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1400&q=75') center/cover no-repeat fixed !important;
+    }
+
+    /* Contact: deep dusk forest */
+    .contact-section {
+      background:
+        linear-gradient(160deg, rgba(8,22,14,0.85) 0%, rgba(18,48,32,0.80) 55%, rgba(30,65,45,0.78) 100%),
+        url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=1400&q=75') center 30%/cover no-repeat fixed !important;
+    }
+    .contact-section .section-title { color:#fff !important; text-shadow:0 2px 12px rgba(0,0,0,0.4); }
+    .contact-section .section-label { color: var(--gold-light, #f0c040) !important; }
+    .contact-section .section-subtitle { color:rgba(255,255,255,0.72) !important; }
+
+    .section-floating-shapes { display:none !important; }
+
+    /* ── Divider fades between sections ─────────────── */
+    #featured::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:80px;
+      background: linear-gradient(to bottom, var(--off-white,transparent), transparent);
+      z-index:1; pointer-events:none;
+    }
+    #featured::after {
+      content:''; position:absolute; bottom:0; left:0; right:0; height:80px;
+      background: linear-gradient(to top, var(--off-white,#f8faf8), transparent);
+      z-index:1; pointer-events:none;
+    }
+    #featured .container { position:relative; z-index:2; }
+
+    .events-section::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:80px;
+      background: linear-gradient(to bottom, var(--off-white,#f8faf8), transparent);
+      z-index:1; pointer-events:none;
+    }
+    .events-section::after {
+      content:''; position:absolute; bottom:0; left:0; right:0; height:80px;
+      background: linear-gradient(to top, var(--off-white,#f8faf8), transparent);
+      z-index:1; pointer-events:none;
+    }
+    .events-section .container { position:relative; z-index:2; }
+
+    .contact-section::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:80px;
+      background: linear-gradient(to bottom, var(--off-white,#f8faf8), transparent);
+      z-index:1; pointer-events:none;
+    }
+    .contact-section .container { position:relative; z-index:2; }
+
+    /* ── Map section background ─────────────────────── */
+    .map-section {
+      background:
+        linear-gradient(160deg, rgba(240,247,242,0.93) 0%, rgba(220,238,228,0.90) 100%),
+        url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1400&q=75') center/cover no-repeat fixed !important;
+      position: relative;
+    }
+    .map-section .container { position:relative; z-index:2; }
+
+    /* ══════════════════════════════════════════════
+       HERO SLIDESHOW — 3-D fan style (Agcararao-inspired)
+    ══════════════════════════════════════════════ */
+
+    .hero-slider-wrap {
+      perspective: 1200px;
+      position: relative;
+      height: 480px;
+      max-width: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: heroFadeUp 1s .25s cubic-bezier(.2,0,.2,1) both;
+    }
+
+    /* Stage holds all slides and drives the 3-D transform */
+    .hs-stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Each slide */
+    .hs-slide {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--bg) center/cover no-repeat;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: transform .65s cubic-bezier(.4,0,.2,1),
+                  opacity  .65s cubic-bezier(.4,0,.2,1),
+                  filter   .65s cubic-bezier(.4,0,.2,1),
+                  z-index    0s  .1s;
+      will-change: transform, opacity;
+      cursor: pointer;
+    }
+
+    /* Dark vignette on every slide */
+    .hs-slide::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg,
+        rgba(8,22,12,0.18) 0%,
+        rgba(8,22,12,0.52) 100%);
+      border-radius: var(--radius-lg);
+      pointer-events: none;
+    }
+
+    /* ── Positions: centre, left-1, right-1, left-2, right-2 ── */
+    /* Active (centre) */
+    .hs-slide[data-pos="0"] {
+      z-index: 5;
+      transform: translateX(0) scale(1) rotateY(0deg);
+      opacity: 1;
+      filter: none;
+      box-shadow: var(--shadow-xl), 0 0 0 2px rgba(255,255,255,0.12);
+    }
+    /* One left */
+    .hs-slide[data-pos="-1"] {
+      z-index: 4;
+      transform: translateX(-52%) scale(0.82) rotateY(14deg);
+      opacity: 0.72;
+      filter: brightness(0.7);
+    }
+    /* One right */
+    .hs-slide[data-pos="1"] {
+      z-index: 4;
+      transform: translateX(52%) scale(0.82) rotateY(-14deg);
+      opacity: 0.72;
+      filter: brightness(0.7);
+    }
+    /* Two left */
+    .hs-slide[data-pos="-2"] {
+      z-index: 3;
+      transform: translateX(-82%) scale(0.65) rotateY(22deg);
+      opacity: 0.38;
+      filter: brightness(0.5);
+    }
+    /* Two right */
+    .hs-slide[data-pos="2"] {
+      z-index: 3;
+      transform: translateX(82%) scale(0.65) rotateY(-22deg);
+      opacity: 0.38;
+      filter: brightness(0.5);
+    }
+    /* Hidden */
+    .hs-slide[data-pos="hidden"] {
+      z-index: 1;
+      opacity: 0;
+      transform: translateX(0) scale(0.5);
+      pointer-events: none;
+    }
+
+    /* ── Prev / Next buttons ── */
+    .hs-btn {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      z-index: 10;
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      color: #fff;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+      box-shadow: var(--glass-shadow);
+    }
+    .hs-btn:hover {
+      background: rgba(255,255,255,0.28);
+      transform: translateY(-50%) scale(1.1);
+    }
+    .hs-prev { left: 10px; }
+    .hs-next { right: 10px; }
+
+    /* ── Dot indicators ── */
+    .hs-dots {
+      position: absolute;
+      bottom: 14px; left: 50%; transform: translateX(-50%);
+      z-index: 10;
+      display: flex; gap: 7px; align-items: center;
+    }
+    .hs-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.45);
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      padding: 0;
+    }
+    .hs-dot.active {
+      background: #fff;
+      width: 22px;
+      border-radius: 4px;
+    }
+
+    /* ── Caption badge ── */
+    .hs-caption {
+      position: absolute;
+      top: 16px; left: 50%; transform: translateX(-50%);
+      z-index: 10;
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 5px 14px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    /* Responsive — flatten on small screens */
+    @media (max-width: 768px) {
+      .hero-slider-wrap { height: 320px; }
+      .hs-slide[data-pos="-1"],
+      .hs-slide[data-pos="1"]  { opacity: 0.55; transform: translateX(±48%) scale(0.78); }
+      .hs-slide[data-pos="-2"],
+      .hs-slide[data-pos="2"]  { opacity: 0; pointer-events:none; }
+    }
+
+    /* ── Scroll-reveal base ──────────────────────── */
+    .animate-on-scroll {
+      opacity:0;transform:translateY(28px);
+      transition:opacity .7s cubic-bezier(.2,0,.2,1),transform .7s cubic-bezier(.2,0,.2,1);
+    }
+    .animate-on-scroll.visible {
+      opacity:1;transform:none;
+    }
+    .animate-on-scroll.delay-1 { transition-delay:.1s; }
+    .animate-on-scroll.delay-2 { transition-delay:.2s; }
+    .animate-on-scroll.delay-3 { transition-delay:.3s; }
+    .animate-on-scroll.delay-4 { transition-delay:.4s; }
+
+    /* ── Scroll indicator pulse ──────────────────── */
+    .scroll-indicator {
+      animation: bounce 2s infinite !important;
+      color:rgba(255,255,255,.7) !important;
+    }
+    @keyframes bounce {
+      0%,100%{transform:translateX(-50%) translateY(0);}
+      50%{transform:translateX(-50%) translateY(8px);}
+    }
+  </style>
 </head>
 
 <body>
 
-  <!-- PAGE LOADER -->
-  <div id="pageLoader" class="page-loader">
-    <div class="brand-logo"
-      style="width:60px;height:60px;background:linear-gradient(135deg,#52b788,#d4a017);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:2rem;">
-      🌿</div>
-    <div class="loader-logo"><?= SITE_NAME ?></div>
-    <div class="loader-bar">
-      <div class="loader-bar-fill"></div>
+  <!-- ═══════════════════════════════════════════
+     PAGE LOADER
+═══════════════════════════════════════════ -->
+<div id="pageLoader" class="page-loader">
+
+  <!-- Stars -->
+  <div class="loader-stars" id="loaderStars"></div>
+
+  <!-- Floating clouds -->
+  <div class="loader-cloud c1"></div>
+  <div class="loader-cloud c2"></div>
+  <div class="loader-cloud c3"></div>
+
+  <!-- Rising sun glow -->
+  <div class="loader-sun"></div>
+
+  <!-- Mountain silhouettes -->
+  <div class="loader-mountains">
+    <svg class="mountain-svg" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Back mountains (lighter) -->
+      <path d="M0,320 L0,200 L120,120 L240,180 L360,80 L480,160 L560,60 L640,140 L720,40 L800,130 L900,70 L1000,160 L1100,50 L1200,140 L1320,90 L1440,160 L1440,320 Z"
+            fill="rgba(27,67,50,0.55)"/>
+      <!-- Mid mountains -->
+      <path d="M0,320 L0,240 L80,190 L180,250 L280,160 L400,220 L500,140 L600,210 L700,120 L820,200 L920,150 L1020,220 L1140,140 L1260,200 L1360,160 L1440,200 L1440,320 Z"
+            fill="rgba(13,43,30,0.75)"/>
+      <!-- Front hills -->
+      <path d="M0,320 L0,280 L100,250 L220,290 L340,240 L460,280 L560,250 L680,285 L780,248 L900,280 L1020,252 L1160,280 L1280,255 L1440,270 L1440,320 Z"
+            fill="rgba(8,22,12,0.92)"/>
+      <!-- Rice field terraces hint -->
+      <path d="M0,320 L0,305 L360,295 L720,300 L1080,295 L1440,305 L1440,320 Z"
+            fill="rgba(4,14,8,0.98)"/>
+    </svg>
+  </div>
+
+  <!-- Waves -->
+  <div class="loader-waves">
+    <div class="wave wave-1"></div>
+    <div class="wave wave-2"></div>
+    <div class="wave wave-3"></div>
+  </div>
+
+  <!-- Center content -->
+  <div class="loader-content">
+    <div class="loader-emblem">🌿</div>
+
+    <div class="loader-site-name">San <span>Enrique</span></div>
+    <div class="loader-tagline">Tourism Hub &nbsp;·&nbsp; Iloilo</div>
+
+    <div class="loader-divider"></div>
+    <div class="loader-welcome">Discover the hidden paradise awaiting you</div>
+
+    <div class="loader-progress-wrap">
+      <div class="loader-dots">
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+      </div>
+      <div class="loader-bar">
+        <div class="loader-bar-fill"></div>
+      </div>
+      <div class="loader-status">Loading experience&hellip;</div>
     </div>
   </div>
+
+</div>
+
 
   <!-- BACK TO TOP -->
   <button id="backToTop" class="back-to-top" aria-label="Back to top">
@@ -107,6 +730,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   <section id="home" class="hero-section">
     <div class="hero-bg-pattern"></div>
     <div class="hero-particles"></div>
+    <canvas class="particles-canvas" id="heroParticles"></canvas>
     
     <!-- Decorative floating shapes -->
     <div class="hero-floating-shapes">
@@ -115,9 +739,9 @@ foreach (['listings', 'categories', 'events'] as $_t) {
       <div class="float-shape float-shape-3"></div>
     </div>
 
-    <div class="container position-relative" style="z-index:2;padding-top:20px;">
-      <div class="row align-items-center g-5">
-        <div class="col-lg-6">
+    <div class="container-fluid position-relative px-lg-4" style="z-index:2;padding-top:20px;">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6 ps-lg-5">
           <div class="hero-content">
             <div class="hero-badge">
               <i class="fas fa-map-marker-alt"></i>
@@ -135,7 +759,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
 
             <!-- Search Bar -->
             <form id="heroSearchForm" class="search-hero-bar mb-4">
-              <i class="fas fa-search" style="color:#5a7564;padding:0 0.5rem;"></i>
+              <i class="fas fa-search" style="color:#5a7564;padding:0.8rem 0;"></i>
               <input type="text" id="heroSearch" placeholder="Search resorts, places, food..." autocomplete="off">
               <button type="submit"><i class="fas fa-arrow-right"></i> Explore</button>
             </form>
@@ -175,21 +799,35 @@ foreach (['listings', 'categories', 'events'] as $_t) {
         </div>
 
         <div class="col-lg-6">
-          <div class="hero-map-preview" style="position:relative;">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15702.12!2d122.8845!3d10.9178!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33afc56e00000001%3A0x1!2sSan%20Enrique%2C%20Iloilo!5e0!3m2!1sen!2sph!4v1700000000000!5m2!1sen!2sph"
-              width="100%" height="420" style="border:0;display:block;border-radius:var(--radius-lg);"
-              allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-              title="San Enrique, Iloilo Map">
-            </iframe>
-            <!-- Open Full Map button overlay -->
-            <a href="map.php" style="position:absolute;bottom:1.2rem;left:50%;transform:translateX(-50%);
-                    background:var(--primary);color:white;padding:10px 24px;border-radius:10px;
-                    font-weight:700;font-size:0.88rem;border:2px solid rgba(255,255,255,0.3);
-                    text-decoration:none;display:inline-flex;align-items:center;gap:6px;
-                    box-shadow:0 4px 16px rgba(26,58,110,0.4);white-space:nowrap;z-index:10;">
-              <i class="fas fa-map-marked-alt"></i> Open Full Interactive Map
-            </a>
+          <div class="hero-slider-wrap">
+
+            <!-- ═══ HERO SLIDESHOW ═══ -->
+            <div class="hs-stage" id="hsStage">
+
+              <!-- Slides — beautiful San Enrique-style nature photos -->
+              <div class="hs-slide" style="--bg:url('https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&q=80')"></div>
+              <div class="hs-slide" style="--bg:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80')"></div>
+              <div class="hs-slide" style="--bg:url('https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80')"></div>
+              <div class="hs-slide" style="--bg:url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80')"></div>
+              <div class="hs-slide" style="--bg:url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=80')"></div>
+
+              <!-- Prev / Next -->
+              <button class="hs-btn hs-prev" onclick="hsPrev()" aria-label="Previous">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button class="hs-btn hs-next" onclick="hsNext()" aria-label="Next">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+
+              <!-- Dot indicators -->
+              <div class="hs-dots" id="hsDots"></div>
+
+              <!-- Caption badge -->
+              <div class="hs-caption">
+                <i class="fas fa-map-marker-alt me-1"></i> San Enrique, Iloilo
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -235,8 +873,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   </section>
 
   <!-- FEATURED LISTINGS -->
-  <section id="featured" style="background:var(--gray-50);position:relative;overflow:hidden;">
-    <div class="section-floating-shapes">
+  <section id="featured" style="position:relative;overflow:hidden;">    <div class="section-floating-shapes">
       <div class="float-shape float-shape-1"></div>
       <div class="float-shape float-shape-2"></div>
       <div class="float-shape float-shape-3"></div>
@@ -673,6 +1310,52 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <!-- Loading Spinner -->
+  <script>
+  /* ── Generate stars ── */
+  const starsEl = document.getElementById('loaderStars');
+  for (let i = 0; i < 60; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.cssText = `
+      top:${Math.random()*65}%;
+      left:${Math.random()*100}%;
+      --d:${1.5+Math.random()*2.5}s;
+      --delay:${Math.random()*3}s;
+      --min-op:${0.1+Math.random()*0.3};
+      --max-op:${0.5+Math.random()*0.5};
+      width:${1+Math.random()*2}px;
+      height:${1+Math.random()*2}px;
+    `;
+    starsEl.appendChild(s);
+  }
+
+  /* ── Generate fireflies ── */
+  const loader = document.getElementById('pageLoader');
+  for (let i = 0; i < 12; i++) {
+    const f = document.createElement('div');
+    f.className = 'firefly';
+    const dx = (Math.random()-0.5)*80;
+    const dy = -(20+Math.random()*60);
+    f.style.cssText = `
+      left:${10+Math.random()*80}%;
+      top:${40+Math.random()*45}%;
+      --d:${3+Math.random()*4}s;
+      --delay:${Math.random()*5}s;
+      --dx:${dx}px;
+      --dy:${dy}px;
+    `;
+    loader.appendChild(f);
+  }
+
+  /* ── Dismiss on page load ── */
+  window.addEventListener('load', function () {
+    setTimeout(function () {
+      loader.classList.add('hidden');
+    }, 1100000);
+  });
+</script>
 
   <!-- Map Data -->
   <script>
@@ -690,6 +1373,151 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=<?= GOOGLE_MAPS_API_KEY ?>&callback=initMap&libraries=places">
     </script>
+
+  <!-- ═══════════ UX ENHANCEMENT JS ═══════════ -->
+  <script>
+  // ── Scroll-reveal ─────────────────────────────────────────────────────────
+  (function(){
+    var els = document.querySelectorAll('.animate-on-scroll');
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); }
+      });
+    },{threshold:0.12});
+    els.forEach(function(el){ io.observe(el); });
+  })();
+
+  // ── Navbar glass on scroll ────────────────────────────────────────────────
+  (function(){
+    var nav = document.querySelector('.navbar-main');
+    if(!nav) return;
+    window.addEventListener('scroll',function(){
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    });
+  })();
+
+  // ── Floating particles canvas ─────────────────────────────────────────────
+  (function(){
+    var c = document.getElementById('heroParticles');
+    if(!c) return;
+    var ctx = c.getContext('2d');
+    var W, H, particles = [];
+    function resize(){ W = c.width = window.innerWidth; H = c.height = c.parentElement.offsetHeight; }
+    resize();
+    window.addEventListener('resize', resize);
+    for(var i=0;i<55;i++){
+      particles.push({
+        x: Math.random()*1920, y: Math.random()*900,
+        r: Math.random()*2.2+0.4,
+        dx: (Math.random()-.5)*0.35, dy: -Math.random()*0.45-0.15,
+        o: Math.random()*0.5+0.15
+      });
+    }
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      particles.forEach(function(p){
+        ctx.beginPath();
+        ctx.arc(p.x%W, p.y, p.r, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(240,192,64,'+p.o+')';
+        ctx.fill();
+        p.x += p.dx; p.y += p.dy;
+        if(p.y < -4){ p.y = H+4; p.x = Math.random()*W; }
+      });
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  // ── Category card click → explore ─────────────────────────────────────────
+  document.querySelectorAll('.category-card').forEach(function(card){
+    card.addEventListener('click',function(){
+      var slug = card.getAttribute('data-slug');
+      if(slug) window.location.href = 'explore.php?category='+slug;
+    });
+  });
+  </script>
+  <script>
+  /* ════ HERO SLIDESHOW JS ════ */
+  (function () {
+    var slides, dots, total, cur = 0, timer;
+
+    var POSITIONS = [0, 1, 2, -2, -1]; // maps index offset → data-pos values cyclically
+
+    function posFor(offset) {
+      // offset: distance from active slide (-2,-1,0,1,2 → visible; rest hidden)
+      if (offset === 0)  return '0';
+      if (offset === 1)  return '1';
+      if (offset === -1) return '-1';
+      if (offset === 2)  return '2';
+      if (offset === -2) return '-2';
+      return 'hidden';
+    }
+
+    function render() {
+      slides.forEach(function (sl, i) {
+        var offset = i - cur;
+        // Wrap around
+        if (offset >  Math.floor(total / 2)) offset -= total;
+        if (offset < -Math.floor(total / 2)) offset += total;
+        sl.setAttribute('data-pos', posFor(offset));
+      });
+      dots.forEach(function (d, i) {
+        d.classList.toggle('active', i === cur);
+      });
+    }
+
+    function goTo(n) {
+      cur = (n + total) % total;
+      render();
+    }
+
+    window.hsPrev = function () { goTo(cur - 1); resetTimer(); };
+    window.hsNext = function () { goTo(cur + 1); resetTimer(); };
+
+    function resetTimer() {
+      clearInterval(timer);
+      timer = setInterval(function () { goTo(cur + 1); }, 4000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      slides = Array.from(document.querySelectorAll('.hs-slide'));
+      var dotsWrap = document.getElementById('hsDots');
+      total = slides.length;
+      if (!total) return;
+
+      // Build dots
+      dots = slides.map(function (_, i) {
+        var d = document.createElement('button');
+        d.className = 'hs-dot';
+        d.setAttribute('aria-label', 'Slide ' + (i + 1));
+        d.addEventListener('click', function () { goTo(i); resetTimer(); });
+        dotsWrap.appendChild(d);
+        return d;
+      });
+
+      // Click side slides to navigate
+      slides.forEach(function (sl, i) {
+        sl.addEventListener('click', function () {
+          var pos = sl.getAttribute('data-pos');
+          if (pos === '1' || pos === '2')  { goTo(cur + 1); resetTimer(); }
+          if (pos === '-1' || pos === '-2') { goTo(cur - 1); resetTimer(); }
+        });
+      });
+
+      // Touch / swipe
+      var startX = 0;
+      var stage = document.getElementById('hsStage');
+      stage.addEventListener('touchstart', function (e) { startX = e.touches[0].clientX; }, {passive:true});
+      stage.addEventListener('touchend', function (e) {
+        var dx = e.changedTouches[0].clientX - startX;
+        if (Math.abs(dx) > 40) { dx < 0 ? hsNext() : hsPrev(); }
+      }, {passive:true});
+
+      render();
+      resetTimer();
+    });
+  })();
+  </script>
 </body>
 
 </html>

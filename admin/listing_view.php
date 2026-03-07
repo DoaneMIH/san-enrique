@@ -444,6 +444,56 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
           </div>
           <?php endif; ?>
 
+          <!-- Video -->
+          <?php if (!empty($listing['video'])): ?>
+          <?php
+            $vid = $listing['video'];
+            $isUploadedVid = strpos($vid, '../uploads/') === 0;
+            $vidPublicUrl  = '';
+            if ($isUploadedVid) {
+              $vClean = preg_replace('#^(\.\./)+#', '', $vid);
+              $vidPublicUrl = BASE_URL . '/' . ltrim($vClean, '/');
+            }
+            // Detect YouTube or Vimeo for embed
+            $isYoutube = preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $vid, $ytm);
+            $isVimeo   = preg_match('/vimeo\.com\/(\d+)/', $vid, $vim);
+          ?>
+          <div class="lv-card">
+            <div class="lv-card-title">
+              <i class="fas fa-video" style="color:var(--accent);"></i> Listing Video
+            </div>
+            <?php if ($isYoutube): ?>
+              <div style="position:relative;padding-bottom:56.25%;border-radius:10px;overflow:hidden;background:#000;">
+                <iframe src="https://www.youtube.com/embed/<?= htmlspecialchars($ytm[1]) ?>"
+                  style="position:absolute;inset:0;width:100%;height:100%;border:none;"
+                  allowfullscreen loading="lazy"></iframe>
+              </div>
+            <?php elseif ($isVimeo): ?>
+              <div style="position:relative;padding-bottom:56.25%;border-radius:10px;overflow:hidden;background:#000;">
+                <iframe src="https://player.vimeo.com/video/<?= htmlspecialchars($vim[1]) ?>"
+                  style="position:absolute;inset:0;width:100%;height:100%;border:none;"
+                  allowfullscreen loading="lazy"></iframe>
+              </div>
+            <?php elseif ($isUploadedVid): ?>
+              <video src="<?= htmlspecialchars($vidPublicUrl) ?>" controls
+                style="width:100%;border-radius:10px;max-height:320px;background:#000;display:block;">
+                Your browser does not support the video tag.
+              </video>
+            <?php else: ?>
+              <div style="position:relative;padding-bottom:56.25%;border-radius:10px;overflow:hidden;background:#000;">
+                <iframe src="<?= htmlspecialchars($vid) ?>"
+                  style="position:absolute;inset:0;width:100%;height:100%;border:none;"
+                  allowfullscreen loading="lazy"></iframe>
+              </div>
+            <?php endif; ?>
+            <div style="margin-top:0.75rem;font-size:0.78rem;color:var(--text-muted);">
+              <i class="fas fa-info-circle me-1"></i>
+              To change or remove this video, use
+              <a href="listings.php?action=edit&id=<?= $listing['id'] ?>" style="color:var(--accent);">Edit Listing</a>.
+            </div>
+          </div>
+          <?php endif; ?>
+
           <!-- Amenities -->
           <?php if ($listing['amenities']): ?>
             <div class="lv-card">

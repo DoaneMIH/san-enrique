@@ -26,6 +26,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $amenities = sanitize($_POST['amenities'] ?? '');
   $status = sanitize($_POST['status'] ?? 'active');
   $featured = isset($_POST['is_featured']) ? 1 : 0;
+
+  // ── Video: uploaded file > URL input > keep existing value ───────────────
+  $video = sanitize($_POST['video_url'] ?? '');
+  if (empty($video)) $video = sanitize($_POST['old_video'] ?? '');
+  $videoUploadDir = '../uploads/listings/videos/';
+  if (!is_dir($videoUploadDir)) mkdir($videoUploadDir, 0755, true);
+  if (!empty($_FILES['video_upload']['name'])) {
+    $vFile  = $_FILES['video_upload'];
+    $vExt   = strtolower(pathinfo($vFile['name'], PATHINFO_EXTENSION));
+    $vAllow = ['mp4','webm','ogg','mov'];
+    if (!in_array($vExt, $vAllow)) {
+      $error = 'Invalid video type. Allowed: MP4, WEBM, OGG, MOV.';
+    } elseif ($vFile['size'] > 200 * 1024 * 1024) {
+      $error = 'Video too large. Max 200 MB.';
+    } elseif ($vFile['error'] !== UPLOAD_ERR_OK) {
+      $error = 'Video upload error (code ' . $vFile['error'] . ').';
+    } else {
+      $vName = 'video_' . time() . '_' . mt_rand(100,999) . '.' . $vExt;
+      if (move_uploaded_file($vFile['tmp_name'], $videoUploadDir . $vName)) {
+        $oldVid = sanitize($_POST['old_video'] ?? '');
+        if ($oldVid && strpos($oldVid, '../uploads/') === 0 && file_exists($oldVid)) unlink($oldVid);
+        $video = '../uploads/listings/videos/' . $vName;
+      } else {
+        $error = 'Failed to save video. Check uploads/listings/videos/ is writable.';
+      }
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────────
   // Keep existing image path from hidden field; override if new file uploaded
   $img = sanitize($_POST['featured_image'] ?? '');
   $uploadDir = '../uploads/listings/';
@@ -99,7 +127,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $slug = "$baseSlug-$i";
       $i++;
     }
-    $sql = "INSERT INTO listings (category_id, name, slug, description, address, barangay, contact, email, website, latitude, longitude, featured_image, gallery, operating_hours, entrance_fee, amenities, status, is_featured) VALUES ($category_id, '$name', '$slug', '$description', '$address', '$barangay', '$contact', '$email', '$website', $lat, $lng, '$img', '$galleryJson', '$hours', '$fee', '$amenities', '$status', $featured)";
+    $videoEsc = $db->real_escape_string($video);
+    $sql = "INSERT INTO listings (category_id, name, slug, description, address, barangay, contact, email, website, latitude, longitude, featured_image, gallery, video, operating_hours, entrance_fee, amenities, status, is_featured) VALUES ($category_id, '$name', '$slug', '$description', '$address', '$barangay', '$contact', '$email', '$website', $lat, $lng, '$img', '$galleryJson', '$videoEsc', '$hours', '$fee', '$amenities', '$status', $featured)";
     if ($db->query($sql)) {
       $message = 'Listing added successfully!';
       $action = 'list';
@@ -115,7 +144,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $slug = "$baseSlug-$i";
       $i++;
     }
-    $sql = "UPDATE listings SET category_id=$category_id, name='$name', slug='$slug', description='$description', address='$address', barangay='$barangay', contact='$contact', email='$email', website='$website', latitude=$lat, longitude=$lng, featured_image='$img', gallery='$galleryJson', operating_hours='$hours', entrance_fee='$fee', amenities='$amenities', status='$status', is_featured=$featured WHERE id=$editId";
+    $videoEsc = $db->real_escape_string($video);
+    $sql = "UPDATE listings SET category_id=$category_id, name='$name', slug='$slug', description='$description', address='$address', barangay='$barangay', contact='$contact', email='$email', website='$website', latitude=$lat, longitude=$lng, featured_image='$img', gallery='$galleryJson', video='$videoEsc', operating_hours='$hours', entrance_fee='$fee', amenities='$amenities', status='$status', is_featured=$featured WHERE id=$editId";
     if ($db->query($sql)) {
       $message = 'Listing updated successfully!';
       $action = 'list';
@@ -499,6 +529,76 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
                   </div>
                 </div>
 
+                <!-- Video Upload -->
+                <div class="col-12">
+                  <label class="admin-label">
+                    <i class="fas fa-video me-1" style="color:var(--accent);"></i> Listing Video
+                    <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);margin-left:6px;">(upload MP4/WEBM or paste YouTube/Vimeo URL &mdash; max 200 MB)</span>
+                  </label>
+
+                  <?php
+                    $existingVideo = $editListing['video'] ?? '';
+                    $isUploadedVideo = $existingVideo && strpos($existingVideo, '../uploads/') === 0;
+                    $isUrlVideo = $existingVideo && !$isUploadedVideo;
+                  ?>
+
+                  <?php if ($existingVideo): ?>
+                  <div id="existingVideoWrap" style="margin-bottom:12px;background:var(--gray-50);border-radius:12px;padding:1rem;border:1px solid var(--border);display:flex;align-items:center;gap:12px;">
+                    <i class="fas fa-video" style="font-size:1.6rem;color:var(--accent);flex-shrink:0;"></i>
+                    <div style="flex:1;min-width:0;">
+                      <div style="font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:2px;">
+                        <?= $isUploadedVideo ? 'Uploaded video file' : 'Video URL' ?>
+                      </div>
+                      <div style="font-size:0.75rem;color:var(--text-muted);word-break:break-all;">
+                        <?= htmlspecialchars($existingVideo) ?>
+                      </div>
+                    </div>
+                    <button type="button" onclick="clearExistingVideo()"
+                      style="background:rgba(220,38,38,.1);color:#dc2626;border:1px solid rgba(220,38,38,.25);border-radius:8px;padding:4px 10px;font-size:0.78rem;cursor:pointer;flex-shrink:0;">
+                      <i class="fas fa-times me-1"></i>Remove
+                    </button>
+                  </div>
+                  <input type="hidden" name="old_video" id="oldVideoInput" value="<?= htmlspecialchars($existingVideo, ENT_QUOTES) ?>">
+                  <?php endif; ?>
+
+                  <div style="display:flex;gap:6px;margin-bottom:10px;">
+                    <button type="button" id="tabUpload" onclick="switchVideoTab('upload')"
+                      style="padding:5px 14px;border-radius:8px;border:1.5px solid var(--accent);background:var(--accent);color:#fff;font-size:0.8rem;font-weight:700;cursor:pointer;">
+                      <i class="fas fa-upload me-1"></i>Upload File
+                    </button>
+                    <button type="button" id="tabUrl" onclick="switchVideoTab('url')"
+                      style="padding:5px 14px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--text-muted);font-size:0.8rem;font-weight:600;cursor:pointer;">
+                      <i class="fas fa-link me-1"></i>Paste URL
+                    </button>
+                  </div>
+
+                  <div id="videoUploadPane">
+                    <div id="videoUploadZone"
+                      style="border:2px dashed var(--border);border-radius:12px;padding:1.5rem 1rem;text-align:center;cursor:pointer;background:var(--content-bg);position:relative;transition:all .2s;"
+                      onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--accent-pale)'"
+                      onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--content-bg)'">
+                      <input type="file" name="video_upload" id="videoInput"
+                        accept="video/mp4,video/webm,video/ogg,video/quicktime"
+                        style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;"
+                        onchange="handleVideoSelect(this)">
+                      <i class="fas fa-film" style="font-size:2rem;color:var(--gray-300);display:block;margin-bottom:.5rem;"></i>
+                      <div style="font-size:.87rem;color:var(--text-muted);font-weight:700;">Click to select a video file</div>
+                      <div style="font-size:.75rem;color:var(--gray-400);margin-top:3px;">MP4, WEBM, OGG or MOV &mdash; max 200 MB</div>
+                    </div>
+                    <div id="videoPreview" style="display:none;margin-top:10px;"></div>
+                  </div>
+
+                  <div id="videoUrlPane" style="display:none;">
+                    <input type="text" name="video_url" id="videoUrlInput" class="admin-input"
+                      placeholder="https://www.youtube.com/watch?v=... or direct video URL"
+                      value="<?= htmlspecialchars($isUrlVideo ? $existingVideo : '', ENT_QUOTES) ?>">
+                    <div style="font-size:.75rem;color:var(--text-muted);margin-top:4px;">
+                      <i class="fas fa-info-circle me-1"></i>
+                      Supports YouTube, Vimeo, or direct MP4/WEBM URLs.
+                    </div>
+                  </div>
+                </div>
+
                 <!-- GPS Coordinates -->
                 <div class="col-12">
                   <label class="admin-label"><i class="fas fa-map-pin me-1" style="color:var(--accent);"></i> GPS
@@ -688,6 +788,67 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
     }
   </script>
 
+
+  <script>
+    // ── Video tab toggle ──────────────────────────────────────
+    function switchVideoTab(tab) {
+      var uploadPane = document.getElementById('videoUploadPane');
+      var urlPane    = document.getElementById('videoUrlPane');
+      var tabUpload  = document.getElementById('tabUpload');
+      var tabUrl     = document.getElementById('tabUrl');
+      if (!uploadPane) return;
+      if (tab === 'upload') {
+        uploadPane.style.display = '';
+        urlPane.style.display    = 'none';
+        tabUpload.style.background  = 'var(--accent)';
+        tabUpload.style.color       = '#fff';
+        tabUpload.style.borderColor = 'var(--accent)';
+        tabUrl.style.background     = 'transparent';
+        tabUrl.style.color          = 'var(--text-muted)';
+        tabUrl.style.borderColor    = 'var(--border)';
+        var ui = document.getElementById('videoUrlInput');
+        if (ui) ui.value = '';
+      } else {
+        uploadPane.style.display = 'none';
+        urlPane.style.display    = '';
+        tabUrl.style.background      = 'var(--accent)';
+        tabUrl.style.color           = '#fff';
+        tabUrl.style.borderColor     = 'var(--accent)';
+        tabUpload.style.background   = 'transparent';
+        tabUpload.style.color        = 'var(--text-muted)';
+        tabUpload.style.borderColor  = 'var(--border)';
+        var fi = document.getElementById('videoInput');
+        if (fi) fi.value = '';
+        document.getElementById('videoPreview').style.display = 'none';
+      }
+    }
+
+    function handleVideoSelect(input) {
+      var preview = document.getElementById('videoPreview');
+      if (!input.files || !input.files[0]) { preview.style.display='none'; return; }
+      var file = input.files[0];
+      var sizeMB = (file.size / 1024 / 1024).toFixed(1);
+      if (file.size > 200 * 1024 * 1024) {
+        alert('Video too large (' + sizeMB + ' MB). Max 200 MB.');
+        input.value = '';
+        preview.style.display = 'none';
+        return;
+      }
+      var url = URL.createObjectURL(file);
+      preview.innerHTML = '<video src="' + url + '" controls style="width:100%;border-radius:10px;max-height:220px;background:#000;"></video>'
+        + '<div style="font-size:0.78rem;color:var(--text-muted);margin-top:4px;">'
+        + '<i class="fas fa-check-circle me-1" style="color:var(--accent);"></i>'
+        + file.name + ' (' + sizeMB + ' MB) &mdash; ready to upload</div>';
+      preview.style.display = '';
+    }
+
+    function clearExistingVideo() {
+      var wrap = document.getElementById('existingVideoWrap');
+      var inp  = document.getElementById('oldVideoInput');
+      if (wrap) wrap.style.display = 'none';
+      if (inp)  inp.value = '';
+    }
+  </script>
 
   <?php if ($action === 'add' || $action === 'edit'): ?>
     <script src="https://maps.googleapis.com/maps/api/js?key=<?= GOOGLE_MAPS_API_KEY ?>&callback=initMap" defer></script>
