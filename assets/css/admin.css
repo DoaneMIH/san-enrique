@@ -694,7 +694,7 @@ body:has(.login-page) {
 .login-logo .logo-icon {
     width: 64px;
     height: 64px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    background: linear-gradient(135deg, var(--accent), var(--gold));
     border-radius: 18px;
     display: flex;
     align-items: center;
@@ -702,7 +702,7 @@ body:has(.login-page) {
     font-size: 1.8rem;
     color: white;
     margin: 0 auto 1rem;
-    box-shadow: 0 8px 24px rgba(26, 58, 110, 0.3);
+    box-shadow: 0 4px 12px rgba(82, 183, 136, 0.4);
 }
 
 .login-title {
