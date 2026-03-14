@@ -23,10 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Login - <?= SITE_NAME ?></title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Nunito:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet">
+  <title>Admin Sign In — <?= SITE_NAME ?></title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/admin.css">
@@ -34,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body>
   <div class="login-page">
+
     <!-- Left Side: Login Form -->
     <div class="login-left">
       <div class="login-card">
@@ -44,52 +43,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <?php if ($error): ?>
-          <div
-            style="background:#fee2e2;color:#dc2626;border-radius:10px;padding:12px 16px;font-size:0.87rem;font-weight:600;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px;">
+          <div class="admin-alert error">
             <i class="fas fa-exclamation-circle"></i> <?= htmlspecialchars($error) ?>
           </div>
         <?php endif; ?>
 
         <form method="POST" action="">
-          <div style="margin-bottom:1.1rem;">
+          <!-- Username -->
+          <div class="login-field">
             <label class="admin-label">Username or Email</label>
-            <div style="position:relative;">
-              <i class="fas fa-user"
-                style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.85rem;"></i>
-              <input type="text" name="username" class="admin-input" style="padding-left:36px;" placeholder="admin"
-                required autofocus>
+            <div class="input-group-icon">
+              <i class="fas fa-user icon"></i>
+              <input type="text" name="username" class="admin-input" placeholder="admin" required autofocus>
             </div>
           </div>
 
-          <div style="margin-bottom:1.5rem;">
+          <!-- Password -->
+          <div class="login-field-pw">
             <label class="admin-label">Password</label>
-            <div style="position:relative;">
-              <i class="fas fa-lock"
-                style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.85rem;"></i>
+            <div class="input-group-icon">
+              <i class="fas fa-lock icon"></i>
               <input type="password" name="password" id="passInput" class="admin-input"
                 style="padding-left:36px;padding-right:44px;" placeholder="••••••••" required>
-              <button type="button" onclick="togglePass()"
-                style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:0.85rem;">
+              <button type="button" onclick="togglePass()" class="input-toggle-btn">
                 <i class="fas fa-eye" id="eyeIcon"></i>
               </button>
             </div>
           </div>
 
-          <button type="submit" class="btn-admin-primary w-100"
-            style="width:100%;justify-content:center;padding:0.85rem;font-size:0.95rem;">
+          <button type="submit" class="btn-admin-primary login-submit-btn">
             <i class="fas fa-sign-in-alt me-2"></i> Sign In to Admin Panel
           </button>
 
-          <div style="text-align:center;margin-top:1.5rem;">
-            <a href="../index.php"
-              style="color:var(--text-muted);font-size:0.82rem;text-decoration:none;display:inline-flex;align-items:center;gap:5px;">
+          <div class="login-submit-center">
+            <a href="../index.php" class="login-back-link">
               <i class="fas fa-globe"></i> Back to Tourism Hub
             </a>
           </div>
         </form>
 
-        <div
-          style="margin-top:1.5rem;padding:1rem;background:var(--content-bg);border-radius:10px;font-size:0.78rem;color:var(--text-muted);border:1px dashed var(--border);">
+        <div class="login-hint-block">
           <strong>Demo Credentials:</strong><br>
           Username: <code>admin</code> &nbsp;|&nbsp; Password: <code>password</code>
         </div>
@@ -98,18 +91,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Right Side: Municipal Hall Tourism Showcase -->
     <div class="login-right">
-      <!-- Decorative floating shapes -->
       <div class="login-right-shapes">
         <div class="shape shape-1"></div>
         <div class="shape shape-2"></div>
         <div class="shape shape-3"></div>
       </div>
 
-      <!-- Main image showcase -->
       <div class="login-showcase">
         <div class="showcase-image-wrapper">
-          <img src="../assets/images/San_Enrique_Municipal_Hall.jpg" alt="San Enrique Municipal Hall"
-            class="showcase-image">
+          <img src="../assets/images/San_Enrique_Municipal_Hall.jpg" alt="San Enrique Municipal Hall" class="showcase-image">
           <div class="showcase-image-border"></div>
         </div>
 
@@ -118,8 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <i class="fas fa-landmark"></i> Heart of Governance
           </div>
           <h2 class="showcase-title">San Enrique<br>Municipal Hall</h2>
-          <p class="showcase-desc">The seat of local governance and community service in the Municipality of San
-            Enrique, Iloilo — proudly serving the community.</p>
+          <p class="showcase-desc">The seat of local governance and community service in the Municipality of San Enrique, Iloilo — proudly serving the community.</p>
 
           <div class="showcase-features">
             <div class="showcase-feature">
@@ -147,7 +136,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
       </div>
 
-      <!-- Bottom tagline -->
       <div class="showcase-tagline">
         <span class="tagline-line"></span>
         <span class="tagline-text"><i class="fas fa-leaf"></i> Discover the Beauty of San Enrique</span>

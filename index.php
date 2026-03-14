@@ -24,6 +24,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="x-icon" href="assets/images/logo.png">
   <title><?= SITE_NAME ?> - <?= SITE_TAGLINE ?></title>
   <meta name="description"
     content="Discover the hidden paradise of San Enrique, Iloilo. Explore resorts, cultural sites, local food, and beautiful barangays.">

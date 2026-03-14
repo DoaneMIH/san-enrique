@@ -38,227 +38,6 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/admin.css">
-  <style>
-    /* ── Listing View Specific ── */
-    .lv-hero {
-      position: relative;
-      width: 100%;
-      height: 280px;
-      border-radius: 16px;
-      overflow: hidden;
-      margin-bottom: 1.5rem;
-      background: var(--sidebar-bg, #1b4332);
-    }
-
-    .lv-hero img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .lv-hero-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, transparent 55%);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 1.5rem 1.75rem;
-    }
-
-    .lv-hero-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #fff;
-      margin: 0 0 0.35rem;
-      line-height: 1.25;
-    }
-
-    .lv-badge-row {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .lv-cat-badge {
-      background: rgba(255, 255, 255, 0.18);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      color: #fff;
-      border-radius: 100px;
-      padding: 4px 14px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      backdrop-filter: blur(4px);
-    }
-
-    .lv-feat-badge {
-      background: #d4a017;
-      color: #fff;
-      border-radius: 100px;
-      padding: 4px 12px;
-      font-size: 0.78rem;
-      font-weight: 700;
-    }
-
-    .lv-status-badge {
-      border-radius: 100px;
-      padding: 4px 12px;
-      font-size: 0.78rem;
-      font-weight: 700;
-    }
-
-    .lv-status-badge.active {
-      background: rgba(82, 183, 136, 0.2);
-      color: #2d6a4f;
-    }
-
-    .lv-status-badge.inactive {
-      background: rgba(220, 53, 69, 0.12);
-      color: #c0392b;
-    }
-
-    .lv-status-badge.draft {
-      background: rgba(255, 193, 7, 0.18);
-      color: #856404;
-    }
-
-    .lv-card {
-      background: var(--content-bg, #fff);
-      border: 1px solid var(--border, #e8ede8);
-      border-radius: 14px;
-      padding: 1.5rem;
-      margin-bottom: 1.25rem;
-    }
-
-    .lv-card-title {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--primary, #1b4332);
-      margin-bottom: 1rem;
-      padding-bottom: 0.6rem;
-      border-bottom: 1px solid var(--border, #e8ede8);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .lv-info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem 1.25rem;
-    }
-
-    @media (max-width: 576px) {
-      .lv-info-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .lv-info-item {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .lv-info-label {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--text-muted, #6c8c74);
-    }
-
-    .lv-info-value {
-      font-size: 0.88rem;
-      color: var(--primary, #1b4332);
-      word-break: break-word;
-    }
-
-    .lv-info-value a {
-      color: var(--accent, #52b788);
-    }
-
-    .lv-amenity-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: rgba(82, 183, 136, 0.1);
-      color: #1b4332;
-      border-radius: 100px;
-      padding: 4px 14px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    .lv-map {
-      width: 100%;
-      height: 260px;
-      border-radius: 10px;
-      border: 1px solid var(--border, #e8ede8);
-      overflow: hidden;
-    }
-
-    #lvMap {
-      width: 100%;
-      height: 100%;
-    }
-
-    .lv-review {
-      padding: 1rem;
-      border-radius: 10px;
-      border-left: 3px solid var(--accent, #52b788);
-      background: var(--sidebar-bg, #f7faf7);
-      margin-bottom: 0.75rem;
-    }
-
-    .lv-review-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.3rem;
-    }
-
-    .lv-reviewer {
-      font-weight: 700;
-      font-size: 0.88rem;
-      color: var(--primary, #1b4332);
-    }
-
-    .lv-stars {
-      font-size: 0.82rem;
-      color: #d4a017;
-    }
-
-    .lv-review-text {
-      font-size: 0.84rem;
-      color: var(--text-muted);
-      margin: 0;
-    }
-
-    .lv-review-date {
-      font-size: 0.72rem;
-      color: var(--gray-500, #adb5bd);
-      margin-top: 0.3rem;
-    }
-
-    .lv-action-bar {
-      display: flex;
-      gap: 0.6rem;
-      flex-wrap: wrap;
-      margin-bottom: 1.5rem;
-    }
-
-    .lv-desc-text {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      line-height: 1.8;
-      white-space: pre-wrap;
-      margin: 0;
-    }
-  </style>
 </head>
 
 <body>
@@ -330,13 +109,13 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
     <div class="admin-topbar">
       <div>
         <button class="d-lg-none" onclick="toggleSidebar()"
-          style="background:none;border:none;color:var(--primary);font-size:1.1rem;cursor:pointer;margin-right:0.75rem;">
+          class="topbar-menu-btn">
           <i class="fas fa-bars"></i>
         </button>
         <span class="topbar-title">Listing Detail</span>
         <div class="topbar-breadcrumb">
-          <a href="listings.php" style="color:var(--text-muted);text-decoration:none;">Listings</a>
-          <span style="margin:0 6px;color:var(--text-muted);">/</span>
+          <a href="listings.php" class="topbar-breadcrumb">Listings</a>
+          <span class="separator">/</span>
           <?= htmlspecialchars($listing['name']) ?>
         </div>
       </div>
@@ -372,7 +151,7 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
               alt="<?= htmlspecialchars($listing['name']) ?>"
               onerror="this.src='https://placehold.co/900x400/2d6a4f/ffffff?text=No+Image'">
             <div class="lv-hero-overlay">
-              <div class="lv-badge-row" style="margin-bottom:0.5rem;">
+              <div class="lv-badge-row">
                 <span class="lv-cat-badge">
                   <i class="<?= htmlspecialchars($listing['icon']) ?> me-1"></i>
                   <?= htmlspecialchars($listing['category_name']) ?>
@@ -386,7 +165,7 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
               </div>
               <div class="lv-hero-title"><?= htmlspecialchars($listing['name']) ?></div>
               <?php if ($listing['address']): ?>
-                <div style="color:rgba(255,255,255,0.75);font-size:0.82rem;">
+                <div class="lv-hero-color-text">
                   <i class="fas fa-map-marker-alt me-1"></i><?= htmlspecialchars($listing['address']) ?>
                 </div>
               <?php endif; ?>
@@ -396,12 +175,12 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
           <!-- Description -->
           <div class="lv-card">
             <div class="lv-card-title">
-              <i class="fas fa-align-left" style="color:var(--accent);"></i> Description
+              <i class="fas fa-align-left"></i> Description
             </div>
             <?php if ($listing['description']): ?>
               <p class="lv-desc-text"><?= htmlspecialchars($listing['description']) ?></p>
             <?php else: ?>
-              <p style="color:var(--text-muted);font-size:0.87rem;font-style:italic;">No description provided.</p>
+              <p class="lv-no-desc">No description provided.</p>
             <?php endif; ?>
           </div>
 
@@ -411,25 +190,24 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
           ?>
           <?php if (!empty($galleryPhotos)): ?>
           <div class="lv-card">
-            <div class="lv-card-title" style="justify-content:space-between;">
-              <span><i class="fas fa-images" style="color:var(--accent);"></i> Photo Gallery</span>
-              <span style="font-size:0.78rem;color:var(--text-muted);font-weight:500;"><?= count($galleryPhotos) ?> photo<?= count($galleryPhotos) !== 1 ? 's' : '' ?></span>
+            <div class="lv-card-title lv-card-title-between">
+              <span><i class="fas fa-images"></i> Photo Gallery</span>
+              <span class="lv-card-photo-count"><?= count($galleryPhotos) ?> photo<?= count($galleryPhotos) !== 1 ? 's' : '' ?></span>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;">
+            <div class="lv-gallery-grid">
               <?php foreach ($galleryPhotos as $gi => $gPhoto):
                 $gClean = preg_replace('#^(\.\./)+#', '', $gPhoto);
                 $gUrl   = BASE_URL . '/' . ltrim($gClean, '/');
               ?>
-              <div style="position:relative;border-radius:8px;overflow:hidden;aspect-ratio:4/3;border:1px solid var(--border);">
+              <div class="lv-gallery-item">
                 <img src="<?= htmlspecialchars($gUrl) ?>"
-                     style="width:100%;height:100%;object-fit:cover;display:block;"
-                     onerror="this.src='https://placehold.co/130x98/1b4332/fff?text=IMG'">
-                <form method="POST" action="gallery_delete.php" style="position:absolute;top:4px;right:4px;"
+                     style="width:100%;height:100%;object-fit:cover;" onerror="this.src='https://placehold.co/130x98/1b4332/fff?text=IMG'">
+                <form method="POST" action="gallery_delete.php" class="lv-gallery-delete-form"
                       onsubmit="return confirm('Remove this photo from the gallery?');">
                   <input type="hidden" name="listing_id" value="<?= $listing['id'] ?>">
                   <input type="hidden" name="photo_path" value="<?= htmlspecialchars($gPhoto, ENT_QUOTES) ?>">
                   <button type="submit"
-                    style="background:rgba(220,38,38,.85);color:white;border:none;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:0.65rem;display:flex;align-items:center;justify-content:center;"
+                    class="lv-gallery-delete-btn"
                     title="Remove photo">
                     <i class="fas fa-times"></i>
                   </button>
@@ -437,9 +215,9 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
               </div>
               <?php endforeach; ?>
             </div>
-            <div style="margin-top:0.75rem;font-size:0.78rem;color:var(--text-muted);">
+            <div class="lv-gallery-note">
               <i class="fas fa-info-circle me-1"></i>
-              To add more photos or remove all, use <a href="listings.php?action=edit&id=<?= $listing['id'] ?>" style="color:var(--accent);">Edit Listing</a>.
+              To add more photos or remove all, use <a href="listings.php?action=edit&id=<?= $listing['id'] ?>">Edit Listing</a>.
             </div>
           </div>
           <?php endif; ?>
@@ -460,19 +238,17 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
           ?>
           <div class="lv-card">
             <div class="lv-card-title">
-              <i class="fas fa-video" style="color:var(--accent);"></i> Listing Video
+              <i class="fas fa-video"></i> Listing Video
             </div>
             <?php if ($isYoutube): ?>
-              <div style="position:relative;padding-bottom:56.25%;border-radius:10px;overflow:hidden;background:#000;">
+              <div class="lv-video-wrap">
                 <iframe src="https://www.youtube.com/embed/<?= htmlspecialchars($ytm[1]) ?>"
-                  style="position:absolute;inset:0;width:100%;height:100%;border:none;"
-                  allowfullscreen loading="lazy"></iframe>
+                  style="position:absolute;inset:0;width:100%;height:100%;border:none;" allowfullscreen loading="lazy"></iframe>
               </div>
             <?php elseif ($isVimeo): ?>
-              <div style="position:relative;padding-bottom:56.25%;border-radius:10px;overflow:hidden;background:#000;">
+              <div class="lv-video-wrap">
                 <iframe src="https://player.vimeo.com/video/<?= htmlspecialchars($vim[1]) ?>"
-                  style="position:absolute;inset:0;width:100%;height:100%;border:none;"
-                  allowfullscreen loading="lazy"></iframe>
+                  style="position:absolute;inset:0;width:100%;height:100%;border:none;" allowfullscreen loading="lazy"></iframe>
               </div>
             <?php elseif ($isUploadedVid): ?>
               <video src="<?= htmlspecialchars($vidPublicUrl) ?>" controls
@@ -480,16 +256,15 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
                 Your browser does not support the video tag.
               </video>
             <?php else: ?>
-              <div style="position:relative;padding-bottom:56.25%;border-radius:10px;overflow:hidden;background:#000;">
+              <div class="lv-video-wrap">
                 <iframe src="<?= htmlspecialchars($vid) ?>"
-                  style="position:absolute;inset:0;width:100%;height:100%;border:none;"
-                  allowfullscreen loading="lazy"></iframe>
+                  style="position:absolute;inset:0;width:100%;height:100%;border:none;" allowfullscreen loading="lazy"></iframe>
               </div>
             <?php endif; ?>
-            <div style="margin-top:0.75rem;font-size:0.78rem;color:var(--text-muted);">
+            <div class="lv-gallery-note">
               <i class="fas fa-info-circle me-1"></i>
               To change or remove this video, use
-              <a href="listings.php?action=edit&id=<?= $listing['id'] ?>" style="color:var(--accent);">Edit Listing</a>.
+              <a href="listings.php?action=edit&id=<?= $listing['id'] ?>">Edit Listing</a>.
             </div>
           </div>
           <?php endif; ?>
@@ -498,12 +273,12 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
           <?php if ($listing['amenities']): ?>
             <div class="lv-card">
               <div class="lv-card-title">
-                <i class="fas fa-check-circle" style="color:var(--accent);"></i> Amenities &amp; Features
+                <i class="fas fa-check-circle"></i> Amenities &amp; Features
               </div>
-              <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+              <div class="lv-amenities-wrap">
                 <?php foreach (explode(',', $listing['amenities']) as $amenity): ?>
                   <span class="lv-amenity-tag">
-                    <i class="fas fa-check" style="color:var(--accent);font-size:0.7rem;"></i>
+                    <i class="fas fa-check lv-amenity-check"></i>
                     <?= htmlspecialchars(trim($amenity)) ?>
                   </span>
                 <?php endforeach; ?>
@@ -515,17 +290,17 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
           <?php if ($listing['latitude'] && $listing['longitude']): ?>
             <div class="lv-card">
               <div class="lv-card-title d-flex justify-content-between align-items-center"
-                style="border:none;padding-bottom:0.75rem;">
-                <span><i class="fas fa-map" style="color:var(--accent);"></i> Location Map</span>
+                class="lv-card-title lv-card-title-borderless">
+                <span><i class="fas fa-map"></i> Location Map</span>
                 <a href="https://www.google.com/maps/dir/?api=1&destination=<?= $listing['latitude'] ?>,<?= $listing['longitude'] ?>"
-                  target="_blank" class="btn-admin-secondary" style="font-size:0.78rem;padding:5px 12px;">
+                  target="_blank" class="btn-admin-secondary btn-map-link">
                   <i class="fas fa-directions me-1"></i> Get Directions
                 </a>
               </div>
               <div class="lv-map">
                 <div id="lvMap"></div>
               </div>
-              <div style="font-size:0.77rem;color:var(--text-muted);margin-top:0.5rem;">
+              <div class="lv-map-hint">
                 Coordinates: <?= number_format((float) $listing['latitude'], 6) ?>,
                 <?= number_format((float) $listing['longitude'], 6) ?>
               </div>
@@ -535,9 +310,9 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
           <!-- Reviews -->
           <div class="lv-card">
             <div class="lv-card-title">
-              <i class="fas fa-star" style="color:#d4a017;"></i> Reviews
+              <i class="fas fa-star lv-stars"></i> Reviews
               <span
-                style="margin-left:auto;font-size:0.82rem;color:var(--text-muted);font-weight:500;"><?= count($reviews) ?>
+                class="lv-count-label"><?= count($reviews) ?>
                 total</span>
             </div>
             <?php if ($reviews): ?>
@@ -545,12 +320,12 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
               $avg = round(array_sum(array_column($reviews, 'rating')) / count($reviews), 1);
               ?>
               <div
-                style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;padding:0.75rem 1rem;background:var(--sidebar-bg,#f7faf7);border-radius:10px;">
-                <div style="font-size:2rem;font-weight:800;color:var(--primary);line-height:1;"><?= $avg ?></div>
+                class="lv-review-summary">
+                <div class="lv-review-avg-val"><?= $avg ?></div>
                 <div>
-                  <div style="color:#d4a017;font-size:1rem;">
+                  <div class="lv-review-avg-stars">
                     <?= str_repeat('★', round($avg)) . str_repeat('☆', 5 - round($avg)) ?></div>
-                  <div style="font-size:0.78rem;color:var(--text-muted);">Average of <?= count($reviews) ?>
+                  <div class="lv-review-avg-count">Average of <?= count($reviews) ?>
                     review<?= count($reviews) !== 1 ? 's' : '' ?></div>
                 </div>
               </div>
@@ -566,7 +341,7 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
                 </div>
               <?php endforeach; ?>
             <?php else: ?>
-              <p style="color:var(--text-muted);font-size:0.87rem;font-style:italic;">No reviews yet.</p>
+              <p class="lv-no-reviews">No reviews yet.</p>
             <?php endif; ?>
           </div>
 
@@ -576,7 +351,7 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
         <div class="col-lg-4">
           <div class="lv-card" style="position:sticky;top:80px;">
             <div class="lv-card-title">
-              <i class="fas fa-info-circle" style="color:var(--accent);"></i> Listing Info
+              <i class="fas fa-info-circle"></i> Listing Info
             </div>
 
             <div class="lv-info-grid">
@@ -634,22 +409,22 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
               </div>
 
               <?php if ($listing['slug']): ?>
-                <div class="lv-info-item" style="grid-column:1/-1;">
+                <div class="lv-info-item lv-info-item-full">
                   <span class="lv-info-label">Slug</span>
                   <span class="lv-info-value"
-                    style="font-family:monospace;font-size:0.82rem;"><?= htmlspecialchars($listing['slug']) ?></span>
+                    class="lv-slug-code"><?= htmlspecialchars($listing['slug']) ?></span>
                 </div>
               <?php endif; ?>
 
               <?php if ($listing['contact']): ?>
-                <div class="lv-info-item" style="grid-column:1/-1;">
+                <div class="lv-info-item lv-info-item-full">
                   <span class="lv-info-label">Contact</span>
                   <span class="lv-info-value"><?= htmlspecialchars($listing['contact']) ?></span>
                 </div>
               <?php endif; ?>
 
               <?php if ($listing['email']): ?>
-                <div class="lv-info-item" style="grid-column:1/-1;">
+                <div class="lv-info-item lv-info-item-full">
                   <span class="lv-info-label">Email</span>
                   <span class="lv-info-value">
                     <a
@@ -659,7 +434,7 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
               <?php endif; ?>
 
               <?php if ($listing['website']): ?>
-                <div class="lv-info-item" style="grid-column:1/-1;">
+                <div class="lv-info-item lv-info-item-full">
                   <span class="lv-info-label">Website</span>
                   <span class="lv-info-value">
                     <a href="<?= htmlspecialchars($listing['website']) ?>" target="_blank">
@@ -686,14 +461,12 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
             </div><!-- /lv-info-grid -->
 
             <!-- Quick Actions -->
-            <div
-              style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border,#e8ede8);display:flex;flex-direction:column;gap:0.5rem;">
-              <a href="listings.php?action=edit&id=<?= $listing['id'] ?>" class="btn-admin-primary"
-                style="justify-content:center;text-align:center;width:100%;">
+            <div class="lv-action-footer">
+              <a href="listings.php?action=edit&id=<?= $listing['id'] ?>" class="btn-admin-primary btn-full-center">
                 <i class="fas fa-pencil-alt me-2"></i>Edit This Listing
               </a>
               <a href="../listing.php?slug=<?= urlencode($listing['slug']) ?>" target="_blank"
-                class="btn-admin-secondary" style="justify-content:center;text-align:center;width:100%;">
+                class="btn-admin-secondary btn-full-center">
                 <i class="fas fa-external-link-alt me-2"></i>Public View
               </a>
             </div>

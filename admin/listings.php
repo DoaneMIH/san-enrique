@@ -189,46 +189,11 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
 
 <body>
 
-  <!-- SIDEBAR (shared) -->
-  <aside class="admin-sidebar" id="adminSidebar">
-    <div class="sidebar-brand">
-      <div class="brand-logo">🌿</div>
-      <div>
-        <div class="brand-text">San Enrique</div>
-        <div class="brand-sub">Tourism Hub Admin</div>
-      </div>
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section-label">Main</div>
-      <a href="dashboard.php" class="admin-nav-link"><i class="fas fa-home"></i> Dashboard</a>
-      <a href="listings.php" class="admin-nav-link active"><i class="fas fa-map-marker-alt"></i> Listings</a>
-      <a href="categories.php" class="admin-nav-link"><i class="fas fa-th-large"></i> Categories</a>
-      <a href="events.php" class="admin-nav-link"><i class="fas fa-calendar-alt"></i> Events</a>
-      <div class="nav-section-label">Communication</div>
-      <a href="messages.php" class="admin-nav-link"><i class="fas fa-envelope"></i> Messages</a>
-      <a href="reviews.php" class="admin-nav-link"><i class="fas fa-star"></i> Reviews</a>
-      <div class="nav-section-label">System</div>
-      <a href="../index.php" class="admin-nav-link" target="_blank"><i class="fas fa-external-link-alt"></i> View
-        Website</a>
-      <a href="settings.php" class="admin-nav-link"><i class="fas fa-cog"></i> Settings</a>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="sidebar-user">
-        <div class="user-avatar"><?= strtoupper(substr($admin['name'], 0, 1)) ?></div>
-        <div>
-          <div class="user-name"><?= htmlspecialchars($admin['name']) ?></div>
-          <div class="user-role"><?= ucfirst($admin['role']) ?></div>
-        </div>
-        <a href="logout.php" class="btn-logout"><i class="fas fa-sign-out-alt"></i></a>
-      </div>
-    </div>
-  </aside>
-
+  <?php require_once 'sidebar.php'; ?>
   <div class="admin-content">
     <div class="admin-topbar">
       <div>
-        <button class="d-lg-none" onclick="toggleSidebar()"
-          style="background:none;border:none;color:var(--primary);font-size:1.1rem;cursor:pointer;margin-right:0.75rem;"><i
+        <button class="d-lg-none topbar-menu-btn" onclick="toggleSidebar()"><i
             class="fas fa-bars"></i></button>
         <span
           class="topbar-title"><?= $action === 'list' ? 'Listings Management' : ($action === 'add' ? 'Add New Listing' : 'Edit Listing') ?></span>
@@ -242,17 +207,17 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
       </div>
     </div>
 
+
+
     <div class="admin-main">
       <?php if ($message): ?>
         <div
-          style="background:#dcfce7;color:#15803d;border-radius:10px;padding:12px 16px;font-size:0.87rem;font-weight:600;margin-bottom:1.5rem;display:flex;align-items:center;gap:8px;">
-          <i class="fas fa-check-circle"></i> <?= htmlspecialchars($message) ?>
+          class="admin-alert success"><i class="fas fa-check-circle"></i> <?= htmlspecialchars($message) ?>
         </div>
       <?php endif; ?>
       <?php if ($error): ?>
         <div
-          style="background:#fee2e2;color:#dc2626;border-radius:10px;padding:12px 16px;font-size:0.87rem;font-weight:600;margin-bottom:1.5rem;display:flex;align-items:center;gap:8px;">
-          <i class="fas fa-exclamation-circle"></i> <?= htmlspecialchars($error) ?>
+          class="admin-alert error"><i class="fas fa-exclamation-circle"></i> <?= htmlspecialchars($error) ?>
         </div>
       <?php endif; ?>
 
@@ -266,7 +231,7 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
               <input type="text" id="tableSearch" placeholder="Search listings...">
             </div>
           </div>
-          <div style="overflow-x:auto;">
+          <div class="table-scroll">
             <table class="admin-table" id="listingsTable">
               <thead>
                 <tr>
@@ -283,36 +248,34 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
               <tbody>
                 <?php foreach ($listings as $i => $listing): ?>
                   <tr>
-                    <td style="color:var(--text-muted);font-size:0.8rem;"><?= $i + 1 ?></td>
+                    <td class="td-muted"><?= $i + 1 ?></td>
                     <td>
-                      <div style="display:flex;align-items:center;gap:10px;">
+                      <div class="listing-info">
                         <img src="<?= $listing['featured_image'] ?: 'https://placehold.co/48x38/1b4332/ffffff?text=?' ?>"
                           class="listing-thumb" alt="" onerror="this.src='https://placehold.co/48x38/1b4332/ffffff?text=?'">
                         <div>
-                          <div style="font-weight:700;font-size:0.87rem;color:var(--primary);">
+                          <div class="listing-name">
                             <?= htmlspecialchars($listing['name']) ?></div>
-                          <div style="font-size:0.72rem;color:var(--text-muted);"><?= htmlspecialchars($listing['slug']) ?>
+                          <div class="listing-slug"><?= htmlspecialchars($listing['slug']) ?>
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td><span
-                        style="font-size:0.82rem;color:var(--text-muted);"><?= htmlspecialchars($listing['cat_name']) ?></span>
+                    <td><span class="cat-pill"><?= htmlspecialchars($listing['cat_name']) ?></span>
                     </td>
-                    <td style="font-size:0.82rem;color:var(--text-muted);">
+                    <td class="td-small">
                       <?= htmlspecialchars($listing['barangay'] ?: '—') ?></td>
-                    <td style="text-align:center;">
-                      <?= $listing['is_featured'] ? '<i class="fas fa-star" style="color:var(--gold);"></i>' : '<i class="far fa-star" style="color:var(--gray-200);"></i>' ?>
+                    <td class="td-center">
+                      <?= $listing['is_featured'] ? '<i class="fas fa-star icon-star-gold"></i>' : '<i class="far fa-star icon-star-empty"></i>' ?>
                     </td>
                     <td><span class="status-badge <?= $listing['status'] ?>"><?= ucfirst($listing['status']) ?></span></td>
-                    <td style="font-size:0.85rem;"><?= number_format($listing['views']) ?></td>
+                    <td class="td-small"><?= number_format($listing['views']) ?></td>
                     <td>
-                      <div style="display:flex;gap:5px;flex-wrap:wrap;">
+                      <div class="table-actions">
                         <a href="?action=edit&id=<?= $listing['id'] ?>" class="btn-admin-edit">
                           <i class="fas fa-pencil-alt"></i> Edit
                         </a>
-                        <a href="listing_view.php?slug=<?= urlencode($listing['slug']) ?>" class="btn-admin-edit"
-                          style="background:rgba(27,111,100,0.05);" title="Preview (Admin View)">
+                        <a href="listing_view.php?slug=<?= urlencode($listing['slug']) ?>" class="btn-admin-edit btn-admin-preview" title="Preview (Admin View)">
                           <i class="fas fa-eye"></i>
                         </a>
                         <button onclick="confirmDelete(<?= $listing['id'] ?>, '<?= addslashes($listing['name']) ?>')"
@@ -332,7 +295,7 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
         <!-- ADD/EDIT FORM -->
         <div class="admin-form-card">
           <div class="admin-form-header">
-            <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--primary);">
+            <div class="form-header-text">
               <?= $action === 'add' ? 'Add New Listing' : 'Edit: ' . htmlspecialchars($editListing['name'] ?? '') ?>
             </div>
           </div>
@@ -427,7 +390,7 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
                 <!-- Featured Photo Upload -->
                 <div class="col-12">
                   <label class="admin-label">
-                    <i class="fas fa-camera me-1" style="color:var(--accent);"></i> Featured Photo
+                    <i class="fas fa-camera me-1"></i> Featured Photo
                   </label>
                   <?php
                   $existingImg = $editListing['featured_image'] ?? '';
@@ -444,38 +407,23 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
                   $hasImg = !empty($displayImg);
                   ?>
                   <div id="imgPreviewWrap"
-                    style="<?= $hasImg ? '' : 'display:none;' ?>border-radius:12px;overflow:hidden;border:2px solid var(--border);position:relative;margin-bottom:8px;">
+                    class="img-preview-wrap" id="imgPreviewWrap" style="<?= $hasImg ? '' : 'display:none;' ?>">
                     <img id="imgPreview" src="<?= htmlspecialchars($displayImg) ?>" alt="Preview"
-                      style="width:100%;height:200px;object-fit:cover;display:block;"
                       onerror="this.src='https://placehold.co/600x200/1b4332/ffffff?text=Preview'">
-                    <span
-                      style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.55);color:white;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px;"
-                      id="imgBadgeLabel">
+                    <span class="img-preview-label" id="imgBadgeLabel">
                       <?= $hasImg ? 'Current photo' : 'Selected photo' ?>
                     </span>
-                    <button type="button" onclick="removeImage()"
-                      style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);color:white;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;"
-                      title="Remove photo">
+                    <button type="button" onclick="removeImage()" class="img-preview-remove" title="Remove photo">
                       <i class="fas fa-times"></i>
                     </button>
                   </div>
-                  <div id="uploadZone"
-                    style="<?= $hasImg ? 'display:none;' : '' ?>border:2px dashed var(--border);border-radius:12px;padding:2rem 1rem;text-align:center;cursor:pointer;background:var(--content-bg);position:relative;transition:all .2s;"
-                    onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--accent-pale)'"
-                    onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--content-bg)'">
-                    <input type="file" name="featured_image_upload" id="fileInput"
-                      accept="image/jpeg,image/png,image/webp,image/gif"
-                      style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;"
-                      onchange="handleFileSelect(this)">
-                    <i class="fas fa-cloud-upload-alt"
-                      style="font-size:2.2rem;color:var(--gray-300);display:block;margin-bottom:.6rem;"></i>
-                    <div style="font-size:.87rem;color:var(--text-muted);font-weight:700;">Click to upload or drag &amp;
-                      drop a photo</div>
-                    <div style="font-size:.75rem;color:var(--gray-400);margin-top:3px;">JPG, PNG, WEBP or GIF &mdash; max
-                      5 MB</div>
+                  <div id="uploadZone" class="upload-zone" style="<?= $hasImg ? 'display:none;' : '' ?>">
+                    <input type="file" name="featured_image_upload" id="fileInput" accept="image/jpeg,image/png,image/webp,image/gif" onchange="handleFileSelect(this)">
+                    <i class="fas fa-cloud-upload-alt upload-zone-icon"></i>
+                    <div class="upload-zone-title">Click to upload or drag &amp; drop a photo</div>
+                    <div class="upload-zone-hint">JPG, PNG, WEBP or GIF &mdash; max 5 MB</div>
                   </div>
-                  <div style="margin-top:.5rem;font-size:.78rem;color:var(--text-muted);">
-                    <i class="fas fa-info-circle me-1"></i>
+                  <div class="form-hint"><i class="fas fa-info-circle me-1"></i>
                     Photos are saved to <code>uploads/listings/</code> and shown automatically on the website.
                   </div>
                 </div>
@@ -483,24 +431,23 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
                 <!-- Gallery Photos Upload -->
                 <div class="col-12">
                   <label class="admin-label">
-                    <i class="fas fa-images me-1" style="color:var(--accent);"></i> Gallery Photos
-                    <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);margin-left:6px;">(up to 10 additional photos)</span>
+                    <i class="fas fa-images me-1"></i> Gallery Photos
+                    <span class="label-sub">(up to 10 additional photos)</span>
                   </label>
                   <?php
                     $existingGallery = json_decode($editListing['gallery'] ?? '[]', true) ?: [];
                   ?>
                   <!-- Existing gallery thumbnails with remove buttons -->
                   <?php if (!empty($existingGallery)): ?>
-                  <div id="existingGalleryWrap" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+                  <div id="existingGalleryWrap" class="gallery-existing-wrap">
                     <?php foreach ($existingGallery as $gImg): ?>
                     <?php
                       $gClean = preg_replace('#^(\.\./)+#', '', $gImg);
                       $gUrl   = BASE_URL . '/' . ltrim($gClean, '/');
                     ?>
-                    <div class="gallery-thumb-wrap" style="position:relative;width:100px;height:80px;border-radius:8px;overflow:hidden;border:2px solid var(--border);">
-                      <img src="<?= htmlspecialchars($gUrl) ?>" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='https://placehold.co/100x80/1b4332/fff?text=IMG'">
-                      <button type="button" onclick="removeGalleryPhoto(this, '<?= htmlspecialchars($gImg, ENT_QUOTES) ?>')"
-                        style="position:absolute;top:3px;right:3px;background:rgba(220,38,38,.85);color:white;border:none;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:0.7rem;display:flex;align-items:center;justify-content:center;" title="Remove">
+                    <div class="gallery-thumb-wrap">
+                      <img src="<?= htmlspecialchars($gUrl) ?>" onerror="this.src='https://placehold.co/100x80/1b4332/fff?text=IMG'">
+                      <button type="button" onclick="removeGalleryPhoto(this, '<?= htmlspecialchars($gImg, ENT_QUOTES) ?>')" class="gallery-thumb-remove" title="Remove">
                         <i class="fas fa-times"></i>
                       </button>
                     </div>
@@ -509,22 +456,15 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
                   <div id="removedGalleryInputs"></div>
                   <?php endif; ?>
                   <!-- New gallery file picker -->
-                  <div id="galleryUploadZone"
-                    style="border:2px dashed var(--border);border-radius:12px;padding:1.5rem 1rem;text-align:center;cursor:pointer;background:var(--content-bg);position:relative;transition:all .2s;"
-                    onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--accent-pale)'"
-                    onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--content-bg)'">
-                    <input type="file" name="gallery_upload[]" id="galleryInput" multiple
-                      accept="image/jpeg,image/png,image/webp,image/gif"
-                      style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;"
-                      onchange="handleGallerySelect(this)">
-                    <i class="fas fa-images" style="font-size:2rem;color:var(--gray-300);display:block;margin-bottom:.5rem;"></i>
-                    <div style="font-size:.87rem;color:var(--text-muted);font-weight:700;">Click to select multiple photos</div>
-                    <div style="font-size:.75rem;color:var(--gray-400);margin-top:3px;">JPG, PNG, WEBP or GIF &mdash; max 5 MB each</div>
+                  <div id="galleryUploadZone" class="upload-zone upload-zone-sm">
+                    <input type="file" name="gallery_upload[]" id="galleryInput" multiple accept="image/jpeg,image/png,image/webp,image/gif" onchange="handleGallerySelect(this)">
+                    <i class="fas fa-images upload-zone-icon upload-zone-icon-sm"></i>
+                    <div class="upload-zone-title">Click to select multiple photos</div>
+                    <div class="upload-zone-hint">JPG, PNG, WEBP or GIF &mdash; max 5 MB each</div>
                   </div>
                   <!-- Preview area for newly picked gallery files -->
-                  <div id="galleryPreviewRow" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;"></div>
-                  <div style="margin-top:.5rem;font-size:.78rem;color:var(--text-muted);">
-                    <i class="fas fa-info-circle me-1"></i>
+                  <div id="galleryPreviewRow" class="gallery-preview-row"></div>
+                  <div class="form-hint"><i class="fas fa-info-circle me-1"></i>
                     These photos appear as a gallery on the public listing page.
                   </div>
                 </div>
@@ -532,8 +472,8 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
                 <!-- Video Upload -->
                 <div class="col-12">
                   <label class="admin-label">
-                    <i class="fas fa-video me-1" style="color:var(--accent);"></i> Listing Video
-                    <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);margin-left:6px;">(upload MP4/WEBM or paste YouTube/Vimeo URL &mdash; max 200 MB)</span>
+                    <i class="fas fa-video me-1"></i> Listing Video
+                    <span class="label-sub">(upload MP4/WEBM or paste YouTube/Vimeo URL &mdash; max 200 MB)</span>
                   </label>
 
                   <?php
@@ -543,56 +483,47 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
                   ?>
 
                   <?php if ($existingVideo): ?>
-                  <div id="existingVideoWrap" style="margin-bottom:12px;background:var(--gray-50);border-radius:12px;padding:1rem;border:1px solid var(--border);display:flex;align-items:center;gap:12px;">
-                    <i class="fas fa-video" style="font-size:1.6rem;color:var(--accent);flex-shrink:0;"></i>
-                    <div style="flex:1;min-width:0;">
-                      <div style="font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:2px;">
+                  <div id="existingVideoWrap" class="video-existing-wrap">
+                    <i class="fas fa-video video-existing-icon"></i>
+                    <div class="video-existing-info">
+                      <div class="video-existing-title">
                         <?= $isUploadedVideo ? 'Uploaded video file' : 'Video URL' ?>
                       </div>
-                      <div style="font-size:0.75rem;color:var(--text-muted);word-break:break-all;">
+                      <div class="video-existing-path">
                         <?= htmlspecialchars($existingVideo) ?>
                       </div>
                     </div>
-                    <button type="button" onclick="clearExistingVideo()"
-                      style="background:rgba(220,38,38,.1);color:#dc2626;border:1px solid rgba(220,38,38,.25);border-radius:8px;padding:4px 10px;font-size:0.78rem;cursor:pointer;flex-shrink:0;">
+                    <button type="button" onclick="clearExistingVideo()" class="btn-admin-danger flex-shrink-0">
                       <i class="fas fa-times me-1"></i>Remove
                     </button>
                   </div>
                   <input type="hidden" name="old_video" id="oldVideoInput" value="<?= htmlspecialchars($existingVideo, ENT_QUOTES) ?>">
                   <?php endif; ?>
 
-                  <div style="display:flex;gap:6px;margin-bottom:10px;">
-                    <button type="button" id="tabUpload" onclick="switchVideoTab('upload')"
-                      style="padding:5px 14px;border-radius:8px;border:1.5px solid var(--accent);background:var(--accent);color:#fff;font-size:0.8rem;font-weight:700;cursor:pointer;">
+                  <div class="video-tab-row">
+                    <button type="button" id="tabUpload" onclick="switchVideoTab('upload')" class="btn-video-tab active">
                       <i class="fas fa-upload me-1"></i>Upload File
                     </button>
-                    <button type="button" id="tabUrl" onclick="switchVideoTab('url')"
-                      style="padding:5px 14px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--text-muted);font-size:0.8rem;font-weight:600;cursor:pointer;">
+                    <button type="button" id="tabUrl" onclick="switchVideoTab('url')" class="btn-video-tab inactive">
                       <i class="fas fa-link me-1"></i>Paste URL
                     </button>
                   </div>
 
                   <div id="videoUploadPane">
-                    <div id="videoUploadZone"
-                      style="border:2px dashed var(--border);border-radius:12px;padding:1.5rem 1rem;text-align:center;cursor:pointer;background:var(--content-bg);position:relative;transition:all .2s;"
-                      onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--accent-pale)'"
-                      onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--content-bg)'">
-                      <input type="file" name="video_upload" id="videoInput"
-                        accept="video/mp4,video/webm,video/ogg,video/quicktime"
-                        style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;"
-                        onchange="handleVideoSelect(this)">
-                      <i class="fas fa-film" style="font-size:2rem;color:var(--gray-300);display:block;margin-bottom:.5rem;"></i>
-                      <div style="font-size:.87rem;color:var(--text-muted);font-weight:700;">Click to select a video file</div>
-                      <div style="font-size:.75rem;color:var(--gray-400);margin-top:3px;">MP4, WEBM, OGG or MOV &mdash; max 200 MB</div>
+                    <div id="videoUploadZone" class="upload-zone upload-zone-sm">
+                      <input type="file" name="video_upload" id="videoInput" accept="video/mp4,video/webm,video/ogg,video/quicktime" onchange="handleVideoSelect(this)">
+                      <i class="fas fa-film upload-zone-icon upload-zone-icon-sm"></i>
+                      <div class="upload-zone-title">Click to select a video file</div>
+                      <div class="upload-zone-hint">MP4, WEBM, OGG or MOV &mdash; max 200 MB</div>
                     </div>
-                    <div id="videoPreview" style="display:none;margin-top:10px;"></div>
+                    <div id="videoPreview" style="display:none;" class="mt-2"></div>
                   </div>
 
-                  <div id="videoUrlPane" style="display:none;">
+                  <div id="videoUrlPane" style="display:none;" class="mt-1">
                     <input type="text" name="video_url" id="videoUrlInput" class="admin-input"
                       placeholder="https://www.youtube.com/watch?v=... or direct video URL"
                       value="<?= htmlspecialchars($isUrlVideo ? $existingVideo : '', ENT_QUOTES) ?>">
-                    <div style="font-size:.75rem;color:var(--text-muted);margin-top:4px;">
+                    <div class="form-hint">
                       <i class="fas fa-info-circle me-1"></i>
                       Supports YouTube, Vimeo, or direct MP4/WEBM URLs.
                     </div>
@@ -601,16 +532,16 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
 
                 <!-- GPS Coordinates -->
                 <div class="col-12">
-                  <label class="admin-label"><i class="fas fa-map-pin me-1" style="color:var(--accent);"></i> GPS
+                  <label class="admin-label"><i class="fas fa-map-pin me-1"></i> GPS
                     Coordinates — Click on the map to set location</label>
                   <div class="coord-fields mb-2">
                     <div>
-                      <label class="admin-label" style="font-size:0.75rem;">Latitude</label>
+                      <label class="admin-label label-sm">Latitude</label>
                       <input type="number" name="latitude" id="latitude" class="admin-input" step="any"
                         value="<?= $editListing['latitude'] ?? '10.9178' ?>" placeholder="10.9178">
                     </div>
                     <div>
-                      <label class="admin-label" style="font-size:0.75rem;">Longitude</label>
+                      <label class="admin-label label-sm">Longitude</label>
                       <input type="number" name="longitude" id="longitude" class="admin-input" step="any"
                         value="<?= $editListing['longitude'] ?? '122.8845' ?>" placeholder="122.8845">
                     </div>
@@ -630,13 +561,12 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
                     </option>
                   </select>
                 </div>
-                <div class="col-md-6" style="display:flex;align-items:flex-end;">
-                  <div class="form-check" style="margin-bottom:0.5rem;">
+                <div class="col-md-6 d-flex align-items-end">
+                  <div class="form-check mb-2">
                     <input class="form-check-input" type="checkbox" name="is_featured" id="isFeatured"
                       <?= ($editListing['is_featured'] ?? 0) ? 'checked' : '' ?> value="1">
-                    <label class="form-check-label" for="isFeatured"
-                      style="font-size:0.87rem;font-weight:600;color:var(--text-muted);">
-                      <i class="fas fa-star me-1" style="color:var(--gold);"></i> Mark as Featured Listing
+                    <label class="form-check-label featured-check-label" for="isFeatured">
+                      <i class="fas fa-star me-1 icon-star-gold"></i> Mark as Featured Listing
                     </label>
                   </div>
                 </div>

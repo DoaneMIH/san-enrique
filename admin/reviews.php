@@ -10,16 +10,12 @@ $message = '';
 if (isset($_GET['delete'])) {
   $delId = (int) $_GET['delete'];
   $db->query("DELETE FROM reviews WHERE id=$delId");
-  // Recalculate rating for that listing
-  $r = $db->query("SELECT listing_id FROM reviews WHERE id=$delId");
-  // Since we deleted it, recalculate all
   $db->query("UPDATE listings l SET rating = (SELECT COALESCE(AVG(r.rating),0) FROM reviews r WHERE r.listing_id = l.id)");
   $message = 'Review deleted.';
 }
 
 $unreadMsgs = $db->query("SELECT COUNT(*) as c FROM messages WHERE is_read=0")->fetch_assoc()['c'];
 
-// Get all reviews with listing name
 $reviews = $db->query("
     SELECT rv.*, l.name as listing_name, l.slug as listing_slug
     FROM reviews rv
@@ -38,7 +34,7 @@ $avgRating = $totalReviews > 0 ? array_sum(array_column($reviews, 'rating')) / $
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reviews - Admin Panel</title>
   <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Nunito:wght@300;400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -47,48 +43,13 @@ $avgRating = $totalReviews > 0 ? array_sum(array_column($reviews, 'rating')) / $
 
 <body>
 
-  <aside class="admin-sidebar" id="adminSidebar">
-    <div class="sidebar-brand">
-      <div class="brand-logo">🌿</div>
-      <div>
-        <div class="brand-text">San Enrique</div>
-        <div class="brand-sub">Tourism Hub Admin</div>
-      </div>
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section-label">Main</div>
-      <a href="dashboard.php" class="admin-nav-link"><i class="fas fa-home"></i> Dashboard</a>
-      <a href="listings.php" class="admin-nav-link"><i class="fas fa-map-marker-alt"></i> Listings</a>
-      <a href="categories.php" class="admin-nav-link"><i class="fas fa-th-large"></i> Categories</a>
-      <a href="events.php" class="admin-nav-link"><i class="fas fa-calendar-alt"></i> Events</a>
-      <div class="nav-section-label">Communication</div>
-      <a href="messages.php" class="admin-nav-link">
-        <i class="fas fa-envelope"></i> Messages
-        <?php if ($unreadMsgs > 0): ?><span class="sidebar-badge"><?= $unreadMsgs ?></span><?php endif; ?>
-      </a>
-      <a href="reviews.php" class="admin-nav-link active"><i class="fas fa-star"></i> Reviews</a>
-      <div class="nav-section-label">System</div>
-      <a href="../index.php" target="_blank" class="admin-nav-link"><i class="fas fa-external-link-alt"></i> View
-        Website</a>
-      <a href="settings.php" class="admin-nav-link"><i class="fas fa-cog"></i> Settings</a>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="sidebar-user">
-        <div class="user-avatar"><?= strtoupper(substr($admin['name'], 0, 1)) ?></div>
-        <div>
-          <div class="user-name"><?= htmlspecialchars($admin['name']) ?></div>
-          <div class="user-role"><?= ucfirst($admin['role']) ?></div>
-        </div>
-        <a href="logout.php" class="btn-logout"><i class="fas fa-sign-out-alt"></i></a>
-      </div>
-    </div>
-  </aside>
+  <?php require_once 'sidebar.php'; ?>
 
-  <div class="admin-content">
+<div class="admin-content">
     <div class="admin-topbar">
       <div>
         <button class="d-lg-none" onclick="toggleSidebar()"
-          style="background:none;border:none;color:var(--primary);font-size:1.1rem;cursor:pointer;margin-right:0.75rem;"><i
+          class="topbar-menu-btn"><i
             class="fas fa-bars"></i></button>
         <span class="topbar-title">Reviews Management</span>
         <div class="topbar-breadcrumb"><?= $totalReviews ?> total reviews · Avg <?= number_format($avgRating, 1) ?>★
@@ -99,7 +60,7 @@ $avgRating = $totalReviews > 0 ? array_sum(array_column($reviews, 'rating')) / $
     <div class="admin-main">
       <?php if ($message): ?>
         <div
-          style="background:#dcfce7;color:#15803d;border-radius:10px;padding:12px 16px;font-size:0.87rem;font-weight:600;margin-bottom:1.5rem;display:flex;align-items:center;gap:8px;">
+          class="admin-alert success">
           <i class="fas fa-check-circle"></i> <?= htmlspecialchars($message) ?>
         </div>
       <?php endif; ?>
@@ -108,7 +69,7 @@ $avgRating = $totalReviews > 0 ? array_sum(array_column($reviews, 'rating')) / $
       <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
           <div class="dash-stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#d4a017,#f0c040);"><i
+            <div class="stat-icon stat-icon-gold"><i
                 class="fas fa-star"></i></div>
             <div class="stat-value"><?= $totalReviews ?></div>
             <div class="stat-name">Total Reviews</div>
@@ -116,7 +77,7 @@ $avgRating = $totalReviews > 0 ? array_sum(array_column($reviews, 'rating')) / $
         </div>
         <div class="col-6 col-md-3">
           <div class="dash-stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#2d6a4f,#52b788);"><i
+            <div class="stat-icon stat-icon-teal"><i
                 class="fas fa-trophy"></i></div>
             <div class="stat-value"><?= number_format($avgRating, 1) ?></div>
             <div class="stat-name">Average Rating</div>
@@ -124,7 +85,7 @@ $avgRating = $totalReviews > 0 ? array_sum(array_column($reviews, 'rating')) / $
         </div>
         <div class="col-6 col-md-3">
           <div class="dash-stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#1b6fb0,#3b9dd1);"><i
+            <div class="stat-icon stat-icon-sky"><i
                 class="fas fa-thumbs-up"></i></div>
             <div class="stat-value"><?= count(array_filter($reviews, fn($r) => $r['rating'] >= 4)) ?></div>
             <div class="stat-name">4-5 Star Reviews</div>
@@ -132,7 +93,7 @@ $avgRating = $totalReviews > 0 ? array_sum(array_column($reviews, 'rating')) / $
         </div>
         <div class="col-6 col-md-3">
           <div class="dash-stat-card">
-            <div class="stat-icon" style="background:linear-gradient(135deg,#c0392b,#e74c3c);"><i
+            <div class="stat-icon stat-icon-crimson"><i
                 class="fas fa-thumbs-down"></i></div>
             <div class="stat-value"><?= count(array_filter($reviews, fn($r) => $r['rating'] <= 2)) ?></div>
             <div class="stat-name">1-2 Star Reviews</div>
@@ -143,7 +104,7 @@ $avgRating = $totalReviews > 0 ? array_sum(array_column($reviews, 'rating')) / $
       <!-- Reviews Table -->
       <div class="admin-table-wrap">
         <div class="admin-table-header">
-          <div class="admin-table-title"><i class="fas fa-star me-2" style="color:var(--gold);"></i>All Reviews</div>
+          <div class="admin-table-title"><i class="fas fa-star me-2 section-icon-gold"></i>All Reviews</div>
           <div class="admin-search">
             <i class="fas fa-search"></i>
             <input type="text" id="reviewSearch" placeholder="Search reviews...">
@@ -151,7 +112,7 @@ $avgRating = $totalReviews > 0 ? array_sum(array_column($reviews, 'rating')) / $
         </div>
 
         <?php if ($reviews): ?>
-          <div style="overflow-x:auto;">
+          <div class="table-scroll">
             <table class="admin-table" id="reviewsTable">
               <thead>
                 <tr>
@@ -167,43 +128,43 @@ $avgRating = $totalReviews > 0 ? array_sum(array_column($reviews, 'rating')) / $
               <tbody>
                 <?php foreach ($reviews as $i => $review): ?>
                   <tr>
-                    <td style="color:var(--text-muted);font-size:0.8rem;"><?= $i + 1 ?></td>
+                    <td class="td-muted"><?= $i + 1 ?></td>
                     <td>
-                      <div style="display:flex;align-items:center;gap:8px;">
+                      <div class="reviewer-row">
                         <div
-                          style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.8rem;flex-shrink:0;">
+                          class="reviewer-avatar">
                           <?= strtoupper(substr($review['reviewer_name'] ?: 'A', 0, 1)) ?>
                         </div>
                         <span
-                          style="font-weight:600;font-size:0.87rem;color:var(--primary);"><?= htmlspecialchars($review['reviewer_name'] ?: 'Anonymous') ?></span>
+                          class="reviewer-name"><?= htmlspecialchars($review['reviewer_name'] ?: 'Anonymous') ?></span>
                       </div>
                     </td>
                     <td>
                       <a href="../listing.php?slug=<?= urlencode($review['listing_slug']) ?>" target="_blank"
-                        style="font-size:0.85rem;font-weight:600;color:var(--primary-mid);text-decoration:none;">
+                        class="review-listing-link">
                         <?= htmlspecialchars($review['listing_name']) ?> <i class="fas fa-external-link-alt"
-                          style="font-size:0.65rem;"></i>
+                          ></i>
                       </a>
                     </td>
                     <td>
-                      <div style="display:flex;align-items:center;gap:4px;">
-                        <div style="display:flex;gap:1px;">
+                      <div class="review-stars">
+                        <div class="review-stars-row">
                           <?php for ($s = 1; $s <= 5; $s++): ?>
                             <i class="<?= $s <= $review['rating'] ? 'fas' : 'far' ?> fa-star"
-                              style="font-size:0.82rem;color:<?= $s <= $review['rating'] ? 'var(--gold)' : 'var(--gray-200)' ?>;"></i>
+                              class="<?= $s <= $review['rating'] ? 'star-filled' : 'star-empty' ?>"></i>
                           <?php endfor; ?>
                         </div>
-                        <span style="font-size:0.8rem;font-weight:700;color:var(--primary);"><?= $review['rating'] ?></span>
+                        <span class="review-rating-val"><?= $review['rating'] ?></span>
                       </div>
                     </td>
-                    <td style="max-width:240px;">
+                    <td>
                       <div
-                        style="font-size:0.83rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"
+                        class="review-comment"
                         title="<?= htmlspecialchars($review['comment']) ?>">
                         <?= htmlspecialchars($review['comment']) ?>
                       </div>
                     </td>
-                    <td style="font-size:0.8rem;color:var(--text-muted);white-space:nowrap;">
+                    <td class="td-small" style="white-space:nowrap;">
                       <?= date('M j, Y', strtotime($review['created_at'])) ?></td>
                     <td>
                       <button
@@ -218,10 +179,10 @@ $avgRating = $totalReviews > 0 ? array_sum(array_column($reviews, 'rating')) / $
             </table>
           </div>
         <?php else: ?>
-          <div style="text-align:center;padding:4rem 2rem;color:var(--text-muted);">
-            <i class="fas fa-star" style="font-size:3rem;color:var(--gray-200);display:block;margin-bottom:1rem;"></i>
-            <div style="font-weight:600;color:var(--primary);margin-bottom:0.25rem;">No reviews yet</div>
-            <div style="font-size:0.85rem;">Visitor reviews will appear here once submitted.</div>
+          <div class="empty-state">
+            <i class="fas fa-star empty-icon-lg"></i>
+            <div class="empty-title">No reviews yet</div>
+            <div class="empty-body">Visitor reviews will appear here once submitted.</div>
           </div>
         <?php endif; ?>
       </div>
@@ -229,12 +190,9 @@ $avgRating = $totalReviews > 0 ? array_sum(array_column($reviews, 'rating')) / $
     </div>
   </div>
 
-  <div class="sidebar-overlay d-none" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
+  <?php require_once 'scripts.php'; ?>
+<script>
     function toggleSidebar() {
       document.getElementById('adminSidebar').classList.toggle('open');
       document.getElementById('sidebarOverlay').classList.toggle('d-none');
@@ -305,11 +263,11 @@ $avgRating = $totalReviews > 0 ? array_sum(array_column($reviews, 'rating')) / $
         animation: slideInRight 0.3s ease;
     `;
       toast.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="toast-inner">
             <i class="fas fa-star"></i>
             <div>
-                <div style="font-weight: 700;">${title}</div>
-                <div style="font-size: 0.85rem; opacity: 0.85;">${message}</div>
+                <div class="toast-title">${title}</div>
+                <div class="toast-body">${message}</div>
             </div>
         </div>
     `;
@@ -344,6 +302,5 @@ $avgRating = $totalReviews > 0 ? array_sum(array_column($reviews, 'rating')) / $
       });
     }
   </script>
-</body>
 
-</html>
+</body>

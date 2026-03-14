@@ -20,6 +20,7 @@ $categories = getCategories();
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="x-icon" href="assets/images/logo.png">
   <title><?= htmlspecialchars($listing['name']) ?> - <?= SITE_NAME ?></title>
   <meta name="description" content="<?= htmlspecialchars(substr($listing['description'], 0, 155)) ?>">
   <link

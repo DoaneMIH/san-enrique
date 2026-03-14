@@ -57,9 +57,9 @@ $adminInfo = $db->query("SELECT * FROM admins WHERE id=" . (int) $admin['id'])->
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Settings - Admin Panel</title>
+  <title>Settings — Admin Panel</title>
   <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Nunito:wght@300;400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -68,64 +68,29 @@ $adminInfo = $db->query("SELECT * FROM admins WHERE id=" . (int) $admin['id'])->
 
 <body>
 
-  <aside class="admin-sidebar" id="adminSidebar">
-    <div class="sidebar-brand">
-      <div class="brand-logo">🌿</div>
-      <div>
-        <div class="brand-text">San Enrique</div>
-        <div class="brand-sub">Tourism Hub Admin</div>
-      </div>
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section-label">Main</div>
-      <a href="dashboard.php" class="admin-nav-link"><i class="fas fa-home"></i> Dashboard</a>
-      <a href="listings.php" class="admin-nav-link"><i class="fas fa-map-marker-alt"></i> Listings</a>
-      <a href="categories.php" class="admin-nav-link"><i class="fas fa-th-large"></i> Categories</a>
-      <a href="events.php" class="admin-nav-link"><i class="fas fa-calendar-alt"></i> Events</a>
-      <div class="nav-section-label">Communication</div>
-      <a href="messages.php" class="admin-nav-link">
-        <i class="fas fa-envelope"></i> Messages
-        <?php if ($unreadMsgs > 0): ?><span class="sidebar-badge"><?= $unreadMsgs ?></span><?php endif; ?>
-      </a>
-      <a href="reviews.php" class="admin-nav-link"><i class="fas fa-star"></i> Reviews</a>
-      <div class="nav-section-label">System</div>
-      <a href="../index.php" target="_blank" class="admin-nav-link"><i class="fas fa-external-link-alt"></i> View
-        Website</a>
-      <a href="settings.php" class="admin-nav-link active"><i class="fas fa-cog"></i> Settings</a>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="sidebar-user">
-        <div class="user-avatar"><?= strtoupper(substr($admin['name'], 0, 1)) ?></div>
-        <div>
-          <div class="user-name"><?= htmlspecialchars($admin['name']) ?></div>
-          <div class="user-role"><?= ucfirst($admin['role']) ?></div>
-        </div>
-        <a href="logout.php" class="btn-logout"><i class="fas fa-sign-out-alt"></i></a>
-      </div>
-    </div>
-  </aside>
+  <?php require_once 'sidebar.php'; ?>
 
-  <div class="admin-content">
+<div class="admin-content">
     <div class="admin-topbar">
       <div>
         <button class="d-lg-none" onclick="toggleSidebar()"
-          style="background:none;border:none;color:var(--primary);font-size:1.1rem;cursor:pointer;margin-right:0.75rem;"><i
+          class="topbar-menu-btn"><i
             class="fas fa-bars"></i></button>
-        <span class="topbar-title">Settings</span>
-        <div class="topbar-breadcrumb">Manage your admin account</div>
+        <div class="topbar-title">Settings</div>
+        <div class="topbar-breadcrumb">Account Settings &amp; System Info</div>
       </div>
     </div>
 
     <div class="admin-main">
       <?php if ($message): ?>
         <div
-          style="background:#dcfce7;color:#15803d;border-radius:10px;padding:12px 16px;font-size:0.87rem;font-weight:600;margin-bottom:1.5rem;display:flex;align-items:center;gap:8px;">
+          class="admin-alert success">
           <i class="fas fa-check-circle"></i> <?= htmlspecialchars($message) ?>
         </div>
       <?php endif; ?>
       <?php if ($error): ?>
         <div
-          style="background:#fee2e2;color:#dc2626;border-radius:10px;padding:12px 16px;font-size:0.87rem;font-weight:600;margin-bottom:1.5rem;display:flex;align-items:center;gap:8px;">
+          class="admin-alert error">
           <i class="fas fa-exclamation-circle"></i> <?= htmlspecialchars($error) ?>
         </div>
       <?php endif; ?>
@@ -136,31 +101,31 @@ $adminInfo = $db->query("SELECT * FROM admins WHERE id=" . (int) $admin['id'])->
         <div class="col-lg-6">
           <div class="admin-form-card">
             <div class="admin-form-header">
-              <div style="display:flex;align-items:center;gap:10px;">
+              <div class="form-section-header">
                 <div
-                  style="width:40px;height:40px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.1rem;">
+                  class="form-section-icon stat-icon-green">
                   <i class="fas fa-user"></i>
                 </div>
                 <div>
-                  <div style="font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--primary);">Profile
+                  <div class="form-section-title">Profile
                     Information</div>
-                  <div style="font-size:0.75rem;color:var(--text-muted);">Update your account details</div>
+                  <div class="form-section-sub">Update your account details</div>
                 </div>
               </div>
             </div>
             <form method="POST" action="">
               <input type="hidden" name="form_action" value="update_profile">
-              <div class="admin-form-body" style="display:flex;flex-direction:column;gap:1rem;">
+              <div class="admin-form-body-flex">
                 <!-- Avatar Preview -->
-                <div style="text-align:center;padding:1rem;background:var(--content-bg);border-radius:12px;">
+                <div class="profile-avatar-block">
                   <div
-                    style="width:72px;height:72px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:20px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:2rem;margin:0 auto 0.75rem;">
+                    class="profile-avatar-icon">
                     <?= strtoupper(substr($adminInfo['full_name'], 0, 1)) ?>
                   </div>
                   <div
-                    style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--primary);font-weight:700;">
+                    class="profile-avatar-name">
                     <?= htmlspecialchars($adminInfo['full_name']) ?></div>
-                  <div style="font-size:0.78rem;color:var(--text-muted);"><?= ucfirst($adminInfo['role']) ?></div>
+                  <div class="profile-avatar-role"><?= ucfirst($adminInfo['role']) ?></div>
                 </div>
 
                 <div>
@@ -176,14 +141,14 @@ $adminInfo = $db->query("SELECT * FROM admins WHERE id=" . (int) $admin['id'])->
                 <div>
                   <label class="admin-label">Username</label>
                   <input type="text" class="admin-input" value="<?= htmlspecialchars($adminInfo['username']) ?>"
-                    disabled style="background:var(--content-bg);cursor:not-allowed;color:var(--text-muted);">
-                  <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;"><i
+                    disabled class="admin-input admin-input-disabled">
+                  <div class="input-hint-sm"><i
                       class="fas fa-info-circle me-1"></i>Username cannot be changed.</div>
                 </div>
                 <div>
                   <label class="admin-label">Role</label>
                   <input type="text" class="admin-input" value="<?= ucfirst($adminInfo['role']) ?>" disabled
-                    style="background:var(--content-bg);cursor:not-allowed;color:var(--text-muted);">
+                    class="admin-input admin-input-disabled">
                 </div>
               </div>
               <div class="admin-form-footer">
@@ -199,57 +164,54 @@ $adminInfo = $db->query("SELECT * FROM admins WHERE id=" . (int) $admin['id'])->
         <div class="col-lg-6">
           <div class="admin-form-card">
             <div class="admin-form-header">
-              <div style="display:flex;align-items:center;gap:10px;">
+              <div class="form-section-header">
                 <div
-                  style="width:40px;height:40px;background:linear-gradient(135deg,#b7791f,#d4a017);border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.1rem;">
+                  class="form-section-icon form-header-icon-amber">
                   <i class="fas fa-lock"></i>
                 </div>
                 <div>
-                  <div style="font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--primary);">Change
+                  <div class="form-section-title">Change
                     Password</div>
-                  <div style="font-size:0.75rem;color:var(--text-muted);">Update your login password</div>
+                  <div class="form-section-sub">Update your login password</div>
                 </div>
               </div>
             </div>
             <form method="POST" action="" id="passwordForm">
               <input type="hidden" name="form_action" value="change_password">
-              <div class="admin-form-body" style="display:flex;flex-direction:column;gap:1rem;">
+              <div class="admin-form-body-flex">
                 <div>
                   <label class="admin-label">Current Password *</label>
-                  <div style="position:relative;">
+                  <div class="pw-field-wrap">
                     <input type="password" name="current_password" class="admin-input" id="cp" required
                       placeholder="Enter current password">
-                    <button type="button" onclick="togglePw('cp','eye1')"
-                      style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);">
+                    <button type="button" onclick="togglePw('cp','eye1')" class="input-toggle-btn">
                       <i class="fas fa-eye" id="eye1"></i>
                     </button>
                   </div>
                 </div>
                 <div>
                   <label class="admin-label">New Password *</label>
-                  <div style="position:relative;">
+                  <div class="pw-field-wrap">
                     <input type="password" name="new_password" class="admin-input" id="np" required
                       placeholder="At least 6 characters" oninput="checkStrength(this.value)">
-                    <button type="button" onclick="togglePw('np','eye2')"
-                      style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);">
+                    <button type="button" onclick="togglePw('np','eye2')" class="input-toggle-btn">
                       <i class="fas fa-eye" id="eye2"></i>
                     </button>
                   </div>
                   <!-- Password Strength -->
-                  <div style="margin-top:6px;">
-                    <div style="height:4px;border-radius:2px;background:var(--border);overflow:hidden;">
-                      <div id="strengthBar" style="height:100%;width:0;border-radius:2px;transition:all 0.3s;"></div>
+                  <div class="pw-strength-wrap">
+                    <div class="pw-strength-bar-bg">
+                      <div id="strengthBar" class="pw-strength-bar"></div>
                     </div>
-                    <div id="strengthLabel" style="font-size:0.72rem;color:var(--text-muted);margin-top:3px;"></div>
+                    <div id="strengthLabel" class="pw-strength-label"></div>
                   </div>
                 </div>
                 <div>
                   <label class="admin-label">Confirm New Password *</label>
-                  <div style="position:relative;">
+                  <div class="pw-field-wrap">
                     <input type="password" name="confirm_password" class="admin-input" id="cnp" required
                       placeholder="Repeat new password">
-                    <button type="button" onclick="togglePw('cnp','eye3')"
-                      style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);">
+                    <button type="button" onclick="togglePw('cnp','eye3')" class="input-toggle-btn">
                       <i class="fas fa-eye" id="eye3"></i>
                     </button>
                   </div>
@@ -264,10 +226,9 @@ $adminInfo = $db->query("SELECT * FROM admins WHERE id=" . (int) $admin['id'])->
           </div>
 
           <!-- SYSTEM INFO -->
-          <div class="admin-form-card" style="margin-top:1.25rem;">
+          <div class="admin-form-card mt-3">
             <div class="admin-form-header">
-              <div style="font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--primary);">
-                <i class="fas fa-info-circle me-2" style="color:var(--accent);"></i>System Information
+              <div class="form-header-title"><i class="fas fa-info-circle me-2"></i>System Information
               </div>
             </div>
             <div class="admin-form-body">
@@ -282,9 +243,9 @@ $adminInfo = $db->query("SELECT * FROM admins WHERE id=" . (int) $admin['id'])->
               foreach ($sysItems as [$label, $value]):
                 ?>
                 <div
-                  style="display:flex;justify-content:space-between;padding:0.65rem 0;border-bottom:1px solid var(--border);font-size:0.86rem;">
-                  <span style="color:var(--text-muted);font-weight:600;"><?= $label ?></span>
-                  <span style="color:var(--primary);font-family:monospace;"><?= htmlspecialchars($value) ?></span>
+                  class="sys-info-row sys-info-row-sm">
+                  <span class="sys-info-label"><?= $label ?></span>
+                  <span class="sys-info-value"><?= htmlspecialchars($value) ?></span>
                 </div>
               <?php endforeach; ?>
             </div>
@@ -295,8 +256,7 @@ $adminInfo = $db->query("SELECT * FROM admins WHERE id=" . (int) $admin['id'])->
         <div class="col-12">
           <div class="admin-form-card">
             <div class="admin-form-header">
-              <div style="font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--primary);">
-                <i class="fas fa-bolt me-2" style="color:var(--gold);"></i>Quick Setup Guide
+              <div class="form-header-title"><i class="fas fa-bolt me-2 section-icon-gold"></i>Quick Setup Guide
               </div>
             </div>
             <div class="admin-form-body">
@@ -312,20 +272,20 @@ $adminInfo = $db->query("SELECT * FROM admins WHERE id=" . (int) $admin['id'])->
                   ?>
                   <div class="col-md-6 col-lg-3">
                     <div
-                      style="background:var(--content-bg);border-radius:12px;padding:1.25rem;border:1px solid var(--border);height:100%;">
-                      <div style="display:flex;align-items:center;gap:10px;margin-bottom:0.75rem;">
+                      class="setup-guide-item h-100">
+                      <div class="setup-guide-header">
                         <div
                           style="width:36px;height:36px;background:<?= $color ?>;border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:0.9rem;flex-shrink:0;">
                           <i class="<?= $icon ?>"></i>
                         </div>
                         <div>
                           <div
-                            style="font-size:0.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">
+                            class="setup-guide-step-label">
                             Step <?= $num ?></div>
-                          <div style="font-weight:700;color:var(--primary);font-size:0.88rem;"><?= $title ?></div>
+                          <div class="setup-guide-title"><?= $title ?></div>
                         </div>
                       </div>
-                      <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.6;margin:0;"><?= $desc ?></p>
+                      <p class="setup-guide-desc"><?= $desc ?></p>
                     </div>
                   </div>
                 <?php endforeach; ?>
@@ -338,17 +298,8 @@ $adminInfo = $db->query("SELECT * FROM admins WHERE id=" . (int) $admin['id'])->
     </div>
   </div>
 
-  <div class="sidebar-overlay d-none" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    function toggleSidebar() {
-      document.getElementById('adminSidebar').classList.toggle('open');
-      document.getElementById('sidebarOverlay').classList.toggle('d-none');
-    }
-
+  <?php require_once 'scripts.php'; ?>
+<script>
     function togglePw(inputId, iconId) {
       const inp = document.getElementById(inputId);
       const ico = document.getElementById(iconId);
@@ -395,6 +346,5 @@ $adminInfo = $db->query("SELECT * FROM admins WHERE id=" . (int) $admin['id'])->
       }
     });
   </script>
-</body>
 
-</html>
+</body>
