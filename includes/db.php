@@ -3,7 +3,7 @@ define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'san_enrique_tourism');
-define('GOOGLE_MAPS_API_KEY', 'AIzaSyDYv7c_1FD5g0pnqTkG7cUxEXApvgQpQNw');
+define('GOOGLE_MAPS_API_KEY', 'Your_Api_Map_Key');
 
 function getDB()
 {
