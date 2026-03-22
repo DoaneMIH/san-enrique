@@ -56,6 +56,7 @@ $adminInfo = $db->query("SELECT * FROM admins WHERE id=" . (int) $admin['id'])->
 
 <head>
   <meta charset="UTF-8">
+  <meta name="site-base" content="<?= rtrim(BASE_URL, '/') ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Settings — Admin Panel</title>
   <link

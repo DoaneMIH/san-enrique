@@ -888,7 +888,7 @@ body {
 
 .listing-name {
     font-weight: 700;
-    font-size: 0.87rem;
+    font-size: 0.80rem;
     color: var(--g1);
 }
 
@@ -3763,4 +3763,415 @@ body:has(.login-page) {
 
 .pw-field-wrap .admin-input {
     padding-right: 44px;
+}
+/* ═══════════════════════════════════════════════════════════════════════
+   PHOTO TAB TOGGLE — Upload File / Paste URL (Featured Image & Gallery)
+   ═══════════════════════════════════════════════════════════════════════ */
+.photo-tab-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.btn-photo-tab {
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    font-family: 'Nunito', sans-serif;
+}
+
+.btn-photo-tab.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+
+.btn-photo-tab.inactive {
+    background: transparent;
+    color: var(--text-muted);
+    border-color: var(--border);
+}
+
+.btn-photo-tab:hover:not(.active) {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(45, 106, 79, 0.04);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   URL INPUT — shared for featured image & gallery URL inputs
+   ═══════════════════════════════════════════════════════════════════════ */
+.url-input-row {
+    margin-bottom: 8px;
+}
+
+.url-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.url-input-icon {
+    position: absolute;
+    left: 14px;
+    color: var(--accent);
+    font-size: 0.82rem;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.url-input-field {
+    padding-left: 38px !important;
+    padding-right: 14px !important;
+    margin-bottom: 0 !important;
+}
+
+/* Featured URL preview thumbnail */
+.url-thumb-preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    padding: 8px 12px;
+    background: var(--gray-50, #f8faf8);
+    border: 1.5px solid var(--accent);
+    border-radius: 10px;
+}
+
+.url-thumb-preview img {
+    width: 120px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.url-thumb-status {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+/* Google Drive hint */
+.form-hint-gdrive {
+    margin-top: 6px;
+    background: rgba(66, 133, 244, 0.06);
+    border: 1px solid rgba(66, 133, 244, 0.18);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: #1a73e8;
+    font-size: 0.76rem;
+}
+
+.form-hint-gdrive .fab.fa-google-drive {
+    color: #1a73e8;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   GALLERY — URL input rows (dynamic)
+   ═══════════════════════════════════════════════════════════════════════ */
+.gallery-url-inputs-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.gallery-url-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.gallery-url-row .url-input-wrap {
+    width: 100%;
+}
+
+.gallery-url-row .url-input-field {
+    padding-right: 42px !important;
+}
+
+.gallery-url-row-remove {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--gray-300);
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    transition: all 0.2s;
+}
+
+.gallery-url-row-remove:hover {
+    background: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+}
+
+/* Gallery URL row — inline thumbnail preview */
+.gallery-url-row-thumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 38px;
+}
+
+.gallery-url-row-thumb img {
+    width: 60px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1.5px solid var(--accent);
+}
+
+.gallery-url-row-thumb .url-thumb-status {
+    font-size: 0.68rem;
+}
+
+/* "Add Image URL" button */
+.btn-add-gallery-url {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 18px;
+    border: 2px dashed var(--accent);
+    background: rgba(45, 106, 79, 0.03);
+    color: var(--accent);
+    border-radius: 10px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Nunito', sans-serif;
+    margin-bottom: 6px;
+}
+
+.btn-add-gallery-url:hover {
+    background: rgba(45, 106, 79, 0.08);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   GALLERY THUMB — type badge (url / file indicator on saved thumbnails)
+   ═══════════════════════════════════════════════════════════════════════ */
+.gallery-thumb-type {
+    position: absolute;
+    bottom: 3px;
+    left: 3px;
+    font-size: 0.55rem;
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: #fff;
+    line-height: 1.5;
+    pointer-events: none;
+}
+
+.gallery-thumb-type.url {
+    background: rgba(37, 99, 235, 0.8);
+}
+
+.gallery-thumb-type.file {
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.gallery-thumb-new {
+    border-color: var(--accent) !important;
+}
+
+.gallery-thumb-new img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .url-thumb-preview img {
+        width: 80px;
+        height: 55px;
+    }
+
+    .gallery-url-row-thumb {
+        margin-left: 0;
+    }
+
+    .gallery-url-row-thumb img {
+        width: 50px;
+        height: 38px;
+    }
+
+    .btn-add-gallery-url {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   GALLERY — Combined upload + URL layout (both visible simultaneously)
+   ═══════════════════════════════════════════════════════════════════════ */
+.gallery-method-block {
+    margin-bottom: 6px;
+}
+
+.gallery-method-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.gallery-method-label i {
+    font-size: 0.72rem;
+}
+
+.gallery-or-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 14px 0;
+}
+
+.gallery-or-divider::before,
+.gallery-or-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+.gallery-or-divider span {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+}
+
+/* ── Admin sidebar SVG logo ── */
+.sidebar-brand-logo-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════════════
+   LIVE UPDATE — Admin toast notification
+   ══════════════════════════════════════════════════════ */
+.admin-live-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #0f5132, #16a34a);
+    color: #fff;
+    padding: 14px 18px;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(15, 81, 50, 0.35), 0 2px 8px rgba(0,0,0,0.15);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    max-width: 320px;
+    pointer-events: auto;
+    opacity: 0;
+    transform: translateX(340px);
+    transition: opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-live-toast.alt-visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.alt-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.alt-body { flex: 1; min-width: 0; }
+.alt-title { font-weight: 700; font-size: 0.875rem; line-height: 1.2; }
+.alt-sub   { font-size: 0.78rem; opacity: 0.8; margin-top: 2px; }
+
+.alt-close {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: #fff;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s;
+    padding: 0;
+    line-height: 1;
+}
+
+.alt-close:hover { background: rgba(255,255,255,0.28); }
+
+/* ── Live-update pulse indicator (subtle dot in topbar) ── */
+.live-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    display: inline-block;
+    position: relative;
+    margin-left: 4px;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+.live-indicator::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 2px solid #22c55e;
+    opacity: 0;
+    animation: livePulse 2.5s ease-out infinite;
+}
+
+@keyframes livePulse {
+    0%   { transform: scale(0.8); opacity: 0.7; }
+    70%  { transform: scale(1.8); opacity: 0; }
+    100% { opacity: 0; }
 }

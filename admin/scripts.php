@@ -37,3 +37,24 @@
       });
     }, 5000);
   </script>
+  <script src="../assets/js/live-update.js"></script>
+
+  <script>
+    /* ── Live indicator dot — shows polling is active ── */
+    (function () {
+      function injectLiveIndicator() {
+        var title = document.querySelector('.topbar-title, .topbar-breadcrumb');
+        if (!title || document.querySelector('.live-indicator')) return;
+        var dot = document.createElement('span');
+        dot.className   = 'live-indicator';
+        dot.title       = 'Live updates active';
+        dot.setAttribute('aria-label', 'Live updates active');
+        // Insert after the title text of the TOPBAR
+        var topbar = document.querySelector('.admin-topbar .topbar-left');
+        if (topbar) topbar.appendChild(dot);
+      }
+      if (document.readyState === 'complete') injectLiveIndicator();
+      else window.addEventListener('load', injectLiveIndicator);
+    })();
+  </script>
+

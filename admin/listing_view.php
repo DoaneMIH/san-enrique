@@ -30,6 +30,7 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
 
 <head>
   <meta charset="UTF-8">
+  <meta name="site-base" content="<?= rtrim(BASE_URL, '/') ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($listing['name']) ?> - Admin View</title>
   <link
@@ -196,8 +197,12 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
             </div>
             <div class="lv-gallery-grid">
               <?php foreach ($galleryPhotos as $gi => $gPhoto):
-                $gClean = preg_replace('#^(\.\./)+#', '', $gPhoto);
-                $gUrl   = BASE_URL . '/' . ltrim($gClean, '/');
+                if (strpos($gPhoto, 'http://') === 0 || strpos($gPhoto, 'https://') === 0) {
+                  $gUrl = $gPhoto;
+                } else {
+                  $gClean = preg_replace('#^(\.\./)+#', '', $gPhoto);
+                  $gUrl   = BASE_URL . '/' . ltrim($gClean, '/');
+                }
               ?>
               <div class="lv-gallery-item">
                 <img src="<?= htmlspecialchars($gUrl) ?>"

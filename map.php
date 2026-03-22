@@ -308,7 +308,7 @@ $mapListings = getAllListingsForMap();
   <div class="map-sidebar" id="mapSidebar">
     <div class="map-sidebar-header">
       <div style="display:flex;align-items:center;gap:10px;">
-        <span style="font-size:1.5rem;">🌿</span>
+        <img src="assets/images/logo-tourism.svg" alt="San Enrique" style="width:36px;height:36px;border-radius:8px;object-fit:contain;">
         <div>
           <div style="font-family:'Playfair Display',serif;font-weight:700;color:white;font-size:0.95rem;">San Enrique
           </div>

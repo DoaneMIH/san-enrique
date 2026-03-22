@@ -19,6 +19,7 @@ $categories = getCategories();
 
 <head>
   <meta charset="UTF-8">
+  <meta name="site-base" content="<?= rtrim(BASE_URL, '/') ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" type="x-icon" href="assets/images/logo.png">
   <title><?= htmlspecialchars($listing['name']) ?> - <?= SITE_NAME ?></title>
@@ -518,7 +519,15 @@ $categories = getCategories();
 
   <!-- NAVBAR -->
   <nav class="navbar-main scrolled">
-    <div class="container">
+    <!-- <div class="container">
+      <div class="d-flex align-items-center justify-content-between w-100">
+        <a href="index.php" class="navbar-brand-wrap text-decoration-none">
+          <img src="assets/images/logo-tourism.svg" alt="San Enrique" class="navbar-brand-logo-img">
+          <div class="brand-text-wrap">
+            <div class="brand-name">San Enrique</div>
+            <div class="brand-sub">Tourism Hub</div>
+          </div> -->
+          <div class="container">
       <div class="d-flex align-items-center justify-content-between w-100">
         <a href="index.php" class="navbar-brand-wrap text-decoration-none">
           <div class="brand-logo">🌿</div>
@@ -930,10 +939,11 @@ $categories = getCategories();
             <i class="fas fa-star me-2" style="color:var(--gold);"></i> Reviews (<?= count($reviews) ?>)
           </h3>
 
+          <div id="reviewsList" data-listing-id="<?= $listing['id'] ?>">
           <?php if ($reviews): ?>
             <div style="display:flex;flex-direction:column;gap:1rem;margin-bottom:1.5rem;">
               <?php foreach ($reviews as $review): ?>
-                <div
+                <div class="review-item" data-review-id="<?= $review['id'] ?>"
                   style="background:var(--gray-50);border-radius:12px;padding:1.25rem;border-left:3px solid var(--accent);">
                   <div class="d-flex align-items-center justify-content-between mb-1">
                     <strong
@@ -951,6 +961,7 @@ $categories = getCategories();
           <?php else: ?>
             <p style="color:var(--text-muted);font-size:0.88rem;">No reviews yet. Be the first to leave one!</p>
           <?php endif; ?>
+          </div><!-- /#reviewsList -->
 
           <!-- Review Form -->
           <div style="background:var(--off-white);border-radius:12px;padding:1.5rem;border:1px solid var(--gray-100);">
@@ -1098,14 +1109,11 @@ $categories = getCategories();
         <div class="col-lg-4">
           <div class="footer-logo">
             <div class="d-flex align-items-center gap-3">
-              <div class="brand-logo"
-                style="width:44px;height:44px;background:linear-gradient(135deg,#52b788,#d4a017);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">
-                🌿</div>
+              <img src="assets/images/logo-tourism.svg" alt="San Enrique" class="footer-logo-img">
               <div>
-                <div style="font-family:'Playfair Display',serif;color:white;font-size:1.1rem;font-weight:700;">San
+                <div class="footer-logo-title">San
                   Enrique Tourism Hub</div>
-                <div
-                  style="font-size:0.7rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em;">
+                <div class="footer-logo-sub">
                   Official LGU Tourism Platform</div>
               </div>
             </div>
@@ -1251,6 +1259,7 @@ $categories = getCategories();
     }, 190000);
   });
 </script>
+  <script src="assets/js/live-update.js"></script>
 </body>
 
 </html>

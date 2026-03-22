@@ -69,6 +69,7 @@ $iconSuggestions = ['fas fa-umbrella-beach', 'fas fa-home', 'fas fa-landmark', '
 
 <head>
   <meta charset="UTF-8">
+  <meta name="site-base" content="<?= rtrim(BASE_URL, '/') ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Categories - Admin Panel</title>
   <link

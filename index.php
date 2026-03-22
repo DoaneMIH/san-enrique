@@ -23,6 +23,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
 
 <head>
   <meta charset="UTF-8">
+  <meta name="site-base" content="<?= rtrim(BASE_URL, '/') ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" type="x-icon" href="assets/images/logo.png">
   <title><?= SITE_NAME ?> - <?= SITE_TAGLINE ?></title>
@@ -407,6 +408,29 @@ foreach (['listings', 'categories', 'events'] as $_t) {
     }
     .contact-section .container { position:relative; z-index:2; }
 
+    /* ── Products section: agricultural parallax ──── */
+    .products-section {
+      background:
+        linear-gradient(160deg, rgba(13,43,30,0.88) 0%, rgba(27,67,50,0.82) 50%, rgba(64,145,108,0.65) 100%),
+        url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80') center/cover no-repeat fixed !important;
+      position: relative;
+      overflow: hidden;
+    }
+    .products-section::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:80px;
+      background: linear-gradient(to bottom, var(--off-white,#f8faf8), transparent);
+      z-index:1; pointer-events:none;
+    }
+    .products-section::after {
+      content:''; position:absolute; bottom:0; left:0; right:0; height:80px;
+      background: linear-gradient(to top, var(--off-white,#f8faf8), transparent);
+      z-index:1; pointer-events:none;
+    }
+    .products-section .container { position:relative; z-index:2; }
+    .products-section .section-title { color: #fff !important; text-shadow: 0 2px 12px rgba(0,0,0,0.4); }
+    .products-section .section-label { color: var(--gold-light, #f0c040) !important; }
+    .products-section .section-subtitle { color: rgba(255,255,255,0.75) !important; }
+
     /* ── Map section background ─────────────────────── */
     .map-section {
       background:
@@ -684,7 +708,15 @@ foreach (['listings', 'categories', 'events'] as $_t) {
 
   <!-- NAVBAR -->
   <nav class="navbar-main">
-    <div class="container">
+    <!-- <div class="container">
+      <div class="d-flex align-items-center justify-content-between w-100">
+        <a href="index.php" class="navbar-brand-wrap text-decoration-none">
+          <img src="assets/images/logo-tourism.svg" alt="San Enrique" class="navbar-brand-logo-img">
+          <div class="brand-text-wrap">
+            <div class="brand-name">San Enrique</div>
+            <div class="brand-sub">Tourism Hub</div>
+          </div> -->
+          <div class="container">
       <div class="d-flex align-items-center justify-content-between w-100">
         <a href="index.php" class="navbar-brand-wrap text-decoration-none">
           <div class="brand-logo">🌿</div>
@@ -1128,6 +1160,139 @@ foreach (['listings', 'categories', 'events'] as $_t) {
     </div>
   </section>
 
+  <!-- LOCAL PRODUCTS SECTION -->
+  <!-- <section id="products" class="products-section" style="position:relative;overflow:hidden;">
+    <div class="container" style="position:relative;z-index:2;">
+      <div class="text-center mb-4 animate-on-scroll">
+        <div class="section-label justify-content-center"><span></span>Farm to Market<span></span></div>
+        <h2 class="section-title">Local Products &amp; Industries</h2>
+        <p class="section-subtitle mx-auto">San Enrique's fertile lands and hardworking people produce a rich variety of agricultural goods, handicrafts, and emerging industries.</p>
+      </div> -->
+
+      <!-- Filter tabs -->
+      <!-- <div class="products-filter animate-on-scroll delay-1">
+        <button class="products-filter-btn active" data-filter="all"><i class="fas fa-th-large"></i> All</button>
+        <button class="products-filter-btn" data-filter="crops"><i class="fas fa-seedling"></i> Crops</button>
+        <button class="products-filter-btn" data-filter="crafts"><i class="fas fa-hands"></i> Handicrafts</button>
+        <button class="products-filter-btn" data-filter="industry"><i class="fas fa-industry"></i> Industries</button>
+      </div> -->
+
+      <!-- Products grid -->
+      <!-- <div class="products-grid">
+        <div class="product-card animate-on-scroll delay-1" data-category="crops">
+          <div class="product-card-img">
+            <img src="https://images.unsplash.com/photo-1560493676-04071c5f467b?w=600&q=80" alt="Sugarcane" loading="lazy">
+            <div class="product-card-overlay"><span class="product-tag">Primary Crop</span></div>
+          </div>
+          <div class="product-card-body">
+            <div class="product-icon-wrap"><i class="fas fa-candy-cane"></i></div>
+            <h3 class="product-card-title">Sugarcane</h3>
+            <p class="product-card-desc">A cornerstone crop in San Enrique. Seasonal workers join the planting and harvesting seasons, fueling the local economy.</p>
+            <div class="product-card-tags"><span><i class="fas fa-calendar-alt me-1"></i>Seasonal</span><span><i class="fas fa-map-marker-alt me-1"></i>Municipality-wide</span></div>
+          </div>
+        </div> -->
+
+        <!-- <div class="product-card animate-on-scroll delay-2" data-category="crops">
+          <div class="product-card-img">
+            <img src="https://images.unsplash.com/photo-1536304993881-460e27c6fc23?w=600&q=80" alt="Rice Paddy" loading="lazy">
+            <div class="product-card-overlay"><span class="product-tag">Staple Crop</span></div>
+          </div>
+          <div class="product-card-body">
+            <div class="product-icon-wrap"><i class="fas fa-leaf"></i></div>
+            <h3 class="product-card-title">Rice (Palay)</h3>
+            <p class="product-card-desc">One of the primary crops cultivated across the municipality. Local rice mills support production from field to table.</p>
+            <div class="product-card-tags"><span><i class="fas fa-warehouse me-1"></i>Rice Mills</span><span><i class="fas fa-utensils me-1"></i>Staple Food</span></div>
+          </div>
+        </div> -->
+
+        <!-- <div class="product-card animate-on-scroll delay-3" data-category="crops">
+          <div class="product-card-img">
+            <img src="https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?w=600&q=80" alt="Corn" loading="lazy">
+            <div class="product-card-overlay"><span class="product-tag">Major Crop</span></div>
+          </div>
+          <div class="product-card-body">
+            <div class="product-icon-wrap"><i class="fas fa-spa"></i></div>
+            <h3 class="product-card-title">Corn</h3>
+            <p class="product-card-desc">Another major agricultural product grown in San Enrique, serving both as food and essential livestock feed.</p>
+            <div class="product-card-tags"><span><i class="fas fa-drumstick-bite me-1"></i>Food &amp; Feed</span><span><i class="fas fa-tractor me-1"></i>Wide Farming</span></div>
+          </div>
+        </div> -->
+
+        <!-- <div class="product-card animate-on-scroll delay-1" data-category="crops">
+          <div class="product-card-img">
+            <img src="https://images.unsplash.com/photo-1580984969071-a8da8c45583a?w=600&q=80" alt="Coconut" loading="lazy">
+            <div class="product-card-overlay"><span class="product-tag">Multi-use</span></div>
+          </div>
+          <div class="product-card-body">
+            <div class="product-icon-wrap"><i class="fas fa-tree"></i></div>
+            <h3 class="product-card-title">Coconut</h3>
+            <p class="product-card-desc">Used for coconut oil and by-products. Strong potential for coco oil processing industries and value-added products.</p>
+            <div class="product-card-tags"><span><i class="fas fa-oil-can me-1"></i>Coco Oil</span><span><i class="fas fa-flask me-1"></i>Processing</span></div>
+          </div>
+        </div> -->
+
+        <!-- <div class="product-card animate-on-scroll delay-2" data-category="crops">
+          <div class="product-card-img">
+            <img src="https://images.unsplash.com/photo-1590165482129-1b8b27698780?w=600&q=80" alt="Root Crops" loading="lazy">
+            <div class="product-card-overlay"><span class="product-tag">Root Crops</span></div>
+          </div>
+          <div class="product-card-body">
+            <div class="product-icon-wrap"><i class="fas fa-carrot"></i></div>
+            <h3 class="product-card-title">Cassava &amp; Camote</h3>
+            <p class="product-card-desc">Locally grown root crops with versatile uses. Cassava has potential for ethanol production and food processing.</p>
+            <div class="product-card-tags"><span><i class="fas fa-recycle me-1"></i>Ethanol Potential</span><span><i class="fas fa-home me-1"></i>Local Staple</span></div>
+          </div>
+        </div> -->
+
+        <!-- <div class="product-card animate-on-scroll delay-3" data-category="crafts">
+          <div class="product-card-img">
+            <img src="https://images.unsplash.com/photo-1590736969955-71cc94901144?w=600&q=80" alt="Handicrafts" loading="lazy">
+            <div class="product-card-overlay"><span class="product-tag">Aeta Heritage</span></div>
+          </div>
+          <div class="product-card-body">
+            <div class="product-icon-wrap"><i class="fas fa-hand-holding-heart"></i></div>
+            <h3 class="product-card-title">Handicrafts</h3>
+            <p class="product-card-desc">Crafted by the Aeta community — intricate baskets, woven mats, and cottage industry products embodying traditional artistry.</p>
+            <div class="product-card-tags"><span><i class="fas fa-shopping-basket me-1"></i>Baskets</span><span><i class="fas fa-border-all me-1"></i>Mat Weaving</span></div>
+          </div>
+        </div> -->
+
+        <!-- <div class="product-card animate-on-scroll delay-1" data-category="industry">
+          <div class="product-card-img">
+            <img src="https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=600&q=80" alt="Livestock" loading="lazy">
+            <div class="product-card-overlay"><span class="product-tag">Emerging</span></div>
+          </div>
+          <div class="product-card-body">
+            <div class="product-icon-wrap"><i class="fas fa-piggy-bank"></i></div>
+            <h3 class="product-card-title">Livestock Production</h3>
+            <p class="product-card-desc">Swine production projects are actively being developed, supporting local livelihoods and the agricultural economy.</p>
+            <div class="product-card-tags"><span><i class="fas fa-chart-line me-1"></i>Growing</span><span><i class="fas fa-handshake me-1"></i>LGU Supported</span></div>
+          </div>
+        </div> -->
+
+        <!-- <div class="product-card animate-on-scroll delay-2" data-category="industry">
+          <div class="product-card-img">
+            <img src="https://images.unsplash.com/photo-1534483509719-8127d8d15df6?w=600&q=80" alt="Marine Products" loading="lazy">
+            <div class="product-card-overlay"><span class="product-tag">Trade</span></div>
+          </div>
+          <div class="product-card-body">
+            <div class="product-icon-wrap"><i class="fas fa-fish"></i></div>
+            <h3 class="product-card-title">Marine Products</h3>
+            <p class="product-card-desc">Fish and seafood brought from nearby coastal towns and traded in San Enrique markets, providing essential nutrition.</p>
+            <div class="product-card-tags"><span><i class="fas fa-exchange-alt me-1"></i>Traded Goods</span><span><i class="fas fa-store me-1"></i>Local Markets</span></div>
+          </div>
+        </div>
+      </div> -->
+
+      <!-- <div class="products-note animate-on-scroll delay-3">
+        <div class="products-note-inner">
+          <div class="products-note-icon"><i class="fas fa-info-circle"></i></div>
+          <div><strong>Did you know?</strong> San Enrique is primarily known for rice, corn, and sugarcane production, complemented by coconut and root crops, traditional Aeta handicrafts, and a growing livestock industry.</div>
+        </div>
+      </div>
+    </div>
+  </section> -->
+
   <!-- CONTACT SECTION -->
   <section id="contact" class="contact-section" style="position:relative;overflow:hidden;">
     <div class="section-floating-shapes">
@@ -1226,14 +1391,11 @@ foreach (['listings', 'categories', 'events'] as $_t) {
         <div class="col-lg-4">
           <div class="footer-logo">
             <div class="d-flex align-items-center gap-3">
-              <div class="brand-logo"
-                style="width:44px;height:44px;background:linear-gradient(135deg,#52b788,#d4a017);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">
-                🌿</div>
+              <img src="assets/images/logo-tourism.svg" alt="San Enrique" class="footer-logo-img">
               <div>
-                <div style="font-family:'Playfair Display',serif;color:white;font-size:1.1rem;font-weight:700;">San
+                <div class="footer-logo-title">San
                   Enrique Tourism Hub</div>
-                <div
-                  style="font-size:0.7rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em;">
+                <div class="footer-logo-sub">
                   Official LGU Tourism Platform</div>
               </div>
             </div>
@@ -1362,13 +1524,13 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   <script>
     const mapListings = <?= json_encode($mapListings) ?>;
 
-    // Live-update poller bootstrap
-    window.pageLoadTimestamp = <?= $initTs ?>;
     window.liveUpdateConfig = { page: 'home' };
   </script>
 
   <!-- Custom JS -->
   <script src="assets/js/main.js"></script>
+  <!-- Live update engine -->
+  <script src="assets/js/live-update.js"></script>
 
   <!-- Google Maps API - Replace YOUR_GOOGLE_MAPS_API_KEY -->
   <script async defer
@@ -1516,6 +1678,32 @@ foreach (['listings', 'categories', 'events'] as $_t) {
 
       render();
       resetTimer();
+    });
+  })();
+  </script>
+
+  <!-- Products filter -->
+  <script>
+  (function(){
+    var btns = document.querySelectorAll('.products-filter-btn');
+    var cards = document.querySelectorAll('.product-card');
+    if (!btns.length) return;
+    btns.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        btns.forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        var filter = btn.getAttribute('data-filter');
+        cards.forEach(function(card, i){
+          var cat = card.getAttribute('data-category');
+          if (filter === 'all' || cat === filter) {
+            card.style.display = '';
+            card.style.animation = 'productFadeIn 0.4s ' + (i * 0.06) + 's both';
+          } else {
+            card.style.display = 'none';
+            card.style.animation = '';
+          }
+        });
+      });
     });
   })();
   </script>

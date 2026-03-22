@@ -32,6 +32,7 @@ if (isset($_GET['view'])) {
 
 <head>
   <meta charset="UTF-8">
+  <meta name="site-base" content="<?= rtrim(BASE_URL, '/') ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Messages - Admin Panel</title>
   <link
@@ -217,96 +218,167 @@ if (isset($_GET['view'])) {
       });
     }
 
-    // Live-update polling for messages
-    const ADMIN_POLL_INTERVAL = 15000; // 15 seconds
-    let messagesTimestamp = null;
-    let messageCount = <?= count($messages) ?>;
+    /* ── Messages live-update: no page reload ─────────────────
+       Polls api/admin-updates.php every 12 s.
+       On new message: shows a toast + updates the list in-place.
+       On count change: fades in new rows without wiping the DOM.
+    ─────────────────────────────────────────────────────────── */
+    var _msgKnownCount   = <?= count($messages) ?>;
+    var _msgKnownUnread  = <?= (int)($unreadMsgs ?? 0) ?>;
+    var _msgBusy         = false;
+    var _MSG_POLL_MS     = 12000;
 
-    function pollForNewMessages() {
-      fetch('/san-enrique/api/admin-updates.php?page=messages', { cache: 'no-store' })
-        .then(res => res.json())
-        .then(data => {
+    function _msgFadeIn(el) {
+      el.style.opacity   = '0';
+      el.style.transform = 'translateY(-6px)';
+      el.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          el.style.opacity   = '1';
+          el.style.transform = 'translateY(0)';
+        });
+      });
+    }
+
+    function _buildMsgRow(msg) {
+      var isUnread = !msg.is_read;
+      var initial  = (msg.name || 'A').charAt(0).toUpperCase();
+      var dateStr  = new Date(msg.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric'});
+      var subject  = (msg.subject || '').substring(0, 45) + (msg.subject && msg.subject.length > 45 ? '...' : '');
+      var preview  = (msg.message || '').substring(0, 60) + '...';
+      return '<a href="messages.php?view=' + msg.id + '" class="msg-list-item">' +
+        '<div class="msg-list-row' + (isUnread ? '' : '') + '">' +
+          '<div class="msg-row-top">' +
+            '<div class="msg-row-left">' +
+              '<div class="msg-sender-wrap">' +
+                '<div class="msg-avatar">' + _esc(initial) + '</div>' +
+                '<div class="msg-sender-info">' +
+                  '<div class="msg-sender-name ' + (isUnread ? 'unread' : 'read') + '">' +
+                    _esc(msg.name) +
+                    (isUnread ? '<span class="msg-unread-dot"></span>' : '') +
+                  '</div>' +
+                  '<div class="msg-email">' + _esc(msg.email) + '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="msg-subject">' + _esc(subject) + '</div>' +
+              '<div class="msg-preview">' + _esc(preview) + '</div>' +
+            '</div>' +
+            '<div class="msg-row-right">' +
+              '<div class="msg-date">' + dateStr + '</div>' +
+              '<button onclick="event.preventDefault();event.stopPropagation();deleteMsg(' + msg.id + ')" class="btn-inline-delete" title="Delete"><i class="fas fa-trash"></i></button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</a>';
+    }
+
+    function _esc(s) {
+      return String(s || '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function _msgPoll() {
+      if (_msgBusy) return;
+      _msgBusy = true;
+      var BASE = (document.querySelector('meta[name="site-base"]') || {}).content || '';
+      fetch(BASE + '/api/admin-updates.php?page=messages', { cache: 'no-store' })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          _msgBusy = false;
           if (!data.success) return;
 
-          // Check if there are new messages
-          if (data.count > messageCount) {
-            showAdminToast('New message received!', 'A visitor just sent a message.');
-            messageCount = data.count;
-
-            // Refresh page after 2 seconds
-            setTimeout(() => {
-              location.reload();
-            }, 2000);
+          // ── Update sidebar unread badge ─────────────────
+          var sidebarBadge = document.querySelector('.sidebar-badge');
+          if (data.unreadCount > 0) {
+            if (sidebarBadge) {
+              sidebarBadge.textContent = data.unreadCount;
+            } else {
+              var msgNavLink = document.querySelector('a[href="messages.php"].admin-nav-link');
+              if (msgNavLink) {
+                var nb = document.createElement('span');
+                nb.className   = 'sidebar-badge';
+                nb.textContent = data.unreadCount;
+                msgNavLink.appendChild(nb);
+              }
+            }
+          } else if (sidebarBadge) {
+            sidebarBadge.remove();
           }
 
-          // Update unread badge if changed
-          const badge = document.querySelector('.sidebar-badge');
-          if (badge && parseInt(badge.textContent) !== data.unreadCount) {
-            if (data.unreadCount > 0) {
-              badge.textContent = data.unreadCount;
-            } else {
-              badge.remove();
+          // ── Update topbar badge ─────────────────────────
+          var topBadge = document.querySelector('.topbar-badge');
+          if (data.unreadCount > 0) {
+            if (topBadge) {
+              topBadge.textContent = Math.min(data.unreadCount, 9);
+              topBadge.style.display = '';
+            }
+          } else if (topBadge) {
+            topBadge.style.display = 'none';
+          }
+
+          // ── New messages arrived — patch list in-place ──
+          if (data.count > _msgKnownCount) {
+            _msgKnownCount = data.count;
+
+            // Show toast
+            _msgToast('New message received!', 'A visitor just sent a message.');
+
+            // Rebuild message list smoothly (prepend new rows)
+            var scrollWrap = document.querySelector('.msg-list-scroll');
+            if (scrollWrap) {
+              // Build all rows fresh
+              var newHtml = data.messages.map(_buildMsgRow).join('');
+              var scrollTop = scrollWrap.scrollTop;
+
+              scrollWrap.style.transition = 'opacity 0.25s ease';
+              scrollWrap.style.opacity    = '0';
+              setTimeout(function () {
+                scrollWrap.innerHTML   = newHtml;
+                scrollWrap.scrollTop   = scrollTop;
+                scrollWrap.style.opacity = '1';
+              }, 250);
             }
           }
 
-          messagesTimestamp = data.timestamp;
+          // ── Unread count changed ────────────────────────
+          if (data.unreadCount !== _msgKnownUnread) {
+            _msgKnownUnread = data.unreadCount;
+          }
         })
-        .catch(err => console.log('Poll error:', err));
+        .catch(function () { _msgBusy = false; });
     }
 
-    function showAdminToast(title, message) {
-      const toast = document.createElement('div');
-      toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: linear-gradient(135deg, #52b788, #2d6a4f);
-        color: white;
-        padding: 16px 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        font-weight: 600;
-        z-index: 9999;
-        max-width: 320px;
-        animation: slideInRight 0.3s ease;
-    `;
-      toast.innerHTML = `
-        <div class="toast-inner">
-            <i class="fas fa-check-circle"></i>
-            <div>
-                <div class="toast-title">${title}</div>
-                <div class="toast-body">${message}</div>
-            </div>
-        </div>
-    `;
+    function _msgToast(title, message) {
+      var id = 'adminMsgToast';
+      if (document.getElementById(id)) return;
+      var toast = document.createElement('div');
+      toast.id  = id;
+      toast.className = 'admin-live-toast';
+      toast.innerHTML =
+        '<div class="alt-icon"><i class="fas fa-envelope"></i></div>' +
+        '<div class="alt-body">' +
+          '<div class="alt-title">' + _esc(title) + '</div>' +
+          '<div class="alt-sub">'   + _esc(message) + '</div>' +
+        '</div>' +
+        '<button class="alt-close" onclick="this.parentElement.remove()">&#10005;</button>';
       document.body.appendChild(toast);
-
-      setTimeout(() => {
-        toast.style.animation = 'slideOutRight 0.3s ease';
-        setTimeout(() => toast.remove(), 300);
-      }, 4000);
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { toast.classList.add('alt-visible'); });
+      });
+      setTimeout(function () {
+        toast.classList.remove('alt-visible');
+        setTimeout(function () { if (toast.parentNode) toast.remove(); }, 350);
+      }, 5000);
     }
 
-    // Add CSS animations
-    const style = document.createElement('style');
-    style.textContent = `
-    @keyframes slideInRight {
-        from { transform: translateX(400px); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes slideOutRight {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(400px); opacity: 0; }
-    }
-`;
-    document.head.appendChild(style);
-
-    // Start polling after page loads
+    // Start polling
     if (document.readyState === 'complete') {
-      setInterval(pollForNewMessages, ADMIN_POLL_INTERVAL);
+      setInterval(_msgPoll, _MSG_POLL_MS);
+      _msgPoll();
     } else {
-      window.addEventListener('load', () => {
-        setInterval(pollForNewMessages, ADMIN_POLL_INTERVAL);
+      window.addEventListener('load', function () {
+        setInterval(_msgPoll, _MSG_POLL_MS);
+        _msgPoll();
       });
     }
   </script>

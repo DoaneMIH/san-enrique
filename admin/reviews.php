@@ -31,6 +31,7 @@ $avgRating = $totalReviews > 0 ? array_sum(array_column($reviews, 'rating')) / $
 
 <head>
   <meta charset="UTF-8">
+  <meta name="site-base" content="<?= rtrim(BASE_URL, '/') ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reviews - Admin Panel</title>
   <link
