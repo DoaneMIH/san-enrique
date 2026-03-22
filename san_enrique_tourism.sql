@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 22, 2026 at 04:43 PM
+-- Generation Time: Mar 22, 2026 at 04:56 PM
 -- Server version: 8.0.44
 -- PHP Version: 8.2.12
 
@@ -29,11 +29,11 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `admins` (
   `id` int NOT NULL,
-  `username` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `full_name` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `role` enum('superadmin','admin') COLLATE utf8mb4_unicode_ci DEFAULT 'admin',
+  `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `full_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `role` enum('superadmin','admin') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'admin',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -52,10 +52,10 @@ INSERT INTO `admins` (`id`, `username`, `email`, `password`, `full_name`, `role`
 
 CREATE TABLE `categories` (
   `id` int NOT NULL,
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `icon` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'fas fa-map-marker-alt',
-  `color` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT '#2d6a4f',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `icon` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'fas fa-map-marker-alt',
+  `color` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '#2d6a4f',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -79,15 +79,15 @@ INSERT INTO `categories` (`id`, `name`, `slug`, `icon`, `color`, `created_at`) V
 
 CREATE TABLE `events` (
   `id` int NOT NULL,
-  `title` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `event_date` date DEFAULT NULL,
   `end_date` date DEFAULT NULL,
-  `location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `latitude` decimal(10,8) DEFAULT NULL,
   `longitude` decimal(11,8) DEFAULT NULL,
-  `image` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` enum('active','inactive') COLLATE utf8mb4_unicode_ci DEFAULT 'active',
+  `image` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` enum('active','inactive') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'active',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -109,23 +109,23 @@ INSERT INTO `events` (`id`, `title`, `description`, `event_date`, `end_date`, `l
 CREATE TABLE `listings` (
   `id` int NOT NULL,
   `category_id` int NOT NULL,
-  `name` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `address` text COLLATE utf8mb4_unicode_ci,
-  `barangay` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `contact` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `email` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `barangay` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `contact` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `website` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `latitude` decimal(10,8) DEFAULT NULL,
   `longitude` decimal(11,8) DEFAULT NULL,
-  `featured_image` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `gallery` text COLLATE utf8mb4_unicode_ci,
-  `video` varchar(512) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `operating_hours` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `entrance_fee` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `amenities` text COLLATE utf8mb4_unicode_ci,
-  `status` enum('active','inactive','pending') COLLATE utf8mb4_unicode_ci DEFAULT 'active',
+  `featured_image` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `gallery` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `video` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `operating_hours` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `entrance_fee` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `amenities` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `status` enum('active','inactive','pending') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'active',
   `is_featured` tinyint(1) DEFAULT '0',
   `views` int DEFAULT '0',
   `rating` decimal(3,2) DEFAULT '0.00',
@@ -172,7 +172,7 @@ INSERT INTO `listings` (`id`, `category_id`, `name`, `slug`, `description`, `add
 (32, 2, 'Barangay Rumagayray', 'barangay-rumagayray', 'One of the barangays of San Enrique, Iloilo. A close-knit rural community contributing to the agricultural and cultural heritage of the municipality. In Barangay Rumagayray, the simboryo holds a special place in the hearts of its people. Known for its weathered beauty, it represents not only faith but also the strength and unity of the community. It serves as a gathering point for reflection and remembrance, carrying with it the stories and prayers of generations.', 'Barangay Rumagayray, San Enrique, Iloilo', 'Rumagayray', NULL, NULL, 'https://www.facebook.com/groups/1556000491533439', NULL, NULL, NULL, NULL, '', 'Open 24 hours', 'Free', NULL, 'active', 0, 0, 0.00, '2026-03-22 14:09:14', '2026-03-22 14:09:14'),
 (33, 2, 'Barangay San Antonio', 'barangay-san-antonio', 'One of the barangays of San Enrique, Iloilo. A close-knit rural community contributing to the agricultural and cultural heritage of the municipality.', 'Barangay San Antonio, San Enrique, Iloilo', 'San Antonio', NULL, NULL, '', NULL, NULL, NULL, NULL, '', 'Open 24 hours', 'Free', NULL, 'active', 0, 0, 0.00, '2026-03-22 14:09:14', '2026-03-22 14:09:14'),
 (34, 2, 'Barangay Tambunac', 'barangay-tambunac', 'One of the barangays of San Enrique, Iloilo. A close-knit rural community contributing to the agricultural and cultural heritage of the municipality.', 'Barangay Tambunac, San Enrique, Iloilo', 'Tambunac', NULL, NULL, 'https://www.facebook.com/barangay.tambunac', NULL, NULL, NULL, NULL, '', 'Open 24 hours', 'Free', NULL, 'active', 0, 0, 0.00, '2026-03-22 14:09:14', '2026-03-22 14:09:14'),
-(35, 5, 'Gumbans Amat Amat Farm', 'gumbans-amat-amat-farm', 'Gumbans Amat Amat Farm is a peaceful farm offering fresh produce and scenic views. Enjoy their fruit trees, fish pond, and vegetable garden. Enjoyable views include fruit trees (peach, lemon, avocado, coconut), fish pond, and vegetable garden.', 'Sitio Gelonoc Cubay, San Enrique, Iloilo', 'Cubay', '09627603707 / 09455067648', '', 'https://www.facebook.com/share1DHRHN9kbMn/?mibextid=wwXlfr', 10.91780000, 122.88450000, '../uploads/listings/listing_1774193877_552.jpg', '[\"..\\/uploads\\/listings\\/gallery_1774193877_3946_0.jpg\"]', '', 'Monday to Friday: 8:00 AM - 5:00 PM; Saturday and Sunday: 9:00 AM - 5:00 PM', 'Contact for rates', 'Fruit trees (peach, lemon, avocado, coconut), Fish pond, Vegetable garden', 'active', 1, 0, 0.00, '2026-03-22 14:09:14', '2026-03-22 15:37:57'),
+(35, 5, 'Gumbans Amat Amat Farm', 'gumbans-amat-amat-farm', 'Gumbans Amat Amat Farm is a peaceful farm offering fresh produce and scenic views. Enjoy their fruit trees, fish pond, and vegetable garden. Enjoyable views include fruit trees (peach, lemon, avocado, coconut), fish pond, and vegetable garden.', 'Sitio Gelonoc Cubay, San Enrique, Iloilo', 'Cubay', '09627603707 / 09455067648', '', 'https://www.facebook.com/share1DHRHN9kbMn/?mibextid=wwXlfr', 10.91780000, 122.88450000, 'https://lh3.googleusercontent.com/d/1uaYxkPouG_dWftb9hcdaFfrhSLojdKLG', '[\"..\\/uploads\\/listings\\/gallery_1774193877_3946_0.jpg\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1t3SUhrRtzoDgU0LhzJ01e6guYK1vsH9j\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1IW48uk2mMRw_V9t1GBlAJFZ2sqK734yr\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1Jpwx7v9x7Uyh2wrfpCJAKLuBIucS_HyP\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1aBKBpSQvM_qsrfdpNTltyhxqgbdHBayU\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1t3SUhrRtzoDgU0LhzJ01e6guYK1vsH9j\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1lZU2sO28viunut6_m2dwlTxw4dWYnWzB\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1RCEmFfbTkklzZI2hGqjVT8dcTrv2ESvU\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1OsbuagXta8GN2jIrqU0xuQMXSFJK4GNN\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1sQPd9yEUYZ-j2dwF8nyWwNy7495I27l3\"]', '', 'Monday to Friday: 8:00 AM - 5:00 PM; Saturday and Sunday: 9:00 AM - 5:00 PM', 'Contact for rates', 'Fruit trees (peach, lemon, avocado, coconut), Fish pond, Vegetable garden', 'active', 1, 0, 0.00, '2026-03-22 14:09:14', '2026-03-22 15:55:20'),
 (36, 6, 'Cabas-an Cold Spring', 'cabas-an-cold-spring', 'Cabasan Cold Spring is a natural spring offering cool, clear waters perfect for swimming and relaxation. Enjoyable views include lush greenery, natural rock formations, and scenic surroundings. Activities: swimming, picnic, and nature walks.', 'Sitio Cabas-an, Brgy. Compo, San Enrique, Iloilo 5036', 'Compo', '0917 302 3878', 'ebtconfi2@gmail.com', 'https://facebook.com/composanenriqueiloilo', 10.91780000, 122.88450000, 'https://lh3.googleusercontent.com/d/1IIzqR-BdAVla0bMmoQVD6O4b2L7e-74G', '[\"https:\\/\\/lh3.googleusercontent.com\\/d\\/12_pjtS1JzfpboXJGEyNQKp2DR7pRNsY5\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1ojNuVohcmWTDIHtfh-IF8hGNbNUGEAxU\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1qma6CERcakkjnLlFdzkVojHpWaxVK-8C\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1abm-slqtPqTsznRa1AFP5KdU8xJRX-w8\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1BDLkortHSboFCsq4CWV1Y5nyrH064tYc\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1RWfwKrgR61EV0USFDUrydHelQK1mo3-D\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1BLgm5FehwbCIyzO5Vri68G0DWSY61LYI\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1EtwrlQ4A-WW4jMiCuN5OVGKymORAMK_R\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1cF3dMUHLpp9DRIgxk_9uVEw6X1zXxoTV\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1IIzqR-BdAVla0bMmoQVD6O4b2L7e-74G\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1xRD3avFozrLY68iax2PEMOfTBzInihdp\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1N_lIjMkZuqMjPx5JMYhqqqQwYqAaKaiU\"]', '', '7:00 AM - 5:00 PM, Daily', 'Contact for rates', 'Natural spring pool, Swimming area, Picnic area, Nature walks, Rock formations', 'active', 1, 0, 0.00, '2026-03-22 14:09:14', '2026-03-22 15:17:43'),
 (37, 5, 'BC Farm', 'bc-farm', 'BC Farm is a peaceful farm in San Enrique, Iloilo, offering a serene atmosphere for swimming and relaxation.', 'Brgy Cabugao Viejo, San Enrique, Iloilo 5036', 'Cabugao Viejo', '0985 181 9131', 'benedictopadon@gmail.com', 'https://facebook.com/BCResortSanEnrique', NULL, NULL, NULL, NULL, '', 'Daily (open 24/7)', 'Contact for rates', 'Swimming area, Farm atmosphere, Relaxation area', 'active', 0, 0, 0.00, '2026-03-22 14:09:14', '2026-03-22 14:09:14'),
 (38, 1, 'Tonys Farm Resort', 'tonys-farm-resort', 'Tonys Valley Farm Resort is a private resort offering a peaceful atmosphere with swimming pools and cottages. Enjoyable views include lush greenery, swimming pools, and scenic surroundings. Activities: swimming, picnic, and nature walks.', 'Sitio Layog Bato, Brgy. Mapili, San Enrique, Iloilo', 'Mapili', '0908 866 6909', '', 'https://facebook.com/TVFRM', 10.91780000, 122.88450000, 'https://lh3.googleusercontent.com/d/1im3ZlRXO7ii_KD2BSfv06e6M9FJOe94J', '[\"https:\\/\\/lh3.googleusercontent.com\\/d\\/15AU4AYUXkLrSYhcjy4OR5JPYSTJHaSCY\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1MAulkNur2vBmRFKbdVPIYvNh7B0lDxIW\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1tUD02J6Ln8sRFatJjqoId-PYUJwTsrNp\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/12jYDEdFRi98wjeVq5vRUuvDC7OVa7TFg\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1ZSuQsVMts2dwPTtJqsPsoe0j1M0dx0ph\",\"https:\\/\\/lh3.googleusercontent.com\\/d\\/1E-xlVBhiGrKroK4Kfj71b7pxeDz0a08r\"]', '', 'Daily (contact for specific hours)', 'Contact for rates', 'Swimming pools, Cottages, Picnic area, Nature walks, Lush greenery', 'active', 1, 5, 0.00, '2026-03-22 14:09:14', '2026-03-22 15:21:13'),
@@ -207,10 +207,10 @@ INSERT INTO `listings` (`id`, `category_id`, `name`, `slug`, `description`, `add
 
 CREATE TABLE `messages` (
   `id` int NOT NULL,
-  `name` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `email` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `subject` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `message` text COLLATE utf8mb4_unicode_ci,
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subject` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `is_read` tinyint(1) DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -224,11 +224,11 @@ CREATE TABLE `messages` (
 CREATE TABLE `reviews` (
   `id` int NOT NULL,
   `listing_id` int NOT NULL,
-  `reviewer_name` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `reviewer_name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `rating` int DEFAULT NULL,
-  `comment` text COLLATE utf8mb4_unicode_ci,
+  `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Indexes for dumped tables
