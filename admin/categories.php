@@ -72,6 +72,8 @@ $iconSuggestions = ['fas fa-umbrella-beach', 'fas fa-home', 'fas fa-landmark', '
   <meta name="site-base" content="<?= rtrim(BASE_URL, '/') ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Categories - Admin Panel</title>
+    <link rel="shortcut icon" type="x-icon" href="../assets/images/san-enrique-logo.jpg">
+
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">

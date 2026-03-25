@@ -21,7 +21,7 @@ $categories = getCategories();
   <meta charset="UTF-8">
   <meta name="site-base" content="<?= rtrim(BASE_URL, '/') ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="x-icon" href="assets/images/logo.png">
+    <link rel="shortcut icon" type="x-icon" href="assets/images/san-enrique-logo.jpg">
   <title><?= htmlspecialchars($listing['name']) ?> - <?= SITE_NAME ?></title>
   <meta name="description" content="<?= htmlspecialchars(substr($listing['description'], 0, 155)) ?>">
   <link
@@ -107,7 +107,7 @@ $categories = getCategories();
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
     body {
       background:
-        url('https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1800&q=80')
+        url('assets/images/7.jpg')
         center center / cover fixed no-repeat !important;
       background-color: #0d2418 !important;
     }
@@ -489,7 +489,8 @@ $categories = getCategories();
 
   <!-- Center content -->
   <div class="loader-content">
-    <div class="loader-emblem">🌿</div>
+    <!-- <div class="loader-emblem">🌿</div> -->
+         <img src="assets/images/san-enrique-logo.jpg" alt="San Enrique" class="loader-emblem">
 
     <div class="loader-site-name">San <span>Enrique</span></div>
     <div class="loader-tagline">Tourism Hub &nbsp;·&nbsp; Iloilo</div>
@@ -530,7 +531,9 @@ $categories = getCategories();
           <div class="container">
       <div class="d-flex align-items-center justify-content-between w-100">
         <a href="index.php" class="navbar-brand-wrap text-decoration-none">
-          <div class="brand-logo">🌿</div>
+          <!-- <div class="brand-logo">🌿</div> -->
+                      <img src="assets/images/san-enrique-logo.jpg" alt="San Enrique" class="brand-logo">
+
           <div class="brand-text-wrap">
             <div class="brand-name">San Enrique</div>
             <div class="brand-sub">Tourism Hub</div>
@@ -578,6 +581,14 @@ $categories = getCategories();
 
   <!-- LISTING DETAIL -->
   <div class="container py-5">
+
+    <!-- Go Back — mobile only (top of page) -->
+    <div class="d-lg-none mb-3">
+      <a href="javascript:history.back()" class="btn-outline-listing-back">
+        <i class="fas fa-arrow-left"></i> Go Back
+      </a>
+    </div>
+
     <div class="row g-4">
       <!-- MAIN CONTENT -->
       <div class="col-lg-8">
@@ -596,7 +607,7 @@ $categories = getCategories();
         ?>
         <style>
           /* ── Carousel wrapper ─────────────────── */
-          .gc-wrap { position:relative; margin-bottom:0; }
+.gc-wrap { position:relative; margin-bottom:0; width:100%; }
 
           /* ── Main stage ───────────────────────── */
           .gc-stage {
@@ -606,6 +617,7 @@ $categories = getCategories();
             background:#0d1f17;
             aspect-ratio:16/9;
             cursor:zoom-in;
+            width:100%;
             box-shadow:0 12px 48px rgba(0,0,0,0.22);
           }
           .gc-slides {
@@ -621,7 +633,8 @@ $categories = getCategories();
           }
           .gc-slide img {
             width:100%;height:100%;
-            object-fit:cover;display:block;
+            object-fit:cover;
+            display:block;
           }
           /* subtle dark vignette */
           .gc-stage::after {
@@ -730,6 +743,54 @@ $categories = getCategories();
           .gc-lb-caption {
             color:rgba(255,255,255,.5);
             font-size:.78rem;margin-top:10px;letter-spacing:.04em;
+          }
+
+          /* ── Mobile gallery fixes ────────────── */
+          @media (max-width: 767px) {
+            .gc-stage {
+              aspect-ratio: 4/3;
+              border-radius: 12px;
+            }
+            .gc-slide img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              object-position:center center;
+              display: block;
+            }
+            .gc-btn {
+              width: 36px;
+              height: 36px;
+              font-size: 1rem;
+            }
+            .gc-btn.prev { left: 8px; }
+            .gc-btn.next { right: 8px; }
+            .gc-counter {
+              font-size: 0.68rem;
+              padding: 3px 9px;
+              top: 10px;
+              right: 10px;
+            }
+            .gc-thumbs {
+              gap: 6px;
+              margin-top: 8px;
+            }
+            .gc-thumb {
+              flex: 0 0 64px;
+              height: 46px;
+              border-radius: 7px;
+              border-width: 2px;
+            }
+            /* Lightbox full-screen on mobile */
+            .gc-lb-btn { width: 40px; height: 40px; font-size: 1.2rem; }
+            .gc-lb-btn.prev { left: 8px; }
+            .gc-lb-btn.next { right: 8px; }
+            #gcLbImg { max-width: 96vw; max-height: 78vh; }
+          }
+
+          @media (max-width: 400px) {
+            .gc-stage { aspect-ratio: 1/1; }
+            .gc-thumb { flex: 0 0 54px; height: 40px; }
           }
         </style>
 
@@ -898,7 +959,7 @@ $categories = getCategories();
 
         <!-- Description -->
         <div class="listing-info-box mb-4">
-          <h3 style="font-size:1.3rem;color:var(--primary);margin-bottom:1rem;">About this Place</h3>
+          <h3 style="font-size:1.3rem;color:var(--primary);margin-bottom:1rem;">About</h3>
           <p style="color:var(--text-muted);line-height:1.8;"><?= nl2br(htmlspecialchars($listing['description'])) ?>
           </p>
         </div>
@@ -944,16 +1005,16 @@ $categories = getCategories();
             <div style="display:flex;flex-direction:column;gap:1rem;margin-bottom:1.5rem;">
               <?php foreach ($reviews as $review): ?>
                 <div class="review-item" data-review-id="<?= $review['id'] ?>"
-                  style="background:var(--gray-50);border-radius:12px;padding:1.25rem;border-left:3px solid var(--accent);">
+                  style="background: #243a2c;border-radius:12px;padding:1.25rem;border-left:3px solid var(--accent);">
                   <div class="d-flex align-items-center justify-content-between mb-1">
                     <strong
-                      style="color:var(--primary);font-size:0.92rem;"><?= htmlspecialchars($review['reviewer_name'] ?: 'Anonymous') ?></strong>
+                      style="color:#b8ddbf;font-size:0.92rem;"><?= htmlspecialchars($review['reviewer_name'] ?: 'Anonymous') ?></strong>
                     <div class="stars" style="font-size:0.85rem;">
                       <?= str_repeat('★', $review['rating']) . str_repeat('☆', 5 - $review['rating']) ?></div>
                   </div>
                   <p style="color:var(--text-muted);font-size:0.87rem;margin:0;"><?= htmlspecialchars($review['comment']) ?>
                   </p>
-                  <div style="font-size:0.75rem;color:var(--gray-500);margin-top:0.5rem;">
+                  <div style="font-size:0.75rem;color: #77787a;margin-top:0.5rem;">
                     <?= date('F j, Y', strtotime($review['created_at'])) ?></div>
                 </div>
               <?php endforeach; ?>
@@ -1002,8 +1063,8 @@ $categories = getCategories();
 
       <!-- SIDEBAR -->
       <div class="col-lg-4">
-        <!-- Back Button -->
-        <a href="javascript:history.back()" class="btn-outline-listing-back mb-4">
+        <!-- Back Button — desktop sidebar only; mobile version is at top -->
+        <a href="javascript:history.back()" class="btn-outline-listing-back mb-4 d-none d-lg-flex">
           <i class="fas fa-arrow-left"></i> Go Back
         </a>
 
@@ -1080,7 +1141,7 @@ $categories = getCategories();
           <?php endif; ?>
 
           <!-- Share Buttons -->
-          <div class="share-sep" style="margin-top:1rem;padding-top:1rem;">
+          <!-- <div class="share-sep" style="margin-top:1rem;padding-top:1rem;">
             <div class="share-label"
               style="font-size:0.8rem;font-weight:700;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.06em;">
               Share this Place</div>
@@ -1096,7 +1157,7 @@ $categories = getCategories();
                 <i class="fab fa-twitter"></i>
               </a>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -1109,7 +1170,7 @@ $categories = getCategories();
         <div class="col-lg-4">
           <div class="footer-logo">
             <div class="d-flex align-items-center gap-3">
-              <img src="assets/images/logo-tourism.svg" alt="San Enrique" class="footer-logo-img">
+              <img src="assets/images/san-enrique-logo.jpg" alt="San Enrique" class="footer-logo-img">
               <div>
                 <div class="footer-logo-title">San
                   Enrique Tourism Hub</div>
@@ -1122,12 +1183,12 @@ $categories = getCategories();
             Your official digital gateway to the beauty, culture, and hospitality of San Enrique, Iloilo. A proud
             initiative of the San Enrique Local Government Unit.
           </p>
-          <div class="footer-social">
+          <!-- <div class="footer-social">
             <a href="#" class="social-btn" title="Facebook"><i class="fab fa-facebook-f"></i></a>
             <a href="#" class="social-btn" title="Instagram"><i class="fab fa-instagram"></i></a>
             <a href="#" class="social-btn" title="YouTube"><i class="fab fa-youtube"></i></a>
             <a href="#" class="social-btn" title="Twitter"><i class="fab fa-twitter"></i></a>
-          </div>
+          </div> -->
         </div>
 
         <div class="col-6 col-lg-2">

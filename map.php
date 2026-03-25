@@ -10,6 +10,8 @@ $mapListings = getAllListingsForMap();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Interactive Map - <?= SITE_NAME ?></title>
+    <link rel="shortcut icon" type="x-icon" href="assets/images/san-enrique-logo.jpg">
+
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
@@ -308,7 +310,7 @@ $mapListings = getAllListingsForMap();
   <div class="map-sidebar" id="mapSidebar">
     <div class="map-sidebar-header">
       <div style="display:flex;align-items:center;gap:10px;">
-        <img src="assets/images/logo-tourism.svg" alt="San Enrique" style="width:36px;height:36px;border-radius:8px;object-fit:contain;">
+        <img src="assets/images/san-enrique-logo.jpg" alt="San Enrique" style="width:36px;height:36px;border-radius:8px;object-fit:contain;">
         <div>
           <div style="font-family:'Playfair Display',serif;font-weight:700;color:white;font-size:0.95rem;">San Enrique
           </div>

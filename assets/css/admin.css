@@ -4175,3 +4175,17 @@ body:has(.login-page) {
     70%  { transform: scale(1.8); opacity: 0; }
     100% { opacity: 0; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LOGIN PAGE — Logo image
+   ═══════════════════════════════════════════════════════════════════════ */
+.login-logo-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 16px;
+    object-fit: cover;
+    margin-bottom: 1rem;
+    border: 3px solid var(--g5);
+    box-shadow: var(--shadow);
+}

@@ -19,8 +19,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $contact = sanitize($_POST['contact'] ?? '');
   $email = sanitize($_POST['email'] ?? '');
   $website = sanitize($_POST['website'] ?? '');
-  $lat = (float) ($_POST['latitude'] ?? 0);
-  $lng = (float) ($_POST['longitude'] ?? 0);
+  // If admin unchecked "Show Map", save NULL so the public page hides the map
+  $showMap = isset($_POST['show_map']) ? 1 : 0;
+  $lat = $showMap ? (float) ($_POST['latitude'] ?? 0) : 'NULL';
+  $lng = $showMap ? (float) ($_POST['longitude'] ?? 0) : 'NULL';
   $hours = sanitize($_POST['operating_hours'] ?? '');
   $fee = sanitize($_POST['entrance_fee'] ?? '');
   $amenities = sanitize($_POST['amenities'] ?? '');
@@ -205,6 +207,8 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
   <meta name="site-base" content="<?= rtrim(BASE_URL, '/') ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Listings Management - Admin</title>
+    <link rel="shortcut icon" type="x-icon" href="../assets/images/san-enrique-logo.jpg">
+
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Nunito:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
@@ -630,21 +634,44 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
 
                 <!-- GPS Coordinates -->
                 <div class="col-12">
-                  <label class="admin-label"><i class="fas fa-map-pin me-1"></i> GPS
-                    Coordinates — Click on the map to set location</label>
-                  <div class="coord-fields mb-2">
-                    <div>
-                      <label class="admin-label label-sm">Latitude</label>
-                      <input type="number" name="latitude" id="latitude" class="admin-input" step="any"
-                        value="<?= $editListing['latitude'] ?? '10.9178' ?>" placeholder="10.9178">
+                  <?php
+                    // Map is shown if latitude is set (not null/empty/zero-only)
+                    $hasCoords = !empty($editListing['latitude']) && $editListing['latitude'] != 0;
+                  ?>
+                  <!-- Show Map toggle -->
+                  <div class="d-flex align-items-center gap-3 mb-3 p-3" style="background:var(--g7);border-radius:10px;border:1px solid var(--border-solid);">
+                    <div class="form-check form-switch mb-0">
+                      <input class="form-check-input" type="checkbox" name="show_map" id="showMapToggle"
+                        <?= $hasCoords ? 'checked' : '' ?> value="1"
+                        onchange="toggleMapSection(this.checked)">
+                      <label class="form-check-label fw-semibold" for="showMapToggle" style="color:var(--g1);">
+                        <i class="fas fa-map-marked-alt me-1" style="color:var(--g2);"></i>
+                        Show Map on Listing Page
+                      </label>
                     </div>
-                    <div>
-                      <label class="admin-label label-sm">Longitude</label>
-                      <input type="number" name="longitude" id="longitude" class="admin-input" step="any"
-                        value="<?= $editListing['longitude'] ?? '122.8845' ?>" placeholder="122.8845">
-                    </div>
+                    <span class="text-muted" style="font-size:0.8rem;">
+                      Uncheck to hide the map (e.g. for food stalls, native delicacies)
+                    </span>
                   </div>
-                  <div id="adminMapPicker"></div>
+
+                  <!-- Map fields — hidden when toggle is off -->
+                  <div id="mapFieldsWrap" style="<?= $hasCoords ? '' : 'display:none;' ?>">
+                    <label class="admin-label"><i class="fas fa-map-pin me-1"></i> GPS
+                      Coordinates — Click on the map to set location</label>
+                    <div class="coord-fields mb-2">
+                      <div>
+                        <label class="admin-label label-sm">Latitude</label>
+                        <input type="number" name="latitude" id="latitude" class="admin-input" step="any"
+                          value="<?= $editListing['latitude'] ?? '10.9178' ?>" placeholder="10.9178">
+                      </div>
+                      <div>
+                        <label class="admin-label label-sm">Longitude</label>
+                        <input type="number" name="longitude" id="longitude" class="admin-input" step="any"
+                          value="<?= $editListing['longitude'] ?? '122.8845' ?>" placeholder="122.8845">
+                      </div>
+                    </div>
+                    <div id="adminMapPicker"></div>
+                  </div>
                 </div>
 
                 <!-- Status & Featured -->
@@ -838,9 +865,29 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
       });
     }
 
+    // Show/hide map fields based on toggle
+    function toggleMapSection(show) {
+      const wrap = document.getElementById('mapFieldsWrap');
+      if (!wrap) return;
+      if (show) {
+        wrap.style.display = '';
+        // If map hasn't been initialised yet, trigger it now
+        if (typeof google !== 'undefined' && typeof initAdminMapPicker !== 'undefined') {
+          const lat = parseFloat($('#latitude').val()) || 10.9178;
+          const lng = parseFloat($('#longitude').val()) || 122.8845;
+          initAdminMapPicker(lat, lng);
+        }
+      } else {
+        wrap.style.display = 'none';
+      }
+    }
+
     // Admin map picker
     <?php if ($action === 'add' || $action === 'edit'): ?>
       function initMap() {
+        // Only initialise if the map section is visible
+        const toggle = document.getElementById('showMapToggle');
+        if (toggle && !toggle.checked) return;
         const lat = parseFloat($('#latitude').val()) || 10.9178;
         const lng = parseFloat($('#longitude').val()) || 122.8845;
         initAdminMapPicker(lat, lng);

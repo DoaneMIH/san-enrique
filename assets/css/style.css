@@ -906,21 +906,34 @@ section {
 
 .stat-card {
     text-align: center;
-    padding: 2rem;
+    padding: 2.5rem 1rem;
     position: relative;
     z-index: 1;
+    border: none !important;
+    outline: none !important;
+}
+
+/* Dividers between stat cards — vertical on desktop, none on mobile */
+.stat-card + .stat-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 20%;
+    height: 60%;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .stat-card .stat-icon {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     color: var(--gold-light);
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
     display: block;
 }
 
 .stat-card .stat-number {
     font-family: 'Playfair Display', serif;
-    font-size: 3rem;
+    font-size: 2.8rem;
     font-weight: 700;
     color: white;
     line-height: 1;
@@ -929,7 +942,7 @@ section {
 
 .stat-card .stat-title {
     color: rgba(255, 255, 255, 0.7);
-    font-size: 0.88rem;
+    font-size: 0.82rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     font-weight: 600;
@@ -1310,20 +1323,34 @@ section {
     border-radius: 16px;
     padding: 0.5rem;
     display: flex;
+    flex-direction: row;
+    align-items: center;
     gap: 0.5rem;
     box-shadow: var(--shadow-lg);
     max-width: 600px;
+    width: 100%;
     animation: fadeInUp 0.9s ease 0.5s both;
+}
+
+.search-hero-bar .search-icon {
+    padding: 0 0.25rem 0 0.75rem;
+    color: var(--text-muted);
+    font-size: 1rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
 }
 
 .search-hero-bar input {
     border: none;
     outline: none;
-    padding: 0.6rem 1rem;
+    padding: 0.75rem 0.5rem;
     font-size: 0.92rem;
     flex: 1;
+    min-width: 0;
     color: var(--text);
     font-family: 'Nunito', sans-serif;
+    background: transparent;
 }
 
 .search-hero-bar button {
@@ -1331,7 +1358,7 @@ section {
     color: white;
     border: none;
     border-radius: 10px;
-    padding: 0.6rem 1.4rem;
+    padding: 0.7rem 1.4rem;
     font-size: 0.9rem;
     font-weight: 700;
     font-family: 'Nunito', sans-serif;
@@ -1339,6 +1366,8 @@ section {
     display: flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .search-hero-bar button:hover {
@@ -1793,6 +1822,8 @@ section {
 
     .search-hero-bar {
         margin: 0 auto;
+        max-width: 100%;
+        flex-direction: row !important;
     }
 
     section {
@@ -2256,6 +2287,181 @@ section {
     letter-spacing: 0.08em;
 }
 
+
+/* ══════════════════════════════════════════════════════
+   ABOUT SECTION — Enhanced with historical content
+   ══════════════════════════════════════════════════════ */
+
+/* Highlight badge on image */
+.about-highlight-label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+}
+
+.about-highlight-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    color: var(--primary);
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.about-highlight-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* History card */
+.about-history-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid var(--gray-100);
+    box-shadow: 0 4px 24px rgba(45,106,79,0.07);
+}
+
+.about-history-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.about-history-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    color: var(--primary);
+    margin-bottom: 0.75rem;
+}
+
+.about-history-text {
+    color: var(--text-muted);
+    line-height: 1.85;
+    margin-bottom: 0.85rem;
+    font-size: 0.95rem;
+}
+
+.about-history-text:last-of-type {
+    margin-bottom: 1.25rem;
+}
+
+.about-source {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    padding: 0.75rem 1rem;
+    background: var(--gray-50);
+    border-radius: 10px;
+    border-left: 3px solid var(--accent);
+}
+
+.about-source a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.about-source a:hover {
+    text-decoration: underline;
+}
+
+/* Fact cards */
+.about-fact-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    border: 1px solid var(--gray-100);
+    box-shadow: 0 2px 12px rgba(45,106,79,0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.about-fact-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 28px rgba(45,106,79,0.12);
+}
+
+.about-fact-icon {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1rem;
+    margin: 0 auto 0.75rem;
+}
+
+.about-fact-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: var(--primary);
+    font-weight: 700;
+    line-height: 1;
+}
+
+.about-fact-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 4px;
+}
+
+/* Feature cards */
+.about-feature-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 1.75rem;
+    border: 1px solid var(--gray-100);
+    box-shadow: 0 2px 16px rgba(45,106,79,0.06);
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.about-feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 32px rgba(45,106,79,0.13);
+}
+
+.about-feature-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+}
+
+.about-feature-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: var(--primary);
+    margin-bottom: 0.6rem;
+}
+
+.about-feature-desc {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    line-height: 1.7;
+    margin: 0;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
    LOCAL PRODUCTS SECTION
    ═══════════════════════════════════════════════════════════════════════ */
@@ -2595,4 +2801,550 @@ section {
 .count-up {
     display: inline-block;
     font-variant-numeric: tabular-nums;
+}
+
+.navbar-brand-logo-img {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.footer-logo-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════════════
+   SEARCH BAR + STATS — Mobile targeted fixes
+   ══════════════════════════════════════════════════════ */
+
+/* Search bar — always stays inline row on every screen size */
+@media (max-width: 575px) {
+    .search-hero-bar {
+        padding: 0.35rem 0.35rem 0.35rem 0.5rem;
+        border-radius: 12px;
+        gap: 0.35rem;
+    }
+
+    .search-hero-bar input {
+        font-size: 0.85rem;
+        padding: 0.6rem 0.25rem;
+    }
+
+    .search-hero-bar button {
+        padding: 0.65rem 1rem;
+        font-size: 0.82rem;
+        border-radius: 8px;
+        gap: 4px;
+    }
+
+    .search-hero-bar .search-icon {
+        padding: 0 0.15rem 0 0.4rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Stats section — remove Bootstrap col borders on mobile */
+@media (max-width: 767px) {
+    .stat-card {
+        padding: 1.75rem 0.75rem;
+        border-right: none !important;
+        border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+    }
+
+    .stat-card + .stat-card::before {
+        display: none; /* hide vertical divider on mobile */
+    }
+
+    /* Bottom divider between the two rows on mobile */
+    .col-6:nth-child(2) .stat-card,
+    .col-6:nth-child(4) .stat-card {
+        border-bottom: none !important;
+    }
+
+    .stat-card .stat-number {
+        font-size: 2.2rem;
+    }
+
+    .stat-card .stat-icon {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-card .stat-title {
+        font-size: 0.75rem;
+        letter-spacing: 0.07em;
+    }
+}
+
+@media (max-width: 575px) {
+    .stat-card {
+        padding: 1.5rem 0.5rem;
+    }
+
+    .stat-card .stat-number {
+        font-size: 2rem;
+    }
+}
+
+/* ══════════════════════════════════════════════════════
+   MOBILE RESPONSIVE — Comprehensive fixes for all pages
+   ══════════════════════════════════════════════════════ */
+
+/* ── Navbar ─────────────────────────────────────────── */
+@media (max-width: 991px) {
+    .navbar-main {
+        padding: 0.6rem 0 !important;
+    }
+
+    .navbar-collapse {
+        background: rgba(13, 43, 30, 0.98);
+        backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(82,183,136,0.2);
+        padding: 1rem 1.25rem 1.5rem;
+        border-radius: 0 0 18px 18px;
+        margin-top: 0.5rem;
+    }
+
+    .nav-link-main {
+        padding: 0.65rem 1rem !important;
+        border-radius: 10px;
+        margin-bottom: 2px;
+        font-size: 1rem !important;
+    }
+
+    .navbar-toggler {
+        border: 1.5px solid rgba(82,183,136,0.5) !important;
+        padding: 6px 10px !important;
+        border-radius: 8px !important;
+    }
+}
+
+/* ── Hero Section ───────────────────────────────────── */
+/* @media (max-width: 991px) {
+    .hero-section {
+        padding: 6rem 0 3rem !important;
+        min-height: auto !important;
+    }
+
+    .hero-title {
+        font-size: clamp(2rem, 8vw, 3.5rem) !important;
+    }
+
+    .hero-badge {
+        font-size: 0.78rem !important;
+    }
+
+    .search-hero-bar {
+        flex-direction: column !important;
+        gap: 8px !important;
+        padding: 12px !important;
+    }
+
+    .search-hero-bar input {
+        width: 100% !important;
+    }
+
+    .search-hero-bar .btn-primary-main {
+        width: 100% !important;
+        justify-content: center;
+    }
+
+    .hero-map-preview {
+        display: none !important;
+    }
+} */
+
+@media (max-width: 575px) {
+    .hero-section {
+        padding: 5rem 0 2.5rem !important;
+    }
+
+    .hero-stats {
+        flex-wrap: wrap;
+        gap: 1rem !important;
+        justify-content: center;
+    }
+
+    .hero-stat {
+        min-width: 80px;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem !important;
+    }
+
+    .hero-actions .btn-primary-main,
+    .hero-actions .btn-outline-main {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ── Categories Section ─────────────────────────────── */
+@media (max-width: 767px) {
+    .category-card {
+        min-height: 140px !important;
+        padding: 1rem 0.5rem !important;
+    }
+
+    .cat-icon {
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 1.2rem !important;
+    }
+
+    .cat-name {
+        font-size: 0.82rem !important;
+        min-height: auto !important;
+    }
+}
+
+/* ── Listing Cards ──────────────────────────────────── */
+@media (max-width: 575px) {
+    .listing-card-img {
+        height: 180px !important;
+    }
+
+    .listing-card-body {
+        padding: 1rem !important;
+    }
+
+    .listing-card-title {
+        font-size: 1rem !important;
+    }
+
+    .listing-card-desc {
+        font-size: 0.83rem !important;
+        -webkit-line-clamp: 2 !important;
+    }
+
+    .listing-card-meta {
+        font-size: 0.78rem !important;
+    }
+}
+
+/* ── Event Cards ─────────────────────────────────────── */
+@media (max-width: 767px) {
+    .event-card {
+        padding: 1.25rem !important;
+    }
+
+    .event-title {
+        font-size: 1.05rem !important;
+    }
+}
+
+/* ── Stats Section ──────────────────────────────────── */
+/* @media (max-width: 575px) {
+    .stat-card {
+        padding: 1.5rem 1rem !important;
+    }
+
+    .stat-card .stat-number {
+        font-size: 2rem !important;
+    }
+
+    .stat-card .stat-title {
+        font-size: 0.8rem !important;
+    }
+} */
+
+/* ── About Section ──────────────────────────────────── */
+@media (max-width: 991px) {
+    .about-history-card {
+        padding: 1.5rem !important;
+    }
+
+    .about-img-wrap img {
+        max-height: 320px;
+        object-fit: cover;
+    }
+}
+
+@media (max-width: 767px) {
+    .about-history-title {
+        font-size: 1.15rem;
+    }
+
+    .about-history-text {
+        font-size: 0.88rem;
+    }
+
+    .about-feature-card {
+        padding: 1.25rem;
+    }
+
+    .about-feature-title {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 575px) {
+    .about-fact-value {
+        font-size: 1.3rem;
+    }
+
+    .about-section-cta {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .about-section-cta .btn-primary-main,
+    .about-section-cta .btn-outline-main {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ── Contact Section ────────────────────────────────── */
+@media (max-width: 767px) {
+    .contact-form-wrap,
+    .contact-info-card {
+        padding: 1.5rem !important;
+        border-radius: 16px !important;
+    }
+
+    .contact-form-wrap input,
+    .contact-form-wrap textarea,
+    .contact-form-wrap select {
+        font-size: 0.9rem !important;
+    }
+}
+
+/* ── Footer ─────────────────────────────────────────── */
+@media (max-width: 767px) {
+    .footer-main {
+        padding: 3rem 0 1.5rem !important;
+    }
+
+    .footer-logo-title {
+        font-size: 1rem !important;
+    }
+
+    .footer-links h5 {
+        font-size: 0.9rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+
+    .footer-links a {
+        font-size: 0.85rem !important;
+    }
+}
+
+/* ── Explore Page ───────────────────────────────────── */
+@media (max-width: 991px) {
+    .filter-sidebar {
+        position: static !important;
+        top: auto !important;
+        margin-bottom: 1.5rem !important;
+        border-radius: 16px !important;
+    }
+
+    .filter-sidebar .filter-title {
+        font-size: 1rem !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .page-hero {
+        padding: 5rem 0 2.5rem !important;
+        min-height: auto !important;
+    }
+
+    .page-hero-title {
+        font-size: 2rem !important;
+    }
+
+    /* Category filters on mobile — horizontal scroll */
+    .category-filter-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .category-filter-item {
+        font-size: 0.82rem !important;
+        padding: 0.45rem 0.75rem !important;
+    }
+}
+
+/* ── Listing Detail Page ────────────────────────────── */
+@media (max-width: 767px) {
+    .listing-detail-hero {
+        height: 260px !important;
+        min-height: 260px !important;
+    }
+
+    .listing-detail-title {
+        font-size: 1.5rem !important;
+    }
+
+    .gc-stage {
+        height: 220px !important;
+    }
+
+    .gc-thumbs {
+        gap: 6px !important;
+    }
+
+    .gc-thumb {
+        width: 60px !important;
+        height: 44px !important;
+    }
+
+    .listing-info-box {
+        padding: 1.25rem !important;
+        border-radius: 14px !important;
+    }
+
+    .info-row {
+        flex-wrap: wrap !important;
+    }
+
+    .ir-label {
+        min-width: 70px !important;
+        font-size: 0.8rem !important;
+    }
+
+    .ir-value {
+        font-size: 0.85rem !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .listing-badge-row {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .detail-map {
+        height: 220px !important;
+    }
+}
+
+/* ── Map Page ───────────────────────────────────────── */
+@media (max-width: 767px) {
+    #interactiveMap {
+        height: 380px !important;
+    }
+
+    .map-filters-bar {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        padding: 0.75rem !important;
+    }
+
+    .map-filter-btn {
+        font-size: 0.78rem !important;
+        padding: 6px 12px !important;
+    }
+}
+
+/* ── Section Titles — responsive ────────────────────── */
+@media (max-width: 767px) {
+    .section-title {
+        font-size: clamp(1.5rem, 6vw, 2.2rem) !important;
+    }
+
+    .section-subtitle {
+        font-size: 0.9rem !important;
+    }
+
+    section {
+        padding: 3rem 0 !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .section-title {
+        font-size: clamp(1.35rem, 7vw, 1.9rem) !important;
+    }
+
+    section {
+        padding: 2.5rem 0 !important;
+    }
+
+    /* Prevent horizontal overflow on all pages */
+    body {
+        overflow-x: hidden !important;
+    }
+
+    .container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    /* Buttons stack nicely on very small screens */
+    .btn-primary-main,
+    .btn-outline-main {
+        font-size: 0.88rem !important;
+        padding: 0.80rem 1.50rem !important;
+        margin-top: 5px;
+    }
+}
+
+/* ── Back-to-top button ─────────────────────────────── */
+@media (max-width: 575px) {
+    .back-to-top {
+        bottom: 16px !important;
+        right: 16px !important;
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 0.85rem !important;
+    }
+}
+
+/* ── Image overflow fix ─────────────────────────────── */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ── Table overflow on small screens ────────────────── */
+.table-responsive-mobile {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+/* ══════════════════════════════════════════════════════
+   LISTING DETAIL PAGE — Mobile fixes
+   ══════════════════════════════════════════════════════ */
+
+/* Go Back button — top mobile version */
+@media (max-width: 991px) {
+    .btn-outline-listing-back {
+        display: inline-flex;
+        width: auto;
+        font-size: 0.88rem;
+        padding: 0.6rem 1.25rem;
+    }
+}
+
+/* Featured image height on mobile */
+@media (max-width: 767px) {
+    .listing-detail-img {
+        height: 240px !important;
+        border-radius: 14px !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .listing-detail-img {
+        height: 200px !important;
+        border-radius: 12px !important;
+    }
+
+    /* Info box padding tighter on small phones */
+    .listing-info-box {
+        padding: 1.1rem !important;
+        border-radius: 14px !important;
+    }
 }

@@ -5,6 +5,10 @@ $categories = getCategories();
 $featured = getFeaturedListings(6);
 $events = getUpcomingEvents(3);
 $stats = getStats();
+// Fix barangays count: use the Barangays category listing count (matches admin panel)
+// instead of counting distinct barangay field values (which inflates the number)
+$_brgy = $db->query("SELECT COUNT(l.id) as c FROM listings l JOIN categories c ON l.category_id=c.id WHERE c.slug='barangays' AND l.status='active'");
+if ($_brgy) $stats['barangays'] = (int)$_brgy->fetch_assoc()['c'];
 $mapListings = getAllListingsForMap();
 
 // Embed initial DB timestamp for the live-update poller
@@ -25,7 +29,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   <meta charset="UTF-8">
   <meta name="site-base" content="<?= rtrim(BASE_URL, '/') ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="shortcut icon" type="x-icon" href="assets/images/logo.png">
+  <link rel="shortcut icon" type="x-icon" href="assets/images/san-enrique-logo.jpg">
   <title><?= SITE_NAME ?> - <?= SITE_TAGLINE ?></title>
   <meta name="description"
     content="Discover the hidden paradise of San Enrique, Iloilo. Explore resorts, cultural sites, local food, and beautiful barangays.">
@@ -63,7 +67,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
       min-height: 100vh !important;
       background:
         linear-gradient(160deg, rgba(13,43,30,0.82) 0%, rgba(27,67,50,0.65) 50%, rgba(64,145,108,0.45) 100%),
-        url('https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=80') center/cover no-repeat fixed !important;
+        url('assets/images/7.jpg') center/cover no-repeat fixed !important;
       display: flex;
       align-items: center;
       position: relative;
@@ -261,7 +265,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
     .stats-section {
       background:
         linear-gradient(135deg, rgba(13,43,30,0.92) 0%, rgba(27,67,50,0.88) 100%),
-        url('https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=1200&q=70') center/cover no-repeat !important;
+        url('assets/images/8.jpg') center/cover no-repeat !important;
     }
     .stat-card {
       background: var(--glass-bg) !important;
@@ -328,7 +332,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
     .categories-section {
       background:
         linear-gradient(180deg, rgba(240,247,242,0.92) 0%, rgba(220,240,228,0.88) 100%),
-        url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1400&q=75') center/cover no-repeat fixed !important;
+        url('assets/images/6.JPG') center/cover no-repeat fixed !important;
       position: relative;
     }
 
@@ -336,7 +340,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
     #featured {
       background:
         linear-gradient(160deg, rgba(10,30,18,0.78) 0%, rgba(22,55,38,0.72) 50%, rgba(40,90,60,0.68) 100%),
-        url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=1600&q=80') center/cover no-repeat fixed !important;
+        url('assets/images/12.JPG') center/cover no-repeat fixed !important;
     }
     /* Section title & subtitle contrast fix for dark bg */
     #featured .section-title { color: #fff !important; text-shadow: 0 2px 12px rgba(0,0,0,0.4); }
@@ -351,7 +355,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
     .events-section {
       background:
         linear-gradient(160deg, rgba(10,25,18,0.80) 0%, rgba(18,48,32,0.75) 55%, rgba(35,75,50,0.70) 100%),
-        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80') center/cover no-repeat fixed !important;
+        url('assets/images/8.jpg') center/cover no-repeat fixed !important;
     }
     .events-section .section-title { color:#fff !important; text-shadow:0 2px 12px rgba(0,0,0,0.35); }
     .events-section .section-label { color: var(--gold-light, #f0c040) !important; }
@@ -361,14 +365,14 @@ foreach (['listings', 'categories', 'events'] as $_t) {
     .about-strip {
       background:
         linear-gradient(160deg, rgba(248,253,248,0.94) 0%, rgba(230,245,235,0.90) 100%),
-        url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1400&q=75') center/cover no-repeat fixed !important;
+        url('assets/images/9.JPG') center/cover no-repeat fixed !important;
     }
 
     /* Contact: deep dusk forest */
     .contact-section {
       background:
         linear-gradient(160deg, rgba(8,22,14,0.85) 0%, rgba(18,48,32,0.80) 55%, rgba(30,65,45,0.78) 100%),
-        url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=1400&q=75') center 30%/cover no-repeat fixed !important;
+        url('assets/images/10.JPG') center 30%/cover no-repeat fixed !important;
     }
     .contact-section .section-title { color:#fff !important; text-shadow:0 2px 12px rgba(0,0,0,0.4); }
     .contact-section .section-label { color: var(--gold-light, #f0c040) !important; }
@@ -412,7 +416,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
     .products-section {
       background:
         linear-gradient(160deg, rgba(13,43,30,0.88) 0%, rgba(27,67,50,0.82) 50%, rgba(64,145,108,0.65) 100%),
-        url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80') center/cover no-repeat fixed !important;
+        url('assets/images/11.JPG') center/cover no-repeat fixed !important;
       position: relative;
       overflow: hidden;
     }
@@ -435,7 +439,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
     .map-section {
       background:
         linear-gradient(160deg, rgba(240,247,242,0.93) 0%, rgba(220,238,228,0.90) 100%),
-        url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1400&q=75') center/cover no-repeat fixed !important;
+        url('assets/images/12.JPG') center/cover no-repeat fixed !important;
       position: relative;
     }
     .map-section .container { position:relative; z-index:2; }
@@ -675,7 +679,8 @@ foreach (['listings', 'categories', 'events'] as $_t) {
 
   <!-- Center content -->
   <div class="loader-content">
-    <div class="loader-emblem">🌿</div>
+    <!-- <div class="loader-emblem">🌿</div> -->
+     <img src="assets/images/san-enrique-logo.jpg" alt="San Enrique" class="loader-emblem">
 
     <div class="loader-site-name">San <span>Enrique</span></div>
     <div class="loader-tagline">Tourism Hub &nbsp;·&nbsp; Iloilo</div>
@@ -719,7 +724,9 @@ foreach (['listings', 'categories', 'events'] as $_t) {
           <div class="container">
       <div class="d-flex align-items-center justify-content-between w-100">
         <a href="index.php" class="navbar-brand-wrap text-decoration-none">
-          <div class="brand-logo">🌿</div>
+          <!-- <div class="brand-logo"> -->
+            <img src="assets/images/san-enrique-logo.jpg" alt="San Enrique" class="navbar-brand-logo-img">
+          <!-- </div> -->
           <div class="brand-text-wrap">
             <div class="brand-name">San Enrique</div>
             <div class="brand-sub">Tourism Hub</div>
@@ -729,7 +736,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
         <div class="d-none d-lg-flex align-items-center gap-1">
           <a href="#home" class="nav-link-main active">Home</a>
           <a href="#categories" class="nav-link-main">Explore</a>
-          <a href="map.php" class="nav-link-main">Map</a>
+          <!-- <a href="map.php" class="nav-link-main">Map</a> -->
           <a href="#events" class="nav-link-main">Events</a>
           <a href="#about" class="nav-link-main">About</a>
           <a href="#contact" class="nav-link-main">Contact</a>
@@ -747,13 +754,13 @@ foreach (['listings', 'categories', 'events'] as $_t) {
         <div class="d-flex flex-column gap-1 py-2">
           <a href="#home" class="nav-link-main">Home</a>
           <a href="#categories" class="nav-link-main">Explore</a>
-          <a href="map.php" class="nav-link-main">Map</a>
+          <!-- <a href="map.php" class="nav-link-main">Map</a> -->
           <a href="#events" class="nav-link-main">Events</a>
           <a href="#about" class="nav-link-main">About</a>
           <a href="#contact" class="nav-link-main">Contact</a>
-          <a href="admin/login.php" class="btn-nav-admin mt-2 text-center" style="max-width:140px;">
+          <!-- <a href="admin/login.php" class="btn-nav-admin mt-2 text-center" style="max-width:140px;">
             <i class="fas fa-shield-alt me-1"></i> Admin
-          </a>
+          </a> -->
         </div>
       </div>
     </div>
@@ -792,7 +799,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
 
             <!-- Search Bar -->
             <form id="heroSearchForm" class="search-hero-bar mb-4">
-              <i class="fas fa-search" style="color:#5a7564;padding:0.8rem 0;"></i>
+              <span class="search-icon"><i class="fas fa-search"></i></span>
               <input type="text" id="heroSearch" placeholder="Search resorts, places, food..." autocomplete="off">
               <button type="submit"><i class="fas fa-arrow-right"></i> Explore</button>
             </form>
@@ -838,11 +845,11 @@ foreach (['listings', 'categories', 'events'] as $_t) {
             <div class="hs-stage" id="hsStage">
 
               <!-- Slides — beautiful San Enrique-style nature photos -->
-              <div class="hs-slide" style="--bg:url('https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&q=80')"></div>
-              <div class="hs-slide" style="--bg:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80')"></div>
-              <div class="hs-slide" style="--bg:url('https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80')"></div>
-              <div class="hs-slide" style="--bg:url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80')"></div>
-              <div class="hs-slide" style="--bg:url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=80')"></div>
+              <div class="hs-slide" style="--bg:url('assets/images/1.jpg')"></div>
+              <div class="hs-slide" style="--bg:url('assets/images/2.jpg')"></div>
+              <div class="hs-slide" style="--bg:url('assets/images/3.jpg')"></div>
+              <div class="hs-slide" style="--bg:url('assets/images/4.jpg')"></div>
+              <div class="hs-slide" style="--bg:url('assets/images/5.JPG')"></div>
 
               <!-- Prev / Next -->
               <button class="hs-btn hs-prev" onclick="hsPrev()" aria-label="Previous">
@@ -1096,7 +1103,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
     </div>
   </section>
 
-  <!-- ABOUT SECTION -->
+    <!-- ABOUT SECTION -->
   <section id="about" class="about-strip" style="position:relative;overflow:hidden;">
     <div class="section-floating-shapes">
       <div class="float-shape float-shape-1"></div>
@@ -1104,59 +1111,136 @@ foreach (['listings', 'categories', 'events'] as $_t) {
       <div class="float-shape float-shape-3"></div>
     </div>
     <div class="container" style="position:relative;z-index:2;">
-      <div class="row align-items-center g-5">
+
+      <!-- Section Header -->
+      <div class="text-center mb-5 animate-on-scroll">
+        <div class="section-label justify-content-center"><span></span>Our Story<span></span></div>
+        <h2 class="section-title">About San Enrique</h2>
+        <p class="section-subtitle mx-auto">A hidden gem nestled in the heart of Iloilo Province — where nature, culture, and community thrive together.</p>
+      </div>
+
+      <!-- Main content row -->
+      <div class="row align-items-center g-5 mb-5">
         <div class="col-lg-5 animate-on-scroll">
           <div class="about-img-wrap">
-            <img src="assets/images/San Enrique LGU.png" alt="San Enrique" loading="lazy">
+            <img src="assets/images/San Enrique LGU.png" alt="San Enrique Municipal Hall" loading="lazy">
             <div class="about-highlight">
-              <div
-                style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">
-                LGU Initiative</div>
-              <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--primary);font-weight:700;">
-                Digital Tourism Platform</div>
-              <div style="font-size:0.82rem;color:var(--text-muted);">Powered by San Enrique LGU</div>
+              <div class="about-highlight-label">Official Record</div>
+              <div class="about-highlight-title">Sangguniang Bayan<br>Resolution No. 2006-53</div>
+              <div class="about-highlight-sub">Official Municipal History, April 19, 2006</div>
             </div>
           </div>
         </div>
         <div class="col-lg-7 animate-on-scroll delay-2">
-          <div class="section-label">About San Enrique</div>
-          <h2 class="section-title">A Gem in the Heart<br>of Iloilo Province</h2>
-          <p style="color:var(--text-muted);margin-bottom:1.5rem;line-height:1.8;">
-            San Enrique is a municipality in the province of Iloilo, Philippines, known for its warm hospitality, rich
-            cultural heritage, and breathtaking natural landscapes. This digital platform is an initiative by the Local
-            Government Unit to promote local tourism and support the community.
-          </p>
-          <ul class="feature-list">
-            <li>
-              <div class="fi-icon"><i class="fas fa-map-marked-alt"></i></div>
-              <div>
-                <strong style="color:var(--primary);display:block;margin-bottom:2px;">GPS-Powered Navigation</strong>
-                <span style="color:var(--text-muted);font-size:0.88rem;">Every listing is pinned with precise GPS
-                  coordinates for easy navigation and real-time directions.</span>
-              </div>
-            </li>
-            <li>
-              <div class="fi-icon"><i class="fas fa-leaf"></i></div>
-              <div>
-                <strong style="color:var(--primary);display:block;margin-bottom:2px;">Eco & Agri Tourism</strong>
-                <span style="color:var(--text-muted);font-size:0.88rem;">Supporting sustainable tourism with organic
-                  farms, eco-trails, and community-led experiences.</span>
-              </div>
-            </li>
-            <li>
-              <div class="fi-icon"><i class="fas fa-landmark"></i></div>
-              <div>
-                <strong style="color:var(--primary);display:block;margin-bottom:2px;">Rich Cultural Heritage</strong>
-                <span style="color:var(--text-muted);font-size:0.88rem;">Historic churches, traditional festivals, and
-                  vibrant local arts celebrating Visayan culture.</span>
-              </div>
-            </li>
-          </ul>
-          <a href="explore.php" class="btn-primary-main mt-2">
-            <i class="fas fa-compass me-1"></i> Explore San Enrique
-          </a>
+          <div class="about-history-card">
+            <div class="about-history-icon"><i class="fas fa-scroll"></i></div>
+            <h3 class="about-history-title">History &amp; Heritage</h3>
+            <p class="about-history-text">
+              San Enrique is a 3rd-class municipality in the province of Iloilo, Philippines, situated in the central
+              part of the island of Panay. Named after Saint Enrique, the municipality is home to <strong>28 barangays</strong>
+              spread across its fertile plains and rolling hills.
+            </p>
+            <p class="about-history-text">
+              With a rich history documented in the official municipal history by Rodrigo P. Ponte and formally adopted
+              through <em>Sangguniang Bayan Resolution No. 2006-53</em> on April 19, 2006, San Enrique stands proud as a
+              community deeply rooted in Ilonggo tradition, faith, and agricultural heritage.
+            </p>
+            <p class="about-history-text">
+              The municipality thrives on agriculture — with sugarcane, rice, and corn among its primary crops — while
+              also nurturing a growing agri-tourism sector, cold springs, river sanctuaries, and vibrant cultural sites
+              that attract visitors from across the region.
+            </p>
+            <div class="about-source">
+              <i class="fas fa-book-open me-2"></i>
+              Source: <a href="https://iloiloelibrary.com/items/show/1208" target="_blank" rel="noopener">
+                Iloilo Province eLibrary — Municipal History of San Enrique
+              </a>
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- Quick Facts Bar -->
+      <div class="row g-3 mb-5">
+        <div class="col-6 col-md-3 animate-on-scroll delay-1">
+          <div class="about-fact-card">
+            <div class="about-fact-icon"><i class="fas fa-map-marker-alt"></i></div>
+            <div class="about-fact-value">3rd Class</div>
+            <div class="about-fact-label">Municipality</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 animate-on-scroll delay-2">
+          <div class="about-fact-card">
+            <div class="about-fact-icon"><i class="fas fa-home"></i></div>
+            <div class="about-fact-value">28</div>
+            <div class="about-fact-label">Barangays</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 animate-on-scroll delay-3">
+          <div class="about-fact-card">
+            <div class="about-fact-icon"><i class="fas fa-seedling"></i></div>
+            <div class="about-fact-value">Agri</div>
+            <div class="about-fact-label">Tourism Hub</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 animate-on-scroll delay-4">
+          <div class="about-fact-card">
+            <div class="about-fact-icon"><i class="fas fa-calendar-alt"></i></div>
+            <div class="about-fact-value">2006</div>
+            <div class="about-fact-label">History Adopted</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature highlights -->
+      <div class="row g-4 animate-on-scroll delay-2">
+        <div class="col-md-4">
+          <div class="about-feature-card">
+            <div class="about-feature-icon" style="background:linear-gradient(135deg,#40916c,#52b788);">
+              <i class="fas fa-water"></i>
+            </div>
+            <h4 class="about-feature-title">Natural Wonders</h4>
+            <p class="about-feature-desc">
+              Crystal-clear cold springs, scenic rivers, and lush farmscapes await adventurers and nature lovers.
+              From Cabas-an Cold Spring to the San Antonio River, nature is always close.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="about-feature-card">
+            <div class="about-feature-icon" style="background:linear-gradient(135deg,#b7791f,#d4a017);">
+              <i class="fas fa-landmark"></i>
+            </div>
+            <h4 class="about-feature-title">Cultural Heritage</h4>
+            <p class="about-feature-desc">
+              Ancient simboryos, historic churches, and native delicacies like Kalamay Hati and Bibingka tell
+              the story of a people proud of their Ilonggo roots and traditions.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="about-feature-card">
+            <div class="about-feature-icon" style="background:linear-gradient(135deg,#2d6a4f,#40916c);">
+              <i class="fas fa-tractor"></i>
+            </div>
+            <h4 class="about-feature-title">Agri-Tourism</h4>
+            <p class="about-feature-desc">
+              Thriving farms like Gumbans Amat Amat Farm and BC Farm open their gates to visitors, offering
+              fresh produce, farm life experiences, and a taste of rural Iloilo.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-5 animate-on-scroll">
+        <a href="explore.php" class="btn-primary-main me-3">
+          <i class="fas fa-compass me-1"></i> Explore Destinations
+        </a>
+        <a href="map.php" class="btn-outline-main">
+          <i class="fas fa-map me-1"></i> View on Map
+        </a>
+      </div>
+
     </div>
   </section>
 
@@ -1391,7 +1475,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
         <div class="col-lg-4">
           <div class="footer-logo">
             <div class="d-flex align-items-center gap-3">
-              <img src="assets/images/logo-tourism.svg" alt="San Enrique" class="footer-logo-img">
+              <img src="assets/images/san-enrique-logo.jpg" alt="San Enrique" class="footer-logo-img">
               <div>
                 <div class="footer-logo-title">San
                   Enrique Tourism Hub</div>
@@ -1404,12 +1488,12 @@ foreach (['listings', 'categories', 'events'] as $_t) {
             Your official digital gateway to the beauty, culture, and hospitality of San Enrique, Iloilo. A proud
             initiative of the San Enrique Local Government Unit.
           </p>
-          <div class="footer-social">
+          <!-- <div class="footer-social">
             <a href="#" class="social-btn" title="Facebook"><i class="fab fa-facebook-f"></i></a>
             <a href="#" class="social-btn" title="Instagram"><i class="fab fa-instagram"></i></a>
             <a href="#" class="social-btn" title="YouTube"><i class="fab fa-youtube"></i></a>
             <a href="#" class="social-btn" title="Twitter"><i class="fab fa-twitter"></i></a>
-          </div>
+          </div> -->
         </div>
 
         <div class="col-6 col-lg-2">

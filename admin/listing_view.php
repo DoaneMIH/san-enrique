@@ -33,6 +33,8 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
   <meta name="site-base" content="<?= rtrim(BASE_URL, '/') ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($listing['name']) ?> - Admin View</title>
+    <link rel="shortcut icon" type="x-icon" href="../assets/images/san-enrique-logo.jpg">
+
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Nunito:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">

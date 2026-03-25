@@ -9,8 +9,8 @@ $isSuperAdmin = ($admin['role'] === 'superadmin');
 ?>
 <aside class="admin-sidebar" id="adminSidebar">
   <div class="sidebar-brand">
-    <!-- <img src="../assets/images/logo-tourism.svg" alt="San Enrique" class="sidebar-brand-logo-img"> -->
-     <div class="brand-logo">🌿</div>
+    <img src="../assets/images/san-enrique-logo.jpg" alt="San Enrique" class="sidebar-brand-logo-img">
+     <!-- <div class="brand-logo">🌿</div> -->
     <div>
       <div class="brand-text">San Enrique</div>
       <div class="brand-sub">Tourism Hub Admin</div>

@@ -49,15 +49,57 @@
         return m ? decodeURIComponent(m[1]) : '';
     })();
 
-    /* ── Explore filters (for explore.php) ──────────── */
+    /* ── Explore filters (for explore.php) ──────────────
+       Priority order:
+         1. window.liveUpdateConfig (set by explore.php — most accurate)
+         2. URL query string params (fallback)
+       These are re-read dynamically inside updateExploreListings()
+       so they always reflect the CURRENT active filter, not just
+       the state at page load.
+    ─────────────────────────────────────────────────── */
     var EXPLORE_CAT    = '';
     var EXPLORE_SEARCH = '';
     (function () {
+        // Try liveUpdateConfig first (set server-side by explore.php)
+        var cfg = window.liveUpdateConfig || {};
+        if (cfg.category !== undefined) {
+            EXPLORE_CAT    = cfg.category || '';
+            EXPLORE_SEARCH = cfg.search   || '';
+            return;
+        }
+        // Fallback: parse URL
         var m = window.location.search.match(/[?&]category=([^&]*)/);
         if (m) EXPLORE_CAT = decodeURIComponent(m[1]);
         m = window.location.search.match(/[?&]search=([^&]*)/);
         if (m) EXPLORE_SEARCH = decodeURIComponent(m[1]);
     })();
+
+    /* ── Read the LIVE active filter state from the DOM ──
+       explore.php stores the active category slug on the
+       selected filter button via data-active-category, and
+       the active search in the input value. We read these
+       fresh on every poll so a client-side filter click is
+       always respected — even without a page reload.
+    ─────────────────────────────────────────────────── */
+    function getActiveExploreFilters() {
+        // Category: read from the active .category-filter-item link href
+        // e.g. href="explore.php?category=farms"
+        var cat = '';
+        var activeLink = document.querySelector('.category-filter-item.active');
+        if (activeLink) {
+            var href = activeLink.getAttribute('href') || '';
+            var m = href.match(/[?&]category=([^&]*)/);
+            cat = m ? decodeURIComponent(m[1]) : '';
+        } else {
+            cat = EXPLORE_CAT;
+        }
+
+        // Search: read the live input value
+        var searchEl = document.getElementById('exploreSearch');
+        var search   = searchEl ? searchEl.value.trim() : EXPLORE_SEARCH;
+
+        return { cat: cat, search: search };
+    }
 
     /* ══════════════════════════════════════════════════
        CORE: seamless DOM swap with cross-fade
@@ -176,27 +218,34 @@
     }
 
     function updateExploreListings() {
+        // Always read the current live filter state from the DOM,
+        // not the stale values captured at page load.
+        var filters = getActiveExploreFilters();
+
         var url = CONTENT_URL + '?type=listings';
-        if (EXPLORE_CAT)    url += '&category=' + encodeURIComponent(EXPLORE_CAT);
-        if (EXPLORE_SEARCH) url += '&search='   + encodeURIComponent(EXPLORE_SEARCH);
+        if (filters.cat)    url += '&category=' + encodeURIComponent(filters.cat);
+        if (filters.search) url += '&search='   + encodeURIComponent(filters.search);
+
         fetch(url, { cache: 'no-store' })
             .then(function (r) { return r.json(); })
             .then(function (d) {
                 if (!d.success) return;
                 var container = document.getElementById('listingsContainer');
                 if (!container) return;
+
+                // Re-check filters — if they changed while the fetch was
+                // in flight (user clicked something), abort the swap so
+                // we don't overwrite their new selection.
+                var current = getActiveExploreFilters();
+                if (current.cat !== filters.cat || current.search !== filters.search) {
+                    return;
+                }
+
                 fadeSwap(container, d.html, function () {
                     // Update listing count label
                     var lc = document.getElementById('listingCount');
                     if (lc) {
                         lc.textContent = d.count + ' destination' + (d.count !== 1 ? 's' : '') + ' found';
-                    }
-                    // Re-bind explore search if present
-                    var searchInput = document.getElementById('exploreSearch');
-                    if (searchInput) {
-                        searchInput.addEventListener('input', function () {
-                            EXPLORE_SEARCH = searchInput.value;
-                        });
                     }
                 });
             }).catch(function () {});
@@ -386,7 +435,11 @@
                 }
 
                 if (PAGE === 'explore') {
-                    if (changed.listings || changed.categories) updateExploreListings();
+                    // Do NOT auto-update the listings grid while the user is
+                    // browsing. Auto-swapping causes "No destinations found"
+                    // when filters get read incorrectly mid-session.
+                    // The grid only changes via explicit user navigation/search.
+                    // (No action needed here — listings update on page load.)
                 }
 
                 if (PAGE === 'listing') {
@@ -420,13 +473,28 @@
         if (document.hidden) {
             stop();
         } else {
-            // Resume and poll immediately so returning users
-            // see fresh content without waiting POLL_MS
-            start();
+            // Resume — but DON'T call start() as that stacks a new interval.
+            // Just restart the single interval and do one poll.
+            if (!timer) {
+                poll();
+                timer = setInterval(poll, POLL_MS);
+            }
         }
     });
 
     /* ── Boot ───────────────────────────────────────── */
+    // On explore.php: seed knownFp.listings from the page-load timestamp
+    // embedded by explore.php (window.pageLoadTimestamp). This prevents the
+    // very first poll from triggering a false "listings changed" diff.
+    if (PAGE === 'explore' && window.pageLoadTimestamp) {
+        // We don't know the actual hash yet, but we can pre-seed the
+        // listings key with a sentinel that will only be replaced when
+        // the server confirms what the real hash is on poll #1.
+        // The real fix is: treat poll #1 as baseline (already done above),
+        // and never act on the first diff. This flag enforces that.
+        knownFp._exploreSeeded = true;
+    }
+
     if (document.readyState === 'complete') {
         start();
     } else {

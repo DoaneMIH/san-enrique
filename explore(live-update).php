@@ -7,6 +7,16 @@ $search = isset($_GET['search']) ? sanitize($_GET['search']) : '';
 $listings = getAllListings($selectedCat, $search, 24);
 $pageTitle = $selectedCat ? ucfirst($selectedCat) : ($search ? "Search: $search" : 'All Destinations');
 
+// Initial DB timestamp for live-update poller
+$initTs = 0;
+foreach (['listings', 'categories', 'events'] as $_t) {
+  $r = $db->query("SELECT UNIX_TIMESTAMP(MAX(created_at)) as t FROM `$_t`");
+  if ($r) {
+    $v = (int) $r->fetch_assoc()['t'];
+    if ($v > $initTs)
+      $initTs = $v;
+  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -514,12 +524,12 @@ $pageTitle = $selectedCat ? ucfirst($selectedCat) : ($search ? "Search: $search"
             Your official digital gateway to the beauty, culture, and hospitality of San Enrique, Iloilo. A proud
             initiative of the San Enrique Local Government Unit.
           </p>
-          <!-- <div class="footer-social">
+          <div class="footer-social">
             <a href="#" class="social-btn" title="Facebook"><i class="fab fa-facebook-f"></i></a>
             <a href="#" class="social-btn" title="Instagram"><i class="fab fa-instagram"></i></a>
             <a href="#" class="social-btn" title="YouTube"><i class="fab fa-youtube"></i></a>
             <a href="#" class="social-btn" title="Twitter"><i class="fab fa-twitter"></i></a>
-          </div> -->
+          </div>
         </div>
 
         <div class="col-6 col-lg-2">
@@ -628,6 +638,15 @@ $pageTitle = $selectedCat ? ucfirst($selectedCat) : ($search ? "Search: $search"
   });
 </script>
 
+  <script>
+    // Live-update poller bootstrap
+    window.pageLoadTimestamp = <?= $initTs ?>;
+    window.liveUpdateConfig = {
+      page: 'explore',
+      category: <?= json_encode($selectedCat) ?>,
+      search: <?= json_encode($search) ?>
+    };
+  </script>
   <script src="assets/js/main.js"></script>
 
   <script>
@@ -669,6 +688,7 @@ $pageTitle = $selectedCat ? ucfirst($selectedCat) : ($search ? "Search: $search"
     });
   })();
   </script>
+  <script src="assets/js/live-update.js"></script>
 </body>
 
 </html>
