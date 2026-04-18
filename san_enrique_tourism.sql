@@ -28,6 +28,18 @@ SET time_zone = "+00:00";
 --
 USE san_enrique_tourism;
 
+
+-- Migration: Add is_pinned column to events table
+-- Run this once in your MySQL database
+ 
+ALTER TABLE events
+  ADD COLUMN is_pinned TINYINT(1) NOT NULL DEFAULT 0
+  AFTER status;
+ 
+-- Optional: pin any existing events you want always visible
+-- UPDATE events SET is_pinned = 1 WHERE id = 1;
+ 
+
 CREATE TABLE `admins` (
   `id` int NOT NULL,
   `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,

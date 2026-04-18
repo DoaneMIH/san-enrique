@@ -54,8 +54,33 @@ function getListing($slug)
 function getUpcomingEvents($limit = 3)
 {
     $db = getDB();
-    $result = $db->query("SELECT * FROM events WHERE status = 'active' AND event_date >= CURDATE() ORDER BY event_date ASC LIMIT $limit");
-    return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+
+    // Pinned events always show first regardless of date
+    $pinned = [];
+    $upcoming = [];
+
+    $pResult = $db->query("SELECT * FROM events WHERE status='active' AND is_pinned=1 ORDER BY event_date ASC");
+    if ($pResult) $pinned = $pResult->fetch_all(MYSQLI_ASSOC);
+
+    // Fill remaining slots with upcoming non-pinned events
+    $pinnedIds = array_column($pinned, 'id');
+    $excludeStr = implode(',', array_map('intval', $pinnedIds)) ?: '0';
+    $remaining = max(0, $limit - count($pinned));
+
+    if ($remaining > 0) {
+        $uResult = $db->query("SELECT * FROM events WHERE status='active' AND is_pinned=0 AND event_date >= CURDATE() AND id NOT IN ($excludeStr) ORDER BY event_date ASC LIMIT $remaining");
+        if ($uResult) $upcoming = $uResult->fetch_all(MYSQLI_ASSOC);
+    }
+
+    $events = array_merge($pinned, $upcoming);
+
+    // Fallback: if is_pinned column doesn't exist yet, use original query
+    if ($db->errno) {
+        $result = $db->query("SELECT * FROM events WHERE status='active' AND event_date >= CURDATE() ORDER BY event_date ASC LIMIT $limit");
+        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+
+    return $events ?: [];
 }
 
 function getAllListingsForMap()

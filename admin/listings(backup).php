@@ -19,8 +19,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $contact = sanitize($_POST['contact'] ?? '');
   $email = sanitize($_POST['email'] ?? '');
   $website = sanitize($_POST['website'] ?? '');
-  $lat = (float) ($_POST['latitude'] ?? 0);
-  $lng = (float) ($_POST['longitude'] ?? 0);
+  // If admin unchecked "Show Map", save NULL so the public page hides the map
+  $showMap = isset($_POST['show_map']) ? 1 : 0;
+  $lat = $showMap ? (float) ($_POST['latitude'] ?? 0) : 'NULL';
+  $lng = $showMap ? (float) ($_POST['longitude'] ?? 0) : 'NULL';
   $hours = sanitize($_POST['operating_hours'] ?? '');
   $fee = sanitize($_POST['entrance_fee'] ?? '');
   $amenities = sanitize($_POST['amenities'] ?? '');
@@ -195,7 +197,7 @@ if ($action === 'edit' && $id) {
 }
 
 // Fetch all listings for list view
-$listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l JOIN categories c ON l.category_id = c.id ORDER BY l.created_at DESC")->fetch_all(MYSQLI_ASSOC);
+$listings = $db->query("SELECT l.*, c.name as cat_name, c.slug as cat_slug, c.color FROM listings l JOIN categories c ON l.category_id = c.id ORDER BY l.created_at DESC")->fetch_all(MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -205,6 +207,8 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
   <meta name="site-base" content="<?= rtrim(BASE_URL, '/') ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Listings Management - Admin</title>
+    <link rel="shortcut icon" type="x-icon" href="../assets/images/san-enrique-logo.jpg">
+
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Nunito:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
@@ -251,11 +255,25 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
         <!-- LISTINGS TABLE -->
         <div class="admin-table-wrap">
           <div class="admin-table-header">
-            <div class="admin-table-title">All Listings (<?= count($listings) ?>)</div>
+            <div class="admin-table-title">All Listings (<span id="visibleCount"><?= count($listings) ?></span>)</div>
             <div class="admin-search">
               <i class="fas fa-search"></i>
               <input type="text" id="tableSearch" placeholder="Search listings...">
             </div>
+          </div>
+          <!-- Category filter pills -->
+          <div id="categoryFilterBar" style="display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border,#e5ede8);background:var(--g8,#f9fdfb);">
+            <button class="cat-filter-pill active" data-cat="all"
+              style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:100px;border:1.5px solid var(--accent,#40916c);background:var(--accent,#40916c);color:#fff;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all .2s;">
+              <i class="fas fa-th-large" style="font-size:0.7rem;"></i> All
+            </button>
+            <?php foreach ($categories as $cat): ?>
+            <button class="cat-filter-pill" data-cat="<?= htmlspecialchars($cat['slug']) ?>"
+              style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:100px;border:1.5px solid var(--border,#d1e8d8);background:#fff;color:var(--primary,#1b4332);font-size:0.78rem;font-weight:600;cursor:pointer;transition:all .2s;">
+              <i class="<?= htmlspecialchars($cat['icon']) ?>" style="color:<?= htmlspecialchars($cat['color']) ?>;font-size:0.7rem;"></i>
+              <?= htmlspecialchars($cat['name']) ?>
+            </button>
+            <?php endforeach; ?>
           </div>
           <div class="table-scroll">
             <table class="admin-table" id="listingsTable">
@@ -273,15 +291,15 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
               </thead>
               <tbody>
                 <?php foreach ($listings as $i => $listing): ?>
-                  <tr>
-                    <td class="td-muted"><?= $i + 1 ?></td>
+                  <tr data-cat="<?= htmlspecialchars($listing['cat_slug']) ?>">
+                    <td class="td-muted listing-row-num"><?= $i + 1 ?></td>
                     <td>
                       <div class="listing-info">
-                        <img src="<?= $listing['featured_image'] ?: 'https://placehold.co/48x38/1b4332/ffffff?text=?' ?>"
+                        <img src="<?= $listing['featured_image'] ? listingImage($listing['featured_image'], $listing['name'], 96, 76) : 'https://placehold.co/48x38/1b4332/ffffff?text=?' ?>"
                           class="listing-thumb" alt="" onerror="this.src='https://placehold.co/48x38/1b4332/ffffff?text=?'">
                         <div>
                           <div class="listing-name">
-                            <?= htmlspecialchars($listing['name']) ?></div>
+                            <?= htmlspecialchars(html_entity_decode($listing['name'], ENT_QUOTES | ENT_HTML5, 'UTF-8')) ?></div>
                           <div class="listing-slug"><?= htmlspecialchars($listing['slug']) ?>
                           </div>
                         </div>
@@ -322,7 +340,7 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
         <div class="admin-form-card">
           <div class="admin-form-header">
             <div class="form-header-text">
-              <?= $action === 'add' ? 'Add New Listing' : 'Edit: ' . htmlspecialchars($editListing['name'] ?? '') ?>
+              <?= $action === 'add' ? 'Add New Listing' : 'Edit: ' . htmlspecialchars(html_entity_decode($editListing['name'] ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8')) ?>
             </div>
           </div>
           <form method="POST" action="" enctype="multipart/form-data">
@@ -340,7 +358,7 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
                 <div class="col-md-8">
                   <label class="admin-label">Listing Name *</label>
                   <input type="text" name="name" class="admin-input" required
-                    value="<?= htmlspecialchars($editListing['name'] ?? '') ?>" placeholder="e.g. Paradise Cove Resort">
+                    value="<?= htmlspecialchars(html_entity_decode($editListing['name'] ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8')) ?>" placeholder="e.g. Paradise Cove Resort">
                 </div>
                 <div class="col-md-4">
                   <label class="admin-label">Category *</label>
@@ -630,21 +648,40 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
 
                 <!-- GPS Coordinates -->
                 <div class="col-12">
-                  <label class="admin-label"><i class="fas fa-map-pin me-1"></i> GPS
-                    Coordinates — Click on the map to set location</label>
-                  <div class="coord-fields mb-2">
-                    <div>
-                      <label class="admin-label label-sm">Latitude</label>
-                      <input type="number" name="latitude" id="latitude" class="admin-input" step="any"
-                        value="<?= $editListing['latitude'] ?? '10.9178' ?>" placeholder="10.9178">
+                  <?php $hasCoords = !empty($editListing['latitude']) && $editListing['latitude'] != 0; ?>
+                  <!-- Show Map toggle -->
+                  <div class="d-flex align-items-center gap-3 mb-3 p-3" style="background:var(--g7,#f6faf7);border-radius:10px;border:1px solid var(--border-solid,#d1e8d8);">
+                    <div class="form-check form-switch mb-0">
+                      <input class="form-check-input" type="checkbox" name="show_map" id="showMapToggle"
+                        <?= $hasCoords ? 'checked' : '' ?> value="1"
+                        onchange="toggleMapSection(this.checked)">
+                      <label class="form-check-label fw-semibold" for="showMapToggle" style="color:var(--primary,#1b4332);">
+                        <i class="fas fa-map-marked-alt me-1" style="color:var(--accent,#40916c);"></i>
+                        Show Map on Listing Page
+                      </label>
                     </div>
-                    <div>
-                      <label class="admin-label label-sm">Longitude</label>
-                      <input type="number" name="longitude" id="longitude" class="admin-input" step="any"
-                        value="<?= $editListing['longitude'] ?? '122.8845' ?>" placeholder="122.8845">
-                    </div>
+                    <span style="font-size:0.8rem;color:var(--text-muted,#6b8c73);">
+                      Uncheck to hide the map (e.g. for food stalls, native delicacies)
+                    </span>
                   </div>
-                  <div id="adminMapPicker"></div>
+                  <!-- Map fields — hidden when toggle is off -->
+                  <div id="mapFieldsWrap" style="<?= $hasCoords ? '' : 'display:none;' ?>">
+                    <label class="admin-label"><i class="fas fa-map-pin me-1"></i> GPS
+                      Coordinates — Click on the map to set location</label>
+                    <div class="coord-fields mb-2">
+                      <div>
+                        <label class="admin-label label-sm">Latitude</label>
+                        <input type="number" name="latitude" id="latitude" class="admin-input" step="any"
+                          value="<?= $editListing['latitude'] ?? '10.9178' ?>" placeholder="10.9178">
+                      </div>
+                      <div>
+                        <label class="admin-label label-sm">Longitude</label>
+                        <input type="number" name="longitude" id="longitude" class="admin-input" step="any"
+                          value="<?= $editListing['longitude'] ?? '122.8845' ?>" placeholder="122.8845">
+                      </div>
+                    </div>
+                    <div id="adminMapPicker"></div>
+                  </div>
                 </div>
 
                 <!-- Status & Featured -->
@@ -711,17 +748,59 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
       });
     });
 
+    // ── Category filter + search (persistent via localStorage) ──────────
+    var _activeCat = localStorage.getItem('listingFilterCat') || 'all';
+
+    function applyFilters() {
+      var q   = $('#tableSearch').val().toLowerCase();
+      var cat = _activeCat;
+      var visible = 0;
+      $('#listingsTable tbody tr').each(function () {
+        var rowCat  = $(this).data('cat') || '';
+        var rowText = $(this).text().toLowerCase();
+        var show = (cat === 'all' || rowCat === cat) && (!q || rowText.includes(q));
+        $(this).toggle(show);
+        if (show) { visible++; $(this).find('.listing-row-num').text(visible); }
+      });
+      $('#visibleCount').text(visible);
+      $('.cat-filter-pill').each(function () {
+        var isActive = $(this).data('cat') === cat;
+        $(this).css(isActive
+          ? { background:'var(--accent,#40916c)', color:'#fff', borderColor:'var(--accent,#40916c)' }
+          : { background:'#fff', color:'var(--primary,#1b4332)', borderColor:'var(--border,#d1e8d8)' }
+        );
+      });
+    }
+
+    $(document).on('click', '.cat-filter-pill', function () {
+      _activeCat = $(this).data('cat');
+      localStorage.setItem('listingFilterCat', _activeCat);
+      applyFilters();
+    });
+
+    $('#tableSearch').on('input', function () { applyFilters(); });
+    $(document).ready(function () { applyFilters(); });
+
     // ══════════════════════════════════════════════════════════════════════
     // Google Drive URL converter (JS mirror of PHP convertGdriveUrl)
     // ══════════════════════════════════════════════════════════════════════
+    function extractGdriveId(url) {
+      if (!url) return null;
+      var ucMatch = url.match(/[?&]id=([a-zA-Z0-9_-]{10,})/);
+      if (ucMatch) return ucMatch[1];
+      var fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]{10,})/);
+      if (fileMatch) return fileMatch[1];
+      var openMatch = url.match(/open\?id=([a-zA-Z0-9_-]{10,})/);
+      if (openMatch) return openMatch[1];
+      return null;
+    }
     function convertGdriveUrl(url) {
       if (!url) return url;
-      if (url.indexOf('lh3.googleusercontent.com') !== -1) return url;
-      if (/drive\.google\.com\/uc\?.*id=/i.test(url)) return url;
-      var m = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i);
-      if (!m) m = url.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/i);
-      if (m && m[1]) return 'https://lh3.googleusercontent.com/d/' + m[1];
-      return url;
+      if (url.indexOf('drive.google.com') === -1 &&
+          url.indexOf('googleusercontent.com') === -1) return url;
+      var id = extractGdriveId(url);
+      if (!id) return url;
+      return 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1200';
     }
 
     // ══════════════════════════════════════════════════════════════════════
@@ -838,11 +917,30 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.color FROM listings l 
       });
     }
 
+    // Show/hide map fields based on toggle
+    function toggleMapSection(show) {
+      var wrap = document.getElementById('mapFieldsWrap');
+      if (!wrap) return;
+      if (show) {
+        wrap.style.display = '';
+        if (typeof google !== 'undefined' && typeof initAdminMapPicker !== 'undefined') {
+          var lat = parseFloat($('#latitude').val()) || 10.9178;
+          var lng = parseFloat($('#longitude').val()) || 122.8845;
+          initAdminMapPicker(lat, lng);
+        }
+      } else {
+        wrap.style.display = 'none';
+      }
+    }
+
     // Admin map picker
     <?php if ($action === 'add' || $action === 'edit'): ?>
       function initMap() {
-        const lat = parseFloat($('#latitude').val()) || 10.9178;
-        const lng = parseFloat($('#longitude').val()) || 122.8845;
+        // Only initialise if the map toggle is checked
+        var toggle = document.getElementById('showMapToggle');
+        if (toggle && !toggle.checked) return;
+        var lat = parseFloat($('#latitude').val()) || 10.9178;
+        var lng = parseFloat($('#longitude').val()) || 122.8845;
         initAdminMapPicker(lat, lng);
       }
     <?php endif; ?>

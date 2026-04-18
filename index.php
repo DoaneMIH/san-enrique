@@ -3,7 +3,25 @@ require_once 'includes/functions.php';
 $db = getDB();
 $categories = getCategories();
 $featured = getFeaturedListings(6);
-$events = getUpcomingEvents(3);
+// Fetch events: pinned ones always show first, then upcoming fill the rest
+// Ensure the column exists (graceful fallback if migration not run yet)
+$_pinnedEvents = [];
+$_upcomingEvents = [];
+try {
+    $_pe = $db->query("SELECT * FROM events WHERE status='active' AND is_pinned=1 ORDER BY event_date ASC");
+    if ($_pe) $_pinnedEvents = $_pe->fetch_all(MYSQLI_ASSOC);
+} catch (Exception $e) { $_pinnedEvents = []; }
+// Fill remaining slots (max 3 total) with upcoming non-pinned events
+$_pinnedIds = array_column($_pinnedEvents, 'id');
+$_pinnedIdStr = implode(',', array_map('intval', $_pinnedIds)) ?: '0';
+$_remainSlots = max(0, 3 - count($_pinnedEvents));
+if ($_remainSlots > 0) {
+    $_ue = $db->query("SELECT * FROM events WHERE status='active' AND is_pinned=0 AND event_date >= CURDATE() AND id NOT IN ($_pinnedIdStr) ORDER BY event_date ASC LIMIT $_remainSlots");
+    if ($_ue) $_upcomingEvents = $_ue->fetch_all(MYSQLI_ASSOC);
+}
+$events = array_merge($_pinnedEvents, $_upcomingEvents);
+// Fallback: if no events at all, use old method
+if (empty($events)) $events = getUpcomingEvents(3);
 $stats = getStats();
 // Fix barangays count: use the Barangays category listing count (matches admin panel)
 // instead of counting distinct barangay field values (which inflates the number)
@@ -44,6 +62,8 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Custom CSS -->
   <link rel="stylesheet" href="assets/css/style.css">
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
   <!-- ═══════════ UX ENHANCEMENT CSS ═══════════ -->
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -152,6 +172,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
       border: none !important;
       border-radius: 16px !important;
       box-shadow: 0 8px 32px rgba(0,0,0,0.18) !important;
+      margin-bottom: 2rem;
     }
     .search-hero-bar input { color: var(--text, #1a2e1a) !important; }
     .search-hero-bar input::placeholder { color: #9aab9a !important; }
@@ -723,26 +744,39 @@ foreach (['listings', 'categories', 'events'] as $_t) {
           </div> -->
           <div class="container">
       <div class="d-flex align-items-center justify-content-between w-100">
-        <a href="index.php" class="navbar-brand-wrap text-decoration-none">
-          <!-- <div class="brand-logo"> -->
+        <div class="d-flex align-items-center navbar-left-group">
+          <a href="index.php" class="navbar-brand-wrap text-decoration-none">
             <img src="assets/images/san-enrique-logo.jpg" alt="San Enrique" class="navbar-brand-logo-img">
-          <!-- </div> -->
-          <div class="brand-text-wrap">
-            <div class="brand-name">San Enrique</div>
-            <div class="brand-sub">Tourism Hub</div>
-          </div>
-        </a>
+            <div class="brand-text-wrap">
+              <div class="brand-name">San Enrique</div>
+              <div class="brand-sub">Tourism Hub</div>
+            </div>
+          </a>
+
+          <!-- Search (desktop) — sits beside logo, slides right on click -->
+          <form class="nav-search-form d-none d-lg-block" action="explore.php" method="GET">
+            <div class="nav-search-wrap" id="navSearchWrap">
+              <button type="button" class="nav-search-toggle" id="navSearchToggle" aria-label="Search">
+                <i class="fas fa-search"></i>
+              </button>
+              <input type="text" name="search" class="nav-search-input" id="navSearchInput" placeholder="Search destinations..." autocomplete="off">
+              <button type="submit" class="nav-search-submit" aria-label="Go">
+                <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+            <!-- Autocomplete dropdown -->
+            <div class="search-dropdown" id="navSearchDropdown"></div>
+          </form>
+        </div>
+
         <!-- Desktop Nav -->
         <div class="d-none d-lg-flex align-items-center gap-1">
           <a href="#home" class="nav-link-main active">Home</a>
-          <a href="#categories" class="nav-link-main">Explore</a>
-          <!-- <a href="map.php" class="nav-link-main">Map</a> -->
           <a href="#events" class="nav-link-main">Events</a>
+          <a href="#categories" class="nav-link-main">Explore</a>
+          
           <a href="#about" class="nav-link-main">About</a>
           <a href="#contact" class="nav-link-main">Contact</a>
-          <!-- <a href="admin/login.php" class="btn-nav-admin ms-3">
-          <i class="fas fa-shield-alt me-1"></i> Admin
-        </a> -->
         </div>
         <!-- Mobile Toggle -->
         <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav">
@@ -752,15 +786,21 @@ foreach (['listings', 'categories', 'events'] as $_t) {
       <!-- Mobile Nav -->
       <div class="collapse" id="mobileNav">
         <div class="d-flex flex-column gap-1 py-2">
+          <!-- Mobile Search -->
+          <form class="nav-search-mobile" action="explore.php" method="GET">
+            <i class="fas fa-search nav-search-mobile-icon"></i>
+            <input type="text" name="search" id="mobileSearchInput" placeholder="Search destinations..." autocomplete="off">
+            <button type="submit"><i class="fas fa-arrow-right"></i></button>
+            <!-- Mobile autocomplete dropdown -->
+            <div class="search-dropdown search-dropdown-mobile" id="mobileSearchDropdown"></div>
+          </form>
+
           <a href="#home" class="nav-link-main">Home</a>
           <a href="#categories" class="nav-link-main">Explore</a>
           <!-- <a href="map.php" class="nav-link-main">Map</a> -->
           <a href="#events" class="nav-link-main">Events</a>
           <a href="#about" class="nav-link-main">About</a>
           <a href="#contact" class="nav-link-main">Contact</a>
-          <!-- <a href="admin/login.php" class="btn-nav-admin mt-2 text-center" style="max-width:140px;">
-            <i class="fas fa-shield-alt me-1"></i> Admin
-          </a> -->
         </div>
       </div>
     </div>
@@ -797,13 +837,6 @@ foreach (['listings', 'categories', 'events'] as $_t) {
               Explore San Enrique like never before.
             </p>
 
-            <!-- Search Bar -->
-            <form id="heroSearchForm" class="search-hero-bar mb-4">
-              <span class="search-icon"><i class="fas fa-search"></i></span>
-              <input type="text" id="heroSearch" placeholder="Search resorts, places, food..." autocomplete="off">
-              <button type="submit"><i class="fas fa-arrow-right"></i> Explore</button>
-            </form>
-
             <div class="hero-actions">
               <a href="explore.php" class="btn-hero-primary">
                 <i class="fas fa-compass"></i> Explore Destinations
@@ -813,10 +846,10 @@ foreach (['listings', 'categories', 'events'] as $_t) {
               </a>
             </div>
 
-            <div class="hero-stats">
+            <!-- <div class="hero-stats">
               <div class="hero-stat">
                 <div class="stat-num"><span class="count-up"
-                    data-target="<?= $stats['listings'] ?>"><?= $stats['listings'] ?></span>+</div>
+                    data-target="<?= $stats['listings'] ?>"><?= $stats['listings'] ?></span></div>
                 <div class="stat-label">Destinations</div>
               </div>
               <div class="hero-stat">
@@ -826,7 +859,8 @@ foreach (['listings', 'categories', 'events'] as $_t) {
               </div>
               <div class="hero-stat">
                 <div class="stat-num"><span class="count-up"
-                    data-target="<?= $stats['barangays'] ?>"><?= $stats['barangays'] ?></span>+</div>
+                    data-target="<?= $stats['barangays'] ?>"><?= $stats['barangays'] ?></span>
+                  </div>
                 <div class="stat-label">Barangays</div>
               </div>
               <div class="hero-stat">
@@ -834,16 +868,21 @@ foreach (['listings', 'categories', 'events'] as $_t) {
                     data-target="<?= $stats['events'] ?>"><?= $stats['events'] ?></span></div>
                 <div class="stat-label">Events</div>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
 
         <div class="col-lg-6">
-          <div class="hero-slider-wrap">
+          <!-- Search bar floats above carousel -->
+          <!-- <form id="heroSearchForm" class="search-hero-bar hero-search-above-slider mb-3">
+            <span class="search-icon"><i class="fas fa-search"></i></span>
+            <input type="text" id="heroSearch" placeholder="Search resorts, places, food..." autocomplete="off">
+            <button type="submit"><i class="fas fa-arrow-right"></i> Explore</button>
+          </form> -->
 
+          <div class="hero-slider-wrap">
             <!-- ═══ HERO SLIDESHOW ═══ -->
             <div class="hs-stage" id="hsStage">
-
               <!-- Slides — beautiful San Enrique-style nature photos -->
               <div class="hs-slide" style="--bg:url('assets/images/1.jpg')"></div>
               <div class="hs-slide" style="--bg:url('assets/images/2.jpg')"></div>
@@ -878,6 +917,193 @@ foreach (['listings', 'categories', 'events'] as $_t) {
       <i class="fas fa-chevron-down"></i>
     </div>
   </section>
+
+   <!-- EVENTS SECTION -->
+  <section id="events" class="events-section" style="position:relative;overflow:hidden;">
+    <div class="section-floating-shapes">
+      <div class="float-shape float-shape-1"></div>
+      <div class="float-shape float-shape-2"></div>
+    </div>
+    <div class="container" style="position:relative;z-index:2;">
+      <div class="d-flex align-items-end justify-content-between mb-5">
+        <div class="animate-on-scroll">
+          <div class="section-label">Upcoming Events</div>
+          <h2 class="section-title mb-1">What's going on in San Enrique</h2>
+          <p class="section-subtitle">Join the celebrations and community events</p>
+        </div>
+      </div>
+      <div class="row g-4 align-items-stretch" id="eventsGrid">
+        <?php if ($events): ?>
+          <?php foreach ($events as $i => $event): ?>
+            <?php
+              $evDateStr = date('F j, Y', strtotime($event['event_date']));
+              if (!empty($event['end_date']) && $event['end_date'] !== $event['event_date'])
+                $evDateStr .= ' – ' . date('F j, Y', strtotime($event['end_date']));
+              $evData = htmlspecialchars(json_encode([
+                'title'       => $event['title'],
+                'description' => $event['description'],
+                'date'        => $evDateStr,
+                'location'    => $event['location'] ?? '',
+                'is_pinned'   => $event['is_pinned'] ?? 0,
+              ]), ENT_QUOTES, 'UTF-8');
+
+              // ── Resolve ALL images (JSON array or legacy single string) ──
+              $evAllImgs = [];
+              if (!empty($event['image'])) {
+                $decoded = json_decode($event['image'], true);
+                $rawList = is_array($decoded) ? $decoded : [$event['image']];
+                foreach ($rawList as $_img) {
+                  if (!$_img) continue;
+                  if (strpos($_img, 'http') === 0) {
+                    if (preg_match('#drive\.google\.com/thumbnail\?id=([a-zA-Z0-9_-]+)#', $_img, $_em)) {
+                      $evAllImgs[] = 'https://lh3.googleusercontent.com/d/' . $_em[1];
+                    } else {
+                      $evAllImgs[] = $_img;
+                    }
+                  } else {
+                    $_clean = preg_replace('#^(\.\./)+#', '', $_img);
+                    $evAllImgs[] = BASE_URL . '/' . ltrim($_clean, '/');
+                  }
+                }
+              }
+              $evImgCount = count($evAllImgs);
+              $evCardId   = 'evSlider_' . $i;
+              $isPinned   = (int)($event['is_pinned'] ?? 0);
+            ?>
+            <div class="col-md-4 animate-on-scroll delay-<?= $i + 1 ?>" style="display:flex;">
+              <div class="event-card event-card-new event-card-clickable w-100"
+                   data-event="<?= $evData ?>"
+                   style="<?= $isPinned ? 'border-top:3px solid #d4a017;' : '' ?> cursor:pointer;">
+
+                <!-- ── Event image / slideshow / placeholder ── -->
+                <?php if ($evImgCount > 1): ?>
+                  <!-- MULTI-IMAGE SLIDESHOW -->
+                  <div class="event-card-img ev-slider" id="<?= $evCardId ?>" data-count="<?= $evImgCount ?>">
+                    <?php if ($isPinned): ?>
+                      <div class="event-pinned-badge-sm"><i class="fas fa-thumbtack"></i> Pinned</div>
+                    <?php endif; ?>
+                    <div class="ev-slides-wrap">
+                      <?php foreach ($evAllImgs as $si => $sImg): ?>
+                        <div class="ev-slide<?= $si === 0 ? ' active' : '' ?>">
+                          <img src="<?= htmlspecialchars($sImg) ?>" alt="<?= htmlspecialchars($event['title']) ?> photo <?= $si+1 ?>"
+                               onerror="this.src='https://placehold.co/600x380/1b4332/fff?text=Photo'">
+                        </div>
+                      <?php endforeach; ?>
+                    </div>
+                    <!-- Prev / Next -->
+                    <button class="ev-sl-btn ev-sl-prev" onclick="evSlide('<?= $evCardId ?>',-1,event)" aria-label="Previous">
+                      <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="ev-sl-btn ev-sl-next" onclick="evSlide('<?= $evCardId ?>',1,event)" aria-label="Next">
+                      <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <!-- Dots -->
+                    <div class="ev-sl-dots">
+                      <?php for ($d = 0; $d < $evImgCount; $d++): ?>
+                        <span class="ev-sl-dot<?= $d === 0 ? ' active' : '' ?>"
+                              onclick="evSlideTo('<?= $evCardId ?>',<?= $d ?>,event)"></span>
+                      <?php endfor; ?>
+                    </div>
+                    <!-- Counter -->
+                    <div class="ev-sl-counter" id="<?= $evCardId ?>_counter">1 / <?= $evImgCount ?></div>
+                  </div>
+
+                <?php elseif ($evImgCount === 1): ?>
+                  <!-- SINGLE IMAGE -->
+                  <div class="event-card-img">
+                    <img src="<?= htmlspecialchars($evAllImgs[0]) ?>" alt="<?= htmlspecialchars($event['title']) ?>"
+                         onerror="this.parentElement.innerHTML='<div class=\'event-card-img-placeholder\'><i class=\'fas fa-calendar-alt\'></i></div>'">
+                    <?php if ($isPinned): ?>
+                      <div class="event-pinned-badge-sm"><i class="fas fa-thumbtack"></i> Pinned</div>
+                    <?php endif; ?>
+                  </div>
+
+                <?php else: ?>
+                  <!-- NO IMAGE PLACEHOLDER -->
+                  <div class="event-card-img-placeholder">
+                    <i class="fas fa-calendar-alt"></i>
+                    <?php if ($isPinned): ?>
+                      <div class="event-pinned-badge-sm"><i class="fas fa-thumbtack"></i> Pinned</div>
+                    <?php endif; ?>
+                  </div>
+                <?php endif; ?>
+
+                <div class="event-card-body">
+                  <div class="event-date-badge">
+                    <i class="fas fa-calendar-alt"></i>
+                    <?= $evDateStr ?>
+                  </div>
+                  <h4 class="event-title"><?= htmlspecialchars($event['title']) ?></h4>
+                  <p class="event-desc"><?= htmlspecialchars(substr($event['description'], 0, 100)) ?>...</p>
+                  <?php if ($event['location']): ?>
+                    <div class="event-location">
+                      <i class="fas fa-map-pin"></i> <?= htmlspecialchars($event['location']) ?>
+                    </div>
+                  <?php endif; ?>
+                  <span class="event-view-link">View Details <i class="fas fa-chevron-right"></i></span>
+                </div>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <div class="col-12">
+            <div class="empty-state">
+              <i class="fas fa-calendar-times"></i>
+              <p>No upcoming events at the moment. Check back soon!</p>
+            </div>
+          </div>
+        <?php endif; ?>
+      </div>
+    </div>
+  </section>
+
+
+    <!-- STATS SECTION -->
+  <section class="stats-section" style="position:relative;overflow:hidden;">
+    <div class="section-floating-shapes">
+      <div class="float-shape float-shape-1"></div>
+      <div class="float-shape float-shape-2"></div>
+      <div class="float-shape float-shape-3"></div>
+    </div>
+    <div class="container" style="position:relative;z-index:2;">
+      <div class="row g-0">
+        <div class="col-6 col-md-3">
+          <div class="stat-card animate-on-scroll">
+            <i class="fas fa-umbrella-beach stat-icon"></i>
+            <div class="stat-number"><span class="count-up" id="statListings"
+                data-target="<?= $stats['listings'] ?>"><?= $stats['listings'] ?></span></div>
+            <div class="stat-title">Listed Destinations</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card animate-on-scroll delay-1">
+            <i class="fas fa-home stat-icon"></i>
+            <div class="stat-number"><span class="count-up" id="statBarangays"
+                data-target="<?= $stats['barangays'] ?>"><?= $stats['barangays'] ?></span></div>
+            <div class="stat-title">Barangays</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card animate-on-scroll delay-2">
+            <i class="fas fa-calendar-alt stat-icon"></i>
+            <div class="stat-number"><span class="count-up" id="statEvents"
+                data-target="<?= $stats['events'] ?>"><?= $stats['events'] ?></span></div>
+            <div class="stat-title">Annual Events</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card animate-on-scroll delay-3">
+            <i class="fas fa-th-large stat-icon"></i>
+            <div class="stat-number"><span class="count-up" id="statCategories"
+                data-target="<?= $stats['categories'] ?>"><?= $stats['categories'] ?></span></div>
+            <div class="stat-title">Categories</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
 
   <!-- CATEGORIES SECTION -->
   <section id="categories" class="categories-section" style="position:relative;overflow:hidden;">
@@ -1009,100 +1235,6 @@ foreach (['listings', 'categories', 'events'] as $_t) {
     </div>
   </section>
 
-  <!-- EVENTS SECTION -->
-  <section id="events" class="events-section" style="position:relative;overflow:hidden;">
-    <div class="section-floating-shapes">
-      <div class="float-shape float-shape-1"></div>
-      <div class="float-shape float-shape-2"></div>
-      <div class="float-shape float-shape-3"></div>
-    </div>
-    <div class="container" style="position:relative;z-index:2;">
-      <div class="d-flex align-items-end justify-content-between mb-5">
-        <div class="animate-on-scroll">
-          <div class="section-label">Upcoming Events</div>
-          <h2 class="section-title mb-1">What's Happening in San Enrique</h2>
-          <p class="section-subtitle">Join the celebrations and community events</p>
-        </div>
-      </div>
-      <div class="row g-4" id="eventsGrid">
-        <?php if ($events): ?>
-          <?php foreach ($events as $i => $event): ?>
-            <div class="col-md-4 animate-on-scroll delay-<?= $i + 1 ?>">
-              <div class="event-card">
-                <div class="event-date-badge">
-                  <i class="fas fa-calendar-alt"></i>
-                  <?= date('F j, Y', strtotime($event['event_date'])) ?>
-                  <?php if ($event['end_date'] && $event['end_date'] !== $event['event_date']): ?>
-                    – <?= date('F j', strtotime($event['end_date'])) ?>
-                  <?php endif; ?>
-                </div>
-                <h4 class="event-title"><?= htmlspecialchars($event['title']) ?></h4>
-                <p class="event-desc"><?= htmlspecialchars(substr($event['description'], 0, 120)) ?>...</p>
-                <?php if ($event['location']): ?>
-                  <div class="event-location">
-                    <i class="fas fa-map-pin"></i> <?= htmlspecialchars($event['location']) ?>
-                  </div>
-                <?php endif; ?>
-              </div>
-            </div>
-          <?php endforeach; ?>
-        <?php else: ?>
-          <div class="col-12">
-            <div class="empty-state">
-              <i class="fas fa-calendar-times"></i>
-              <p>No upcoming events at the moment. Check back soon!</p>
-            </div>
-          </div>
-        <?php endif; ?>
-      </div>
-    </div>
-  </section>
-
-  <!-- STATS SECTION -->
-  <section class="stats-section" style="position:relative;overflow:hidden;">
-    <div class="section-floating-shapes">
-      <div class="float-shape float-shape-1"></div>
-      <div class="float-shape float-shape-2"></div>
-      <div class="float-shape float-shape-3"></div>
-    </div>
-    <div class="container" style="position:relative;z-index:2;">
-      <div class="row g-0">
-        <div class="col-6 col-md-3">
-          <div class="stat-card animate-on-scroll">
-            <i class="fas fa-umbrella-beach stat-icon"></i>
-            <div class="stat-number"><span class="count-up" id="statListings"
-                data-target="<?= $stats['listings'] ?>"><?= $stats['listings'] ?></span>+</div>
-            <div class="stat-title">Listed Destinations</div>
-          </div>
-        </div>
-        <div class="col-6 col-md-3">
-          <div class="stat-card animate-on-scroll delay-1">
-            <i class="fas fa-home stat-icon"></i>
-            <div class="stat-number"><span class="count-up" id="statBarangays"
-                data-target="<?= $stats['barangays'] ?>"><?= $stats['barangays'] ?></span></div>
-            <div class="stat-title">Barangays</div>
-          </div>
-        </div>
-        <div class="col-6 col-md-3">
-          <div class="stat-card animate-on-scroll delay-2">
-            <i class="fas fa-calendar-alt stat-icon"></i>
-            <div class="stat-number"><span class="count-up" id="statEvents"
-                data-target="<?= $stats['events'] ?>"><?= $stats['events'] ?></span></div>
-            <div class="stat-title">Annual Events</div>
-          </div>
-        </div>
-        <div class="col-6 col-md-3">
-          <div class="stat-card animate-on-scroll delay-3">
-            <i class="fas fa-th-large stat-icon"></i>
-            <div class="stat-number"><span class="count-up" id="statCategories"
-                data-target="<?= $stats['categories'] ?>"><?= $stats['categories'] ?></span></div>
-            <div class="stat-title">Categories</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
     <!-- ABOUT SECTION -->
   <section id="about" class="about-strip" style="position:relative;overflow:hidden;">
     <div class="section-floating-shapes">
@@ -1116,7 +1248,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
       <div class="text-center mb-5 animate-on-scroll">
         <div class="section-label justify-content-center"><span></span>Our Story<span></span></div>
         <h2 class="section-title">About San Enrique</h2>
-        <p class="section-subtitle mx-auto">A hidden gem nestled in the heart of Iloilo Province — where nature, culture, and community thrive together.</p>
+        <p class="section-subtitle mx-auto">A hidden gem nestled in the heart of Iloilo Province where nature, culture, and community thrive together.</p>
       </div>
 
       <!-- Main content row -->
@@ -1135,20 +1267,31 @@ foreach (['listings', 'categories', 'events'] as $_t) {
           <div class="about-history-card">
             <div class="about-history-icon"><i class="fas fa-scroll"></i></div>
             <h3 class="about-history-title">History &amp; Heritage</h3>
+            <h1 class="about-history-text1">by <strong>Rodrigo P. Ponte</strong></h1>
             <p class="about-history-text">
-              San Enrique is a 3rd-class municipality in the province of Iloilo, Philippines, situated in the central
-              part of the island of Panay. Named after Saint Enrique, the municipality is home to <strong>28 barangays</strong>
-              spread across its fertile plains and rolling hills.
+              Located in the central part of the province of Iloilo, San Enrique is a municipality bounded by scenic
+              mountains Bayoso, Cañapasan, Agcarope, and Puti-an, where crystal-clear waters from natural springs provide
+              the population with an abundant source of drinking water. The town is noted for its <strong>fertile valleys
+              and verdant meadows</strong> where once grazed by herds of cattle, now filled with luxuriant sugarcane plantations.
+              The beautiful landscape cannot entirely describe the whole picture of a town it is important to know the people,
+              who are descendants of those great Malays who braved the seas in search of a place where their families could live
+              with freedom and dignity.
             </p>
             <p class="about-history-text">
-              With a rich history documented in the official municipal history by Rodrigo P. Ponte and formally adopted
-              through <em>Sangguniang Bayan Resolution No. 2006-53</em> on April 19, 2006, San Enrique stands proud as a
-              community deeply rooted in Ilonggo tradition, faith, and agricultural heritage.
+              The earliest inhabitants of San Enrique may be traced back to the tribes of those great Datus who had moved up the 
+              river Jalaud and settled on a promontory they called <em> "Bontoc" </em> near the eastern banks where they tilled land and practiced 
+              farming and animal husbandry for a self-sustaining economy.
+              <!-- The earliest inhabitants of San Enrique can be traced back to the tribes of great Datus who moved up the
+              river Jalaud and settled on a promontory called <em>"Bontoc"</em> near its eastern banks, where they tilled
+              land and practiced farming and animal husbandry. From that flourishing settlement rose great leaders like
+              Manuel Paez, Modesto Palabrica, and Apolinario Palabrica — among the early Capitanes of the mother town of Passi. -->
             </p>
             <p class="about-history-text">
-              The municipality thrives on agriculture — with sugarcane, rice, and corn among its primary crops — while
-              also nurturing a growing agri-tourism sector, cold springs, river sanctuaries, and vibrant cultural sites
-              that attract visitors from across the region.
+              Out of that flourishing settlement later rose great men like <em> Manuel Paez, Modesto Palabrica and Apolinario Palabrica, </em> 
+              who had earlier become <strong> Capitanes </strong>of the mother town of Passi. The names of <em>Santiago Pama, Augusto Palencia, Gregorio Aguilar, 
+              Bartolo Garrido, Cipriano Gonzales, Vicente Quianzon, and others surnamed alatbrica and Paez,</em> had been elected to the positions 
+              of <strong>Capitanes or Tenientes. </strong> Other men <em> Simon Padios and Florencio Villalobos, </em> emerged as <strong> leaoes </strong> and followed the footsteps of their 
+              forebears in the long journey to progress.
             </p>
             <div class="about-source">
               <i class="fas fa-book-open me-2"></i>
@@ -1766,6 +1909,168 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   })();
   </script>
 
+  <!-- ══ Event card image slideshow ══ -->
+  <script>
+  (function () {
+    /* Per-slider state: { cur, count, timer } */
+    var _evState = {};
+
+    function _getState(id) {
+      if (!_evState[id]) {
+        var el = document.getElementById(id);
+        _evState[id] = { cur: 0, count: parseInt(el ? el.dataset.count : 1, 10), timer: null };
+      }
+      return _evState[id];
+    }
+
+    function _render(id) {
+      var st    = _getState(id);
+      var wrap  = document.getElementById(id);
+      if (!wrap) return;
+      var slides = wrap.querySelectorAll('.ev-slide');
+      var dots   = wrap.querySelectorAll('.ev-sl-dot');
+      var ctr    = document.getElementById(id + '_counter');
+      slides.forEach(function (s, i) { s.classList.toggle('active', i === st.cur); });
+      dots.forEach(function (d, i)   { d.classList.toggle('active', i === st.cur); });
+      if (ctr) ctr.textContent = (st.cur + 1) + ' / ' + st.count;
+    }
+
+    function _go(id, n) {
+      var st = _getState(id);
+      st.cur = (n + st.count) % st.count;
+      _render(id);
+    }
+
+    function _startAuto(id) {
+      var st = _getState(id);
+      if (st.count <= 1) return;
+      clearInterval(st.timer);
+      st.timer = setInterval(function () { _go(id, _getState(id).cur + 1); }, 3500);
+    }
+
+    function _stopAuto(id) {
+      clearInterval(_getState(id).timer);
+    }
+
+    window.evSlide = function (id, dir, e) {
+      if (e) { e.stopPropagation(); e.preventDefault(); }
+      _stopAuto(id);
+      _go(id, _getState(id).cur + dir);
+      _startAuto(id);
+    };
+
+    window.evSlideTo = function (id, n, e) {
+      if (e) { e.stopPropagation(); e.preventDefault(); }
+      _stopAuto(id);
+      _go(id, n);
+      _startAuto(id);
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.ev-slider').forEach(function (el) {
+        var id = el.id;
+        _render(id);
+        _startAuto(id);
+        /* Pause on hover */
+        el.addEventListener('mouseenter', function () { _stopAuto(id); });
+        el.addEventListener('mouseleave', function () { _startAuto(id); });
+        /* Touch swipe */
+        var tx = 0;
+        el.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; }, { passive: true });
+        el.addEventListener('touchend', function (e) {
+          var dx = e.changedTouches[0].clientX - tx;
+          if (Math.abs(dx) > 35) evSlide(id, dx < 0 ? 1 : -1, null);
+        }, { passive: true });
+      });
+    });
+  })();
+  </script>
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+  /* ══ Event Card → SweetAlert2 modal ══ */
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.event-card-clickable').forEach(function (card) {
+      card.addEventListener('click', function () {
+        var raw = card.getAttribute('data-event');
+        if (!raw) return;
+        var ev;
+        try { ev = JSON.parse(raw); } catch(e){ return; }
+
+        var pinnedBadge = (parseInt(ev.is_pinned, 10) === 1)
+          ? '<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(212,160,23,0.15);color:#d4a017;font-size:0.72rem;font-weight:700;padding:4px 12px;border-radius:100px;border:1px solid rgba(212,160,23,0.35);margin-bottom:1rem;"><i class="fas fa-thumbtack" style="font-size:0.65rem;"></i> PINNED</span>'
+          : '';
+
+        var locationHtml = ev.location
+          ? '<div style="display:flex;align-items:center;gap:8px;background:rgba(64,145,108,0.1);border:1px solid rgba(64,145,108,0.25);border-radius:10px;padding:10px 14px;margin-top:1rem;">'
+            + '<i class="fas fa-map-pin" style="color:#40916c;font-size:0.9rem;"></i>'
+            + '<span style="font-size:0.88rem;color:#1b4332;font-weight:500;">' + escHtml(ev.location) + '</span>'
+            + '</div>'
+          : '';
+
+        Swal.fire({
+          html:
+            '<div style="text-align:left;padding:0 0.25rem;">'
+            + pinnedBadge
+            + '<div style="display:flex;align-items:center;gap:8px;background:rgba(27,67,50,0.08);border-radius:100px;padding:6px 14px;font-size:0.8rem;color:#1b4332;font-weight:600;margin-bottom:1rem;width:fit-content;">'
+            +   '<i class="fas fa-calendar-alt" style="color:#40916c;"></i> ' + escHtml(ev.date)
+            + '</div>'
+            + '<h3 style="font-family:Cormorant Garamond,serif;font-size:1.55rem;font-weight:700;color:#0d2b1e;line-height:1.2;margin-bottom:0.75rem;">' + escHtml(ev.title) + '</h3>'
+            + '<p style="font-size:0.93rem;color:#3a5240;line-height:1.7;margin-bottom:0;">' + escHtml(ev.description) + '</p>'
+            + locationHtml
+            + '</div>',
+          showConfirmButton: false,
+          showCloseButton: true,
+          width: '540px',
+          padding: '2rem 2rem 2rem',
+          background: '#fff',
+          customClass: {
+            popup:    'swal-event-popup',
+            closeButton: 'swal-event-close',
+          },
+          backdrop: 'rgba(13,43,30,0.55)',
+        });
+      });
+    });
+
+    function escHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+  });
+  </script>
+  <style>
+  /* SweetAlert event popup polish */
+  .swal-event-popup {
+    border-radius: 22px !important;
+    box-shadow: 0 24px 80px rgba(13,43,30,0.28), 0 0 0 1px rgba(64,145,108,0.12) !important;
+    overflow: hidden;
+  }
+  .swal-event-popup::before {
+    content: '';
+    display: block;
+    height: 5px;
+    background: linear-gradient(90deg, #1b4332, #40916c, #d4a017);
+    margin: -2rem -2rem 1.5rem;
+  }
+  .swal-event-close {
+    color: #1b4332 !important;
+    font-size: 1.4rem !important;
+    top: 1rem !important;
+    right: 1rem !important;
+  }
+  .swal-event-close:hover { color: #40916c !important; }
+  /* Uniform card height row */
+  #eventsGrid { align-items: stretch !important; }
+  #eventsGrid > [class*="col-"] { display: flex !important; }
+  #eventsGrid .event-card { flex: 1 1 auto; }
+  </style>
+
   <!-- Products filter -->
   <script>
   (function(){
@@ -1789,6 +2094,167 @@ foreach (['listings', 'categories', 'events'] as $_t) {
         });
       });
     });
+  })();
+  </script>
+
+  <!-- Navbar search expand/collapse + autocomplete dropdown -->
+  <script>
+  (function(){
+    /* ── Expand / collapse toggle (unchanged) ── */
+    var toggle = document.getElementById('navSearchToggle');
+    var wrap = document.getElementById('navSearchWrap');
+    var input = document.getElementById('navSearchInput');
+    var dropdown = document.getElementById('navSearchDropdown');
+    if (!toggle || !wrap || !input) return;
+
+    var isOpen = false;
+
+    toggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (!isOpen) {
+        wrap.classList.add('expanded');
+        isOpen = true;
+        setTimeout(function(){ input.focus(); }, 350);
+      } else {
+        if (input.value.trim()) {
+          wrap.closest('form').submit();
+        } else {
+          wrap.classList.remove('expanded');
+          hideDropdown(dropdown);
+          isOpen = false;
+        }
+      }
+    });
+
+    document.addEventListener('click', function(e) {
+      if (isOpen && !wrap.contains(e.target) && !wrap.closest('form').contains(e.target)) {
+        if (!input.value.trim()) {
+          wrap.classList.remove('expanded');
+          isOpen = false;
+        }
+        hideDropdown(dropdown);
+      }
+    });
+
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        input.value = '';
+        wrap.classList.remove('expanded');
+        hideDropdown(dropdown);
+        isOpen = false;
+        input.blur();
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        var first = dropdown.querySelector('.sd-item');
+        if (first) first.focus();
+      }
+    });
+
+    /* ── Autocomplete — uses mapListings data already on the page ── */
+    var allListings = (typeof mapListings !== 'undefined') ? mapListings : [];
+    var debounceTimer = null;
+
+    // Desktop input
+    input.addEventListener('input', function() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(function() {
+        searchAndShow(input.value, dropdown);
+      }, 200);
+    });
+
+    // Mobile input
+    var mobileInput = document.getElementById('mobileSearchInput');
+    var mobileDropdown = document.getElementById('mobileSearchDropdown');
+    if (mobileInput && mobileDropdown) {
+      var mDebounce = null;
+      mobileInput.addEventListener('input', function() {
+        clearTimeout(mDebounce);
+        mDebounce = setTimeout(function() {
+          searchAndShow(mobileInput.value, mobileDropdown);
+        }, 200);
+      });
+      // Close mobile dropdown on outside click
+      document.addEventListener('click', function(e) {
+        if (!mobileInput.closest('form').contains(e.target)) {
+          hideDropdown(mobileDropdown);
+        }
+      });
+      mobileInput.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          var first = mobileDropdown.querySelector('.sd-item');
+          if (first) first.focus();
+        }
+      });
+    }
+
+    function searchAndShow(query, dd) {
+      query = query.trim().toLowerCase();
+      if (query.length < 2) { hideDropdown(dd); return; }
+
+      var results = allListings.filter(function(l) {
+        return (l.name && l.name.toLowerCase().indexOf(query) !== -1) ||
+               (l.address && l.address.toLowerCase().indexOf(query) !== -1) ||
+               (l.category_name && l.category_name.toLowerCase().indexOf(query) !== -1);
+      }).slice(0, 6);
+
+      if (results.length === 0) {
+        dd.innerHTML = '<div class="sd-empty"><i class="fas fa-search me-2"></i>No results for "' + escHtml(query) + '"</div>';
+        dd.classList.add('visible');
+        return;
+      }
+
+      var html = '';
+      results.forEach(function(l, idx) {
+        var img = l.featured_image || 'https://placehold.co/60x44/1b4332/fff?text=' + encodeURIComponent(l.name.charAt(0));
+        var catColor = l.color || '#1b4332';
+        html += '<a href="listing.php?slug=' + encodeURIComponent(l.slug) + '" class="sd-item" tabindex="0">'
+          + '<div class="sd-img"><img src="' + escHtml(img) + '" alt="" onerror="this.src=\'https://placehold.co/60x44/1b4332/fff?text=' + encodeURIComponent(l.name.charAt(0)) + '\'"></div>'
+          + '<div class="sd-info">'
+          + '<div class="sd-name">' + highlightMatch(l.name, query) + '</div>'
+          + '<div class="sd-meta">'
+          + '<span class="sd-cat" style="color:' + escHtml(catColor) + '"><i class="' + escHtml(l.icon || 'fas fa-map-marker-alt') + ' me-1"></i>' + escHtml(l.category_name || '') + '</span>'
+          + (l.address ? '<span class="sd-addr"><i class="fas fa-map-pin me-1"></i>' + escHtml(l.address).substring(0, 40) + '</span>' : '')
+          + '</div>'
+          + '</div>'
+          + '<i class="fas fa-chevron-right sd-arrow"></i>'
+          + '</a>';
+      });
+
+      // "View all" link
+      html += '<a href="explore.php?search=' + encodeURIComponent(query) + '" class="sd-viewall">'
+        + '<i class="fas fa-search me-1"></i> View all results for "' + escHtml(query) + '"'
+        + '</a>';
+
+      dd.innerHTML = html;
+      dd.classList.add('visible');
+
+      // Keyboard nav inside dropdown
+      dd.querySelectorAll('.sd-item, .sd-viewall').forEach(function(item, i, arr) {
+        item.addEventListener('keydown', function(e) {
+          if (e.key === 'ArrowDown') { e.preventDefault(); if (arr[i+1]) arr[i+1].focus(); }
+          if (e.key === 'ArrowUp')   { e.preventDefault(); if (i > 0) arr[i-1].focus(); else input.focus(); }
+          if (e.key === 'Escape')    { hideDropdown(dd); input.focus(); }
+        });
+      });
+    }
+
+    function hideDropdown(dd) {
+      if (dd) dd.classList.remove('visible');
+    }
+
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function highlightMatch(text, query) {
+      if (!query) return escHtml(text);
+      var safe = escHtml(text);
+      var idx = safe.toLowerCase().indexOf(query.toLowerCase());
+      if (idx === -1) return safe;
+      return safe.substring(0, idx) + '<mark>' + safe.substring(idx, idx + query.length) + '</mark>' + safe.substring(idx + query.length);
+    }
   })();
   </script>
 </body>

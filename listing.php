@@ -430,6 +430,7 @@ $categories = getCategories();
       position: relative; z-index: 10;
       background: rgba(8, 20, 12, 0.97) !important;
       backdrop-filter: blur(10px) !important;
+      margin-top: 12px;
     }
   </style>
 </head>
