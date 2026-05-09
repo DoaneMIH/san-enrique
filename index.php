@@ -66,7 +66,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
   <!-- ═══════════ UX ENHANCEMENT CSS ═══════════ -->
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@1,400;1,600;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     /* ── Root overrides ────────────────────────── */
     :root {
@@ -112,12 +112,14 @@ foreach (['listings', 'categories', 'events'] as $_t) {
 
     /* ── Animated headline ─────────────────────── */
     .hero-title {
-      font-family:'Cormorant Garamond',serif !important;
-      font-size: clamp(2.6rem,6vw,4.8rem) !important;
-      font-weight: 700 !important;
+      font-family: 'Great Vibes', 'Cormorant Garamond', cursive !important;
+      font-size: clamp(3.2rem,7.5vw,6rem) !important;
+      font-weight: 400 !important;
+      font-style: normal !important;
       color: #fff !important;
-      line-height: 1.1 !important;
-      letter-spacing: -0.01em;
+      line-height: 1.18 !important;
+      letter-spacing: 0.03em;
+      text-shadow: 0 2px 32px rgba(0,0,0,0.32), 0 1px 6px rgba(0,0,0,0.2);
       animation: heroFadeUp 1s cubic-bezier(.2,0,.2,1) both;
     }
     .hero-title .highlight {
