@@ -185,7 +185,7 @@ $pageTitle = $selectedCat ? ucfirst($selectedCat) : ($search ? "Search: $search"
       box-shadow: 0 24px 60px rgba(0,0,0,0.4) !important;
       border-color: rgba(82,183,136,0.45) !important;
     }
-    .listing-card-img { position:relative; overflow:hidden; height:220px; }
+    .listing-card-img { position:relative; overflow:hidden; height:220px; display:block; }
     .listing-card-img img {
       width:100%; height:100%; object-fit:cover; display:block;
       transition: transform .6s cubic-bezier(.2,0,.2,1) !important;
@@ -451,7 +451,7 @@ $pageTitle = $selectedCat ? ucfirst($selectedCat) : ($search ? "Search: $search"
             <?php foreach ($listings as $i => $listing): ?>
               <div class="col-md-6 col-xl-4 animate-on-scroll delay-<?= ($i % 4) + 1 ?>">
                 <div class="listing-card">
-                  <div class="listing-card-img">
+                  <a href="listing.php?slug=<?= urlencode($listing['slug']) ?>" class="listing-card-img" style="text-decoration:none;">
                     <img src="<?= htmlspecialchars(listingImage($listing['featured_image'], $listing['name'], 600, 400)) ?>"
                       alt="<?= htmlspecialchars($listing['name']) ?>" loading="lazy"
                       onerror="this.src='https://placehold.co/600x400/1b4332/ffffff?text=No+Image'">
@@ -462,7 +462,7 @@ $pageTitle = $selectedCat ? ucfirst($selectedCat) : ($search ? "Search: $search"
                     <?php if ($listing['is_featured']): ?>
                       <div class="featured-badge">★ Featured</div>
                     <?php endif; ?>
-                  </div>
+                  </a>
                   <div class="listing-card-body">
                     <h3 class="listing-card-title"><?= htmlspecialchars($listing['name']) ?></h3>
                     <p class="listing-card-desc"><?= htmlspecialchars($listing['description']) ?></p>
