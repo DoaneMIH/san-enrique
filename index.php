@@ -318,19 +318,573 @@ foreach (['listings', 'categories', 'events'] as $_t) {
     .nav-link-main { color:rgba(255,255,255,0.85) !important; }
     .nav-link-main:hover, .nav-link-main.active { color:#fff !important; }
 
-    /* ── ABOUT SECTION image wrap ───────────────── */
-    .about-img-wrap img {
-      border-radius:24px !important;
-      box-shadow:0 20px 60px rgba(0,0,0,0.2) !important;
-      transition:transform .5s !important;
+     /* ══════════════════════════════════════════════
+       ABOUT SECTION — matches .about-strip in index
+       ══════════════════════════════════════════════ */
+    #about {
+      position: relative;
+      overflow: hidden;
+      padding: 100px 0 80px;
+      background:
+        linear-gradient(160deg, rgba(248,253,248,0.97) 0%, rgba(225,242,231,0.93) 100%),
+        url('assets/images/9.JPG') center/cover no-repeat fixed;
     }
-    .about-img-wrap:hover img { transform:scale(1.02) rotate(0.5deg); }
+ 
+    /* Top gold accent bar */
+    #about::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--green-light) 70%, transparent 100%);
+    }
+ 
+    /* Subtle radial glow */
+    #about::after {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 15% 30%, rgba(64,145,108,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 75%, rgba(212,160,23,0.06) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+ 
+    .container { position: relative; z-index: 1; }
+ 
+    /* ── Section label — same pattern as index ── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--green-light);
+      margin-bottom: 10px;
+    }
+    .section-label span {
+      display: block;
+      width: 36px; height: 2px;
+      background: linear-gradient(90deg, var(--gold), var(--green-light));
+      border-radius: 2px;
+    }
+ 
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      color: var(--green-deep);
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+ 
+    .section-subtitle {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      color: #4a6e4a;
+      line-height: 1.7;
+      max-width: 560px;
+      opacity: 0.9;
+    }
+ 
+    /* ══════════════════════════════════════════════
+       MAIN GRID — Image + History Card
+       ══════════════════════════════════════════════ */
+    .about-main-grid {
+      display: grid;
+      grid-template-columns: 5fr 7fr;
+      gap: 52px;
+      align-items: start;
+      margin-bottom: 60px;
+    }
+ 
+    /* ── Image Column ───────────────────────────── */
+    .about-img-col { position: sticky; top: 32px; }
+ 
+    .about-img-wrap {
+      position: relative;
+      border-radius: 24px;
+      overflow: visible;
+    }
+ 
+    .about-img-wrap img {
+      width: 100%;
+      aspect-ratio: 4/5;
+      object-fit: cover;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(13,43,30,0.22);
+      transition: transform .5s cubic-bezier(.2,0,.2,1);
+      display: block;
+    }
+    .about-img-wrap:hover img { transform: scale(1.02) rotate(0.4deg); }
+ 
+    /* Placeholder shown when no image */
+    .about-img-placeholder {
+      width: 100%;
+      aspect-ratio: 4/5;
+      border-radius: 24px;
+      background:
+        linear-gradient(160deg, rgba(27,67,50,0.08) 0%, rgba(64,145,108,0.12) 100%);
+      border: 2px dashed rgba(64,145,108,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--green-light);
+    }
+    .about-img-placeholder i { font-size: 3.5rem; opacity: 0.35; }
+    .about-img-placeholder span {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      opacity: 0.45;
+    }
+ 
+    /* Glassmorphism badge overlay — same style as index */
     .about-highlight {
+      position: absolute;
+      bottom: -18px; right: -18px;
       background: rgba(255,255,255,0.88) !important;
       backdrop-filter: blur(12px) !important;
       border: 1px solid rgba(255,255,255,0.6) !important;
       border-radius: 16px !important;
       box-shadow: 0 8px 30px rgba(0,0,0,0.12) !important;
+      padding: 16px 20px;
+      min-width: 200px;
+      z-index: 2;
+    }
+    .about-highlight-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--green-light);
+      margin-bottom: 5px;
+    }
+    .about-highlight-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--green-deep);
+      line-height: 1.35;
+      margin-bottom: 3px;
+    }
+    .about-highlight-sub {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.68rem;
+      color: #5a7a5a;
+      line-height: 1.4;
+    }
+ 
+    /* Decorative corner accent on image */
+    .about-img-corner {
+      position: absolute;
+      top: -10px; left: -10px;
+      width: 56px; height: 56px;
+      border-top: 3px solid var(--gold);
+      border-left: 3px solid var(--gold);
+      border-radius: 4px 0 0 0;
+      pointer-events: none;
+      z-index: 3;
+    }
+ 
+    /* ── History Card — glassmorphism ──────────── */
+    .about-history-card {
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.62);
+      border-radius: 24px;
+      box-shadow: 0 6px 32px rgba(27,67,50,0.10), 0 1px 4px rgba(0,0,0,0.04);
+      padding: 40px 44px;
+      position: relative;
+    }
+ 
+    .about-history-icon {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, var(--green-mid), var(--green-light));
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.25rem;
+      margin-bottom: 18px;
+      box-shadow: 0 6px 20px rgba(27,67,50,0.28);
+    }
+ 
+    .about-history-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--green-deep);
+      margin-bottom: 4px;
+    }
+ 
+    .about-history-author {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.9rem;
+      color: var(--gold);
+      margin-bottom: 22px;
+    }
+    .about-history-author strong {
+      font-style: normal;
+      font-weight: 600;
+      color: var(--green-mid);
+    }
+ 
+    /* Gold divider rule */
+    .history-divider {
+      width: 52px; height: 3px;
+      background: linear-gradient(90deg, var(--gold), var(--green-light));
+      border-radius: 2px;
+      margin-bottom: 24px;
+    }
+ 
+    /* Paragraph groups with left accent */
+    .history-para {
+      position: relative;
+      padding-left: 16px;
+      border-left: 2px solid rgba(64,145,108,0.25);
+      margin-bottom: 18px;
+    }
+    .history-para::before {
+      content: '';
+      position: absolute;
+      left: -5px; top: 9px;
+      width: 8px; height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      border: 2px solid var(--off-white);
+    }
+ 
+    .about-history-text {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.95rem;
+      line-height: 1.82;
+      color: #2e4a2e;
+      margin: 0;
+    }
+    .about-history-text strong { color: var(--green-deep); font-weight: 700; }
+    .about-history-text em { color: var(--green-light); font-style: italic; }
+ 
+    /* Source citation */
+    .about-source {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 24px;
+      padding: 13px 16px;
+      background: rgba(64,145,108,0.07);
+      border-left: 3px solid var(--green-light);
+      border-radius: 0 8px 8px 0;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.78rem;
+      color: var(--green-mid);
+    }
+    .about-source i { color: var(--green-light); margin-top: 1px; flex-shrink: 0; }
+    .about-source a {
+      color: var(--green-light);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .about-source a:hover { text-decoration: underline; color: var(--gold); }
+ 
+    /* ══════════════════════════════════════════════
+       TIMELINE — Chronicle of San Enrique
+       ══════════════════════════════════════════════ */
+    .timeline-section { margin-bottom: 68px; }
+ 
+    .timeline-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1rem;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 48px;
+    }
+ 
+    .timeline-track {
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+      padding-left: 44px;
+    }
+    .timeline-track::before {
+      content: '';
+      position: absolute;
+      left: 18px; top: 18px; bottom: 18px;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--gold), rgba(64,145,108,0.2));
+    }
+ 
+    .tl-item {
+      position: relative;
+      margin-bottom: 28px;
+      opacity: 0;
+      transform: translateX(-18px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .tl-item.visible { opacity: 1; transform: translateX(0); }
+ 
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: -32px; top: 18px;
+      width: 16px; height: 16px;
+      background: var(--gold);
+      border-radius: 50%;
+      border: 3px solid var(--off-white);
+      box-shadow: 0 0 0 2px var(--gold);
+    }
+ 
+    .tl-card {
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 18px;
+      padding: 22px 28px;
+      box-shadow: 0 4px 20px rgba(27,67,50,0.08);
+      transition: transform .3s cubic-bezier(.2,0,.2,1), box-shadow .3s;
+    }
+    .tl-card:hover {
+      transform: translateX(6px);
+      box-shadow: 0 10px 36px rgba(27,67,50,0.14);
+    }
+ 
+    .tl-era {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 5px;
+    }
+    .tl-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--green-deep);
+      margin-bottom: 8px;
+    }
+    .tl-text {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.88rem;
+      color: #3a5e3a;
+      line-height: 1.75;
+      margin: 0;
+    }
+    .tl-text strong { color: var(--green-mid); }
+    .tl-text em { color: var(--green-light); font-style: italic; }
+ 
+    /* ══════════════════════════════════════════════
+       QUICK FACTS
+       ══════════════════════════════════════════════ */
+    .about-facts-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 60px;
+    }
+ 
+    .about-fact-card {
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(27,67,50,0.08);
+      padding: 28px 16px;
+      text-align: center;
+      transition: transform .35s cubic-bezier(.2,0,.2,1), box-shadow .35s;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-fact-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, rgba(64,145,108,0.06) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity .35s;
+    }
+    .about-fact-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 18px 50px rgba(27,67,50,0.14);
+    }
+    .about-fact-card:hover::before { opacity: 1; }
+ 
+    .about-fact-icon {
+      width: 54px; height: 54px;
+      background: linear-gradient(135deg, var(--green-mid), var(--green-light));
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      color: #fff;
+      font-size: 1.25rem;
+      box-shadow: 0 6px 20px rgba(27,67,50,0.25);
+    }
+ 
+    .about-fact-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--green-deep);
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+ 
+    .about-fact-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green-light);
+    }
+ 
+    /* ══════════════════════════════════════════════
+       FEATURE CARDS
+       ══════════════════════════════════════════════ */
+    .about-features-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+      margin-bottom: 56px;
+    }
+ 
+    .about-feature-card {
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 22px;
+      box-shadow: 0 4px 20px rgba(27,67,50,0.08);
+      padding: 32px 26px;
+      transition: transform .35s cubic-bezier(.2,0,.2,1), box-shadow .35s;
+    }
+    .about-feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 22px 60px rgba(27,67,50,0.16);
+    }
+ 
+    .about-feature-icon {
+      width: 58px; height: 58px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      font-size: 1.4rem;
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+    }
+ 
+    .about-feature-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--green-deep);
+      margin-bottom: 10px;
+    }
+ 
+    .about-feature-desc {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.88rem;
+      color: #3a5e3a;
+      line-height: 1.75;
+      margin: 0;
+    }
+ 
+    /* ══════════════════════════════════════════════
+       CTA BUTTONS — same as btn-primary-main / btn-outline-main
+       ══════════════════════════════════════════════ */
+    .btn-primary-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 30px;
+      background: linear-gradient(135deg, var(--green-mid), var(--green-light));
+      color: #fff;
+      border-radius: 50px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 6px 24px rgba(27,67,50,0.28);
+      transition: transform .25s, box-shadow .25s, opacity .25s;
+      margin: 0 8px 8px;
+    }
+    .btn-primary-main:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 36px rgba(27,67,50,0.35);
+      opacity: 0.92;
+      color: #fff;
+    }
+ 
+    .btn-outline-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 30px;
+      background: transparent;
+      color: var(--green-mid);
+      border: 2px solid var(--green-light);
+      border-radius: 50px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background .25s, color .25s, transform .25s, box-shadow .25s;
+      margin: 0 8px 8px;
+    }
+    .btn-outline-main:hover {
+      background: var(--green-mid);
+      color: #fff;
+      border-color: var(--green-mid);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(27,67,50,0.22);
+    }
+
+    /* ══════════════════════════════════════════════
+       SCROLL ANIMATIONS — same as index.php pattern
+       ══════════════════════════════════════════════ */
+    .animate-on-scroll {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .animate-on-scroll.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
+
+    /* ══════════════════════════════════════════════
+       RESPONSIVE
+       ══════════════════════════════════════════════ */
+    @media (max-width: 991px) {
+      .about-main-grid { grid-template-columns: 1fr; gap: 40px; }
+      .about-img-col { position: static; }
+      .about-highlight { bottom: -14px; right: 14px; }
+      .about-facts-row { grid-template-columns: repeat(2, 1fr); }
+      .about-features-row { grid-template-columns: 1fr; }
+      .about-history-card { padding: 30px 28px; }
+    }
+    @media (max-width: 575px) {
+      #about { padding: 72px 0 56px; }
+      .about-facts-row { gap: 12px; }
+      .about-history-card { padding: 24px 20px; }
+      .btn-primary-main, .btn-outline-main { width: calc(100% - 16px); justify-content: center; }
     }
 
     /* ── CONTACT FORM glass ──────────────────────── */
@@ -654,13 +1208,15 @@ foreach (['listings', 'categories', 'events'] as $_t) {
       0%,100%{transform:translateX(-50%) translateY(0);}
       50%{transform:translateX(-50%) translateY(8px);}
     }
+
+    
   </style>
 </head>
 
 <body>
 
   <!-- ═══════════════════════════════════════════
-     PAGE LOADER
+    PAGE LOADER
 ═══════════════════════════════════════════ -->
 <div id="pageLoader" class="page-loader">
 
@@ -1238,156 +1794,269 @@ foreach (['listings', 'categories', 'events'] as $_t) {
   </section>
 
     <!-- ABOUT SECTION -->
-  <section id="about" class="about-strip" style="position:relative;overflow:hidden;">
-    <div class="section-floating-shapes">
-      <div class="float-shape float-shape-1"></div>
-      <div class="float-shape float-shape-2"></div>
-      <div class="float-shape float-shape-3"></div>
+  <section id="about" class="about-strip">
+  <div class="container">
+
+    <!-- Section Header -->
+    <div class="text-center mb-5 animate-on-scroll">
+      <div class="section-label justify-content-center"><span></span>Our Story<span></span></div>
+      <h2 class="section-title">About San Enrique</h2>
+      <p class="section-subtitle mx-auto">
+        A hidden gem nestled in the heart of Iloilo Province — where nature, culture, and community thrive together.
+      </p>
     </div>
-    <div class="container" style="position:relative;z-index:2;">
 
-      <!-- Section Header -->
-      <div class="text-center mb-5 animate-on-scroll">
-        <div class="section-label justify-content-center"><span></span>Our Story<span></span></div>
-        <h2 class="section-title">About San Enrique</h2>
-        <p class="section-subtitle mx-auto">A hidden gem nestled in the heart of Iloilo Province where nature, culture, and community thrive together.</p>
-      </div>
+    <!-- Main Grid: Image + History -->
+    <div class="about-main-grid">
 
-      <!-- Main content row -->
-      <div class="row align-items-center g-5 mb-5">
-        <div class="col-lg-5 animate-on-scroll">
-          <div class="about-img-wrap">
+      <!-- Image Column -->
+      <div class="about-img-col animate-on-scroll delay-1">
+        <div class="about-img-wrap">
+          <div class="about-img-corner"></div>
+
+          <!--
+            Replace the placeholder below with your actual image:
             <img src="assets/images/San Enrique LGU.png" alt="San Enrique Municipal Hall" loading="lazy">
-            <div class="about-highlight">
-              <div class="about-highlight-label">Official Record</div>
-              <div class="about-highlight-title">Sangguniang Bayan<br>Resolution No. 2006-53</div>
-              <div class="about-highlight-sub">Official Municipal History, April 19, 2006</div>
-            </div>
+          -->
+          <!-- <div class="about-img-placeholder">
+            <i class="fas fa-city"></i>
+            <span>San Enrique Municipal Hall</span>
+          </div> -->
+          <img src="assets/images/San_Enrique_Municipal_Hall.jpg" alt="San Enrique Municipal Hall" loading="lazy">
+
+
+          <div class="about-highlight">
+            <div class="about-highlight-label">Official Record</div>
+            <div class="about-highlight-title">Sangguniang Bayan<br>Resolution No. 2006-53</div>
+            <div class="about-highlight-sub">Official Municipal History, April 19, 2006</div>
           </div>
         </div>
-        <div class="col-lg-7 animate-on-scroll delay-2">
-          <div class="about-history-card">
-            <div class="about-history-icon"><i class="fas fa-scroll"></i></div>
-            <h3 class="about-history-title">History &amp; Heritage</h3>
-            <h1 class="about-history-text1">by <strong>Rodrigo P. Ponte</strong></h1>
+      </div>
+
+      <!-- History Card -->
+      <div class="animate-on-scroll delay-2">
+        <div class="about-history-card">
+
+          <div class="about-history-icon">
+            <i class="fas fa-scroll"></i>
+          </div>
+          <h3 class="about-history-title">History &amp; Heritage</h3>
+          <div class="about-history-author">by <strong>Rodrigo P. Ponte</strong></div>
+          <div class="history-divider"></div>
+
+          <!-- <div class="history-para">
             <p class="about-history-text">
               Located in the central part of the province of Iloilo, San Enrique is a municipality bounded by scenic
-              mountains Bayoso, Cañapasan, Agcarope, and Puti-an, where crystal-clear waters from natural springs provide
-              the population with an abundant source of drinking water. The town is noted for its <strong>fertile valleys
-              and verdant meadows</strong> where once grazed by herds of cattle, now filled with luxuriant sugarcane plantations.
-              The beautiful landscape cannot entirely describe the whole picture of a town it is important to know the people,
-              who are descendants of those great Malays who braved the seas in search of a place where their families could live
-              with freedom and dignity.
+              mountains <em>Bayoso, Cañapasan, Agcarope,</em> and <em>Puti-an</em>, where crystal-clear waters from
+              natural springs provide the population with an abundant source of drinking water. The town is noted for
+              its <strong>fertile valleys and verdant meadows</strong> once grazed by herds of cattle, now filled
+              with luxuriant sugarcane plantations.
             </p>
+          </div> -->
+          
+          <div class="history-para">
             <p class="about-history-text">
-              The earliest inhabitants of San Enrique may be traced back to the tribes of those great Datus who had moved up the 
-              river Jalaud and settled on a promontory they called <em> "Bontoc" </em> near the eastern banks where they tilled land and practiced 
-              farming and animal husbandry for a self-sustaining economy.
-              <!-- The earliest inhabitants of San Enrique can be traced back to the tribes of great Datus who moved up the
-              river Jalaud and settled on a promontory called <em>"Bontoc"</em> near its eastern banks, where they tilled
-              land and practiced farming and animal husbandry. From that flourishing settlement rose great leaders like
-              Manuel Paez, Modesto Palabrica, and Apolinario Palabrica — among the early Capitanes of the mother town of Passi. -->
+              San Enrique is a 4th class municipality located in the central part of <strong>Iloilo</strong>. It is surrounded by <em> mountains 
+              and rivers </em> that provide natural springs and fertile lands. The town is known for its rich <strong> agricultural resources</strong>, 
+              especially <em> sugarcane plantations</em>.
             </p>
+          </div>
+
+
+          <!-- <div class="history-para">
             <p class="about-history-text">
-              Out of that flourishing settlement later rose great men like <em> Manuel Paez, Modesto Palabrica and Apolinario Palabrica, </em> 
-              who had earlier become <strong> Capitanes </strong>of the mother town of Passi. The names of <em>Santiago Pama, Augusto Palencia, Gregorio Aguilar, 
-              Bartolo Garrido, Cipriano Gonzales, Vicente Quianzon, and others surnamed alatbrica and Paez,</em> had been elected to the positions 
-              of <strong>Capitanes or Tenientes. </strong> Other men <em> Simon Padios and Florencio Villalobos, </em> emerged as <strong> leaoes </strong> and followed the footsteps of their 
-              forebears in the long journey to progress.
-            </p>
-            <div class="about-source">
-              <i class="fas fa-book-open me-2"></i>
-              Source: <a href="https://iloiloelibrary.com/items/show/1208" target="_blank" rel="noopener">
-                Iloilo Province eLibrary — Municipal History of San Enrique
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Facts Bar -->
-      <div class="row g-3 mb-5">
-        <div class="col-6 col-md-3 animate-on-scroll delay-1">
-          <div class="about-fact-card">
-            <div class="about-fact-icon"><i class="fas fa-map-marker-alt"></i></div>
-            <div class="about-fact-value">3rd Class</div>
-            <div class="about-fact-label">Municipality</div>
-          </div>
-        </div>
-        <div class="col-6 col-md-3 animate-on-scroll delay-2">
-          <div class="about-fact-card">
-            <div class="about-fact-icon"><i class="fas fa-home"></i></div>
-            <div class="about-fact-value">28</div>
-            <div class="about-fact-label">Barangays</div>
-          </div>
-        </div>
-        <div class="col-6 col-md-3 animate-on-scroll delay-3">
-          <div class="about-fact-card">
-            <div class="about-fact-icon"><i class="fas fa-seedling"></i></div>
-            <div class="about-fact-value">Agri</div>
-            <div class="about-fact-label">Tourism Hub</div>
-          </div>
-        </div>
-        <div class="col-6 col-md-3 animate-on-scroll delay-4">
-          <div class="about-fact-card">
-            <div class="about-fact-icon"><i class="fas fa-calendar-alt"></i></div>
-            <div class="about-fact-value">2006</div>
-            <div class="about-fact-label">History Adopted</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Feature highlights -->
-      <div class="row g-4 animate-on-scroll delay-2">
-        <div class="col-md-4">
-          <div class="about-feature-card">
-            <div class="about-feature-icon" style="background:linear-gradient(135deg,#40916c,#52b788);">
-              <i class="fas fa-water"></i>
-            </div>
-            <h4 class="about-feature-title">Natural Wonders</h4>
-            <p class="about-feature-desc">
-              Crystal-clear cold springs, scenic rivers, and lush farmscapes await adventurers and nature lovers.
-              From Cabas-an Cold Spring to the San Antonio River, nature is always close.
+              The beautiful landscape cannot entirely describe the whole picture of a town. It is important to know
+              its people <strong>descendants of those great Malays</strong> who braved the seas in search of a
+              place where their families could live with freedom and dignity.
             </p>
           </div>
-        </div>
-        <div class="col-md-4">
-          <div class="about-feature-card">
-            <div class="about-feature-icon" style="background:linear-gradient(135deg,#b7791f,#d4a017);">
-              <i class="fas fa-landmark"></i>
-            </div>
-            <h4 class="about-feature-title">Cultural Heritage</h4>
-            <p class="about-feature-desc">
-              Ancient simboryos, historic churches, and native delicacies like Kalamay Hati and Bibingka tell
-              the story of a people proud of their Ilonggo roots and traditions.
+
+          <div class="history-para">
+            <p class="about-history-text">
+              The earliest inhabitants of San Enrique may be traced back to the tribes of those great Datus who
+              moved up the river <strong>Jalaud</strong> and settled on a promontory they called <em>"Bontoc"</em>
+              near the eastern banks, where they tilled land and practiced farming and animal husbandry for a
+              self-sustaining economy.
             </p>
           </div>
-        </div>
-        <div class="col-md-4">
-          <div class="about-feature-card">
-            <div class="about-feature-icon" style="background:linear-gradient(135deg,#2d6a4f,#40916c);">
-              <i class="fas fa-tractor"></i>
-            </div>
-            <h4 class="about-feature-title">Agri-Tourism</h4>
-            <p class="about-feature-desc">
-              Thriving farms like Gumbans Amat Amat Farm and BC Farm open their gates to visitors, offering
-              fresh produce, farm life experiences, and a taste of rural Iloilo.
+
+          <div class="history-para">
+            <p class="about-history-text">
+              Out of that flourishing settlement later rose great men like <em>Manuel Paez, Modesto Palabrica,</em>
+              and <em>Apolinario Palabrica</em>, who became <strong>Capitanes</strong> of the mother town of Passi.
+              Names such as <em>Santiago Pama, Augusto Palencia, Gregorio Aguilar, Bartolo Garrido, Cipriano
+              Gonzales,</em> and <em>Vicente Quianzon</em> were elected to positions of
+              <strong>Capitanes or Tenientes</strong> faithful leaders in the long journey toward progress.
             </p>
+          </div> -->
+
+          <div class="about-source">
+            <i class="fas fa-book-open"></i>
+            Source: <a href="https://iloiloelibrary.com/items/show/1208" target="_blank" rel="noopener">
+              Iloilo Province eLibrary — Municipal History of San Enrique
+            </a>
           </div>
+
         </div>
       </div>
-
-      <div class="text-center mt-5 animate-on-scroll">
-        <a href="explore.php" class="btn-primary-main me-3">
-          <i class="fas fa-compass me-1"></i> Explore Destinations
-        </a>
-        <a href="map.php" class="btn-outline-main">
-          <i class="fas fa-map me-1"></i> View on Map
-        </a>
-      </div>
-
     </div>
-  </section>
+
+    <!-- Chronicle / Timeline -->
+    <div class="timeline-section animate-on-scroll">
+      <div class="text-center mb-2">
+        <div class="section-label justify-content-center"><span></span>Through the Ages<span></span></div>
+        <h3 class="section-title" style="font-size:1.9rem;">A Chronicle of San Enrique</h3>
+        <p class="timeline-subtitle">From the first settlers to independence restored</p>
+      </div>
+
+      <div class="timeline-track">
+
+        <div class="tl-item">
+          <div class="tl-card">
+            <div class="tl-era">Pre-Colonial Era — Early Settlement</div>
+            <div class="tl-title">Early Inhabitants</div>
+            <p class="tl-text">The first settlers were descendants of Malay tribes led by datus who settled near the 
+              Jalaud River in a place called <em> “Bontoc.” </em>They practiced farming and animal husbandry and built a peaceful community. 
+              Many local leaders later emerged from this settlement, including Manuel Paez and the Palabrica family.</p>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-card">
+            <div class="tl-era">Spanish Colonial Period</div>
+            <div class="tl-title">Founding of the Town &amp; Parish</div>
+            <p class="tl-text">Because floods and difficult roads often isolated Bontoc from the town of Passi, local 
+              leaders requested the creation of an independent town. Their petition was approved by Spanish authorities 
+              and confirmed by the King of Spain. The town was named <strong> “San Enrique” </strong>in honor of Governor <em> Don Enrique Fajardo y Garcia.</em>
+              The parish church was also established during Spanish times. Catholicism became the dominant religion and remains strong 
+              among the people of San Enrique today.
+
+</p>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-card">
+            <div class="tl-era">American Period — 1902</div>
+            <div class="tl-title">A New Era of Governance</div>
+            <p class="tl-text">During the American occupation, the title “Capitan” changed to “Presidente.” In 1902, 
+              <strong>Quiterio Paez </strong>became the first elected Presidente. Later, San Enrique was merged with Passi, 
+              Dueñas, and Calinog as part of government reorganization. While other towns regained independence earlier, 
+              San Enrique remained under Passi for more than 50 years.</p>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-card">
+            <div class="tl-era">July 12, 1957</div>
+            <div class="tl-title">Restoration of Independence</div>
+            <p class="tl-text">The movement to restore San Enrique as an independent municipality was led by
+              <strong> Jesus Palmerola Prudente.</strong> Together with local leaders and professionals, they organized 
+              meetings and gathered support from the people. On July 12, 1957, <em> Carlos P. Garcia </em>signed
+              <strong> Executive Order No. 259</strong> creating the Municipality of San Enrique once again.
+               Jesus Prudente became the first mayor of the restored municipality.</p>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-card">
+            <div class="tl-era">Present Day</div>
+            <div class="tl-title">San Enrique Today</div>
+            <p class="tl-text">Modern San Enrique has developed through education, religion, and industry while preserving 
+              its rich culture and traditions. The people remain hardworking, proud of their history, and determined to continue 
+              progressing into the future.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Quick Facts -->
+    <div class="about-facts-row">
+      <div class="about-fact-card animate-on-scroll delay-1">
+        <div class="about-fact-icon"><i class="fas fa-map-marker-alt"></i></div>
+        <div class="about-fact-value">3rd Class</div>
+        <div class="about-fact-label">Municipality</div>
+      </div>
+      <div class="about-fact-card animate-on-scroll delay-2">
+        <div class="about-fact-icon"><i class="fas fa-home"></i></div>
+        <div class="about-fact-value">28</div>
+        <div class="about-fact-label">Barangays</div>
+      </div>
+      <div class="about-fact-card animate-on-scroll delay-3">
+        <div class="about-fact-icon"><i class="fas fa-seedling"></i></div>
+        <div class="about-fact-value">Agri</div>
+        <div class="about-fact-label">Tourism Hub</div>
+      </div>
+      <div class="about-fact-card animate-on-scroll delay-4">
+        <div class="about-fact-icon"><i class="fas fa-calendar-alt"></i></div>
+        <div class="about-fact-value">1957</div>
+        <div class="about-fact-label">Independence Restored</div>
+      </div>
+    </div>
+
+    <!-- Feature Highlights -->
+    <div class="about-features-row animate-on-scroll delay-2">
+      <div class="about-feature-card">
+        <div class="about-feature-icon" style="background:linear-gradient(135deg,#40916c,#52b788);">
+          <i class="fas fa-water"></i>
+        </div>
+        <h4 class="about-feature-title">Natural Wonders</h4>
+        <p class="about-feature-desc">
+          Crystal-clear cold springs, scenic rivers, and lush farmscapes await adventurers and nature lovers.
+          From Cabas-an Cold Spring to the San Antonio River, nature is always close.
+        </p>
+      </div>
+      <div class="about-feature-card">
+        <div class="about-feature-icon" style="background:linear-gradient(135deg,#b7791f,#d4a017);">
+          <i class="fas fa-landmark"></i>
+        </div>
+        <h4 class="about-feature-title">Cultural Heritage</h4>
+        <p class="about-feature-desc">
+          Ancient simboryos, historic churches, and native delicacies like Kalamay Hati and Bibingka tell
+          the story of a people proud of their Ilonggo roots and traditions.
+        </p>
+      </div>
+      <div class="about-feature-card">
+        <div class="about-feature-icon" style="background:linear-gradient(135deg,#2d6a4f,#40916c);">
+          <i class="fas fa-tractor"></i>
+        </div>
+        <h4 class="about-feature-title">Agri-Tourism</h4>
+        <p class="about-feature-desc">
+          Thriving farms like Gumbans Amat Amat Farm and BC Farm open their gates to visitors, offering
+          fresh produce, farm life experiences, and a taste of rural Iloilo.
+        </p>
+      </div>
+    </div>
+
+    <!-- CTA Buttons -->
+    <div class="text-center mt-4 animate-on-scroll delay-3">
+      <a href="explore.php" class="btn-primary-main me-2">
+        <i class="fas fa-compass me-1"></i> Explore Destinations
+      </a>
+      <a href="map.php" class="btn-outline-main">
+        <i class="fas fa-map me-1"></i> View on Map
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(el => {
+      if (el.isIntersecting) {
+        el.target.classList.add('visible');
+        observer.unobserve(el.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.animate-on-scroll, .tl-item').forEach(el => observer.observe(el));
+  document.querySelectorAll('.tl-item').forEach((item, i) => {
+    item.style.transitionDelay = `${i * 0.1}s`;
+  });
+</script>
 
   <!-- LOCAL PRODUCTS SECTION -->
   <!-- <section id="products" class="products-section" style="position:relative;overflow:hidden;">
