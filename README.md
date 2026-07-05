@@ -109,7 +109,7 @@ San Enrique/
 |----------|-------------------------------|
 | URL      | `/admin/login.php`             |
 | Username | `admin`                        |
-| Password | `Admin@123`                    |
+| Password | `password`                    |
 
 > ⚠️ **Change this password immediately after first login** — it ships with the seed data and should never be used in production as-is.
 
