@@ -176,12 +176,47 @@ $reviews = $db->query("SELECT * FROM reviews WHERE listing_id = {$listing['id']}
           </div>
 
           <!-- Description -->
+          <?php
+          /**
+           * Strip Word/Outlook "MsoNormal" junk and reduce to clean semantic HTML.
+           * Keeps: b, strong, i, em, u, ul, ol, li, p, br, span (inline styles only),
+           *        div, h1-h4, blockquote — discards class/lang/office attributes.
+           */
+          function cleanRichContent(string $html): string {
+            // 1. Remove <o:p> and other Office namespace tags
+            $html = preg_replace('#</?o:[^>]*>#i', '', $html);
+            // 2. Unwrap <font> tags — keep inner content, discard the tag itself
+            //    (execCommand bold wraps in <font color="..."> due to CSS inheritance)
+            $html = preg_replace('#<font[^>]*>(.*?)</font>#is', '$1', $html);
+            // 3. Strip color: and background-color: from inline styles injected by execCommand
+            $html = preg_replace('/\s*color\s*:\s*[^;";]+;?\s*/i', '', $html);
+            $html = preg_replace('/\s*background-color\s*:\s*[^;";]+;?\s*/i', '', $html);
+            // 4. Strip class="Mso*" and lang="*" and mso-* inline styles
+            $html = preg_replace('/\s+class="[^"]*Mso[^"]*"/i', '', $html);
+            $html = preg_replace('/\s+lang="[^"]*"/i', '', $html);
+            $html = preg_replace('/\bmso-[^;";]+;?\s*/i', '', $html);
+            // 5. Strip font-size inline styles
+            $html = preg_replace('/\s*font-size\s*:\s*[^;";]+;?\s*/i', '', $html);
+            // 6. Remove empty style="" and color="" attributes left behind
+            $html = preg_replace('/\s+style="\s*"/i', '', $html);
+            $html = preg_replace('/\s+color="[^"]*"/i', '', $html);
+            // 7. Unwrap <span> tags that have no remaining attributes
+            $html = preg_replace('#<span\s*>([^<]*)</span>#i', '$1', $html);
+            // 8. Collapse runs of &nbsp; into a single space
+            $html = preg_replace('/(\s*&nbsp;\s*)+/', ' ', $html);
+            // 9. Remove empty <p> tags
+            $html = preg_replace('#<p[^>]*>\s*</p>#i', '', $html);
+            // 10. Trim
+            return trim($html);
+          }
+          $cleanDesc = cleanRichContent($listing['description'] ?? '');
+          ?>
           <div class="lv-card">
             <div class="lv-card-title">
               <i class="fas fa-align-left"></i> Description
             </div>
-            <?php if ($listing['description']): ?>
-              <p class="lv-desc-text"><?= htmlspecialchars($listing['description']) ?></p>
+            <?php if ($cleanDesc): ?>
+              <div class="lv-rich-content"><?= $cleanDesc ?></div>
             <?php else: ?>
               <p class="lv-no-desc">No description provided.</p>
             <?php endif; ?>

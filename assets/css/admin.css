@@ -4189,3 +4189,335 @@ body:has(.login-page) {
     border: 3px solid var(--g5);
     box-shadow: var(--shadow);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   RICH TEXT EDITOR — Description field
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Wrapper ─────────────────────────────────────────────────────────── */
+.rte-wrapper {
+    border: 1.5px solid rgba(34, 197, 94, 0.35);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.rte-wrapper:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(45, 122, 58, 0.12);
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────── */
+.rte-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding: 6px 8px;
+    background: var(--g7);
+    border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+    user-select: none;
+}
+
+.rte-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.rte-divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(34, 197, 94, 0.25);
+    margin: 0 4px;
+    flex-shrink: 0;
+}
+
+/* ── Toolbar buttons ─────────────────────────────────────────────────── */
+.rte-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+.rte-btn:hover {
+    background: rgba(45, 122, 58, 0.1);
+    color: var(--accent);
+}
+.rte-btn--active {
+    background: rgba(45, 122, 58, 0.18);
+    color: var(--accent);
+    font-weight: 600;
+}
+.rte-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+/* ── Editable content area ───────────────────────────────────────────── */
+.rte-editor {
+    min-height: 130px;
+    max-height: 420px;
+    overflow-y: auto;
+    padding: 12px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.93rem;
+    color: var(--text);
+    line-height: 1.65;
+    outline: none;
+    word-break: break-word;
+    transition: background 0.2s;
+}
+.rte-editor:focus {
+    background: #fdfffd;
+}
+
+/* Placeholder */
+.rte-editor.rte-placeholder-visible:before {
+    content: attr(data-placeholder);
+    color: var(--text-light);
+    pointer-events: none;
+    font-style: italic;
+}
+
+/* ── Content styling inside editor ──────────────────────────────────── */
+.rte-editor p {
+    margin: 0 0 0.55em;
+}
+.rte-editor p:last-child {
+    margin-bottom: 0;
+}
+.rte-editor ul,
+.rte-editor ol {
+    margin: 0.4em 0 0.6em 1.4em;
+    padding: 0;
+}
+.rte-editor li {
+    margin-bottom: 0.25em;
+    line-height: 1.55;
+}
+.rte-editor ul li {
+    list-style-type: disc;
+}
+.rte-editor ol li {
+    list-style-type: decimal;
+}
+.rte-editor b,
+.rte-editor strong {
+    font-weight: 700;
+    color: var(--primary);
+}
+.rte-editor i,
+.rte-editor em {
+    font-style: italic;
+}
+.rte-editor u {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* ── Two-column layout ───────────────────────────────────────────────── */
+.rte-editor.rte-two-col {
+    columns: 2;
+    column-gap: 2em;
+    column-rule: 1px solid rgba(34, 197, 94, 0.2);
+}
+@media (max-width: 600px) {
+    .rte-editor.rte-two-col {
+        columns: 1;
+    }
+}
+
+/* ── Scrollbar (WebKit) ──────────────────────────────────────────────── */
+.rte-editor::-webkit-scrollbar {
+    width: 5px;
+}
+.rte-editor::-webkit-scrollbar-thumb {
+    background: var(--g5);
+    border-radius: 100px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   RICH TEXT CONTENT DISPLAY — listing_view.php description renderer
+   Mirrors the RTE editor styles so what-you-see = what-you-get
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.lv-rich-content {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text);
+    line-height: 1.75;
+    word-break: break-word;
+}
+
+/* Paragraphs */
+.lv-rich-content p {
+    margin: 0 0 0.7em;
+}
+.lv-rich-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Bold & strong */
+.lv-rich-content b,
+.lv-rich-content strong {
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* Italic & emphasis */
+.lv-rich-content i,
+.lv-rich-content em {
+    font-style: italic;
+}
+
+/* Underline */
+.lv-rich-content u {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* Bullet & ordered lists */
+.lv-rich-content ul,
+.lv-rich-content ol {
+    margin: 0.4em 0 0.75em 1.5em;
+    padding: 0;
+}
+.lv-rich-content li {
+    margin-bottom: 0.3em;
+    line-height: 1.6;
+}
+.lv-rich-content ul li {
+    list-style-type: disc;
+}
+.lv-rich-content ol li {
+    list-style-type: decimal;
+}
+
+/* Two-column layout (set by the RTE column toggle) */
+.lv-rich-content[style*="column"],
+.lv-rich-content .rte-two-col,
+.lv-rich-content[class*="rte-two-col"] {
+    columns: 2;
+    column-gap: 2em;
+    column-rule: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* Handle inline column style injected by execCommand */
+.lv-rich-content div[style*="column-count"],
+.lv-rich-content div[style*="columns"] {
+    column-gap: 2em;
+    column-rule: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* Text alignment (set by execCommand justifyLeft/Center/Right) */
+.lv-rich-content [style*="text-align: left"],
+.lv-rich-content [align="left"]   { text-align: left; }
+.lv-rich-content [style*="text-align: center"],
+.lv-rich-content [align="center"] { text-align: center; }
+.lv-rich-content [style*="text-align: right"],
+.lv-rich-content [align="right"]  { text-align: right; }
+.lv-rich-content [style*="text-align: justify"],
+.lv-rich-content [align="justify"]{ text-align: justify; }
+
+/* Headings (if pasted from Word / other sources) */
+.lv-rich-content h1,
+.lv-rich-content h2,
+.lv-rich-content h3,
+.lv-rich-content h4 {
+    font-family: 'DM Serif Display', serif;
+    color: var(--primary);
+    margin: 0.8em 0 0.35em;
+    line-height: 1.25;
+}
+.lv-rich-content h1 { font-size: 1.45rem; }
+.lv-rich-content h2 { font-size: 1.25rem; }
+.lv-rich-content h3 { font-size: 1.08rem; }
+.lv-rich-content h4 { font-size: 0.97rem; }
+
+/* Blockquote */
+.lv-rich-content blockquote {
+    border-left: 3px solid var(--accent);
+    margin: 0.75em 0;
+    padding: 0.5em 1em;
+    background: var(--g7);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Inline code / pre */
+.lv-rich-content code {
+    background: var(--g6);
+    border: 1px solid var(--border-solid);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 0.85em;
+    font-family: 'Courier New', monospace;
+}
+
+/* Responsive: collapse two-col on small screens */
+@media (max-width: 600px) {
+    .lv-rich-content[style*="column"],
+    .lv-rich-content div[style*="column-count"],
+    .lv-rich-content div[style*="columns"] {
+        columns: 1 !important;
+    }
+}
+
+
+/* ── RTE editor: force plain color so execCommand never injects <font color> ── */
+.rte-editor,
+.rte-editor * {
+    color: inherit !important;
+}
+.rte-editor {
+    color: #0a2e1a !important;   /* --text value, explicitly not a CSS var */
+}
+.rte-editor b,
+.rte-editor strong {
+    color: #0f5132 !important;   /* --primary, kept for visual distinction */
+}
+/* ══════════════════════════════════════════════════════
+   BARANGAY EXTRA FIELDS — admin listings form
+   ══════════════════════════════════════════════════════ */
+.brgy-extra-fields {
+    animation: fadeSlideDown 0.25s ease;
+}
+
+@keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.brgy-extra-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--g7, #f6faf7), var(--g8, #f9fdfb));
+    border: 1.5px solid var(--accent, #40916c);
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary, #1b4332);
+    margin-bottom: 12px;
+}
+
+.brgy-extra-sub {
+    margin-left: auto;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-muted, #6b8c73);
+    font-style: italic;
+}

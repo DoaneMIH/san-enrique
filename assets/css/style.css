@@ -3902,7 +3902,7 @@ img {
 .search-dropdown {
     position: absolute;
     top: calc(100% + 6px);
-    left: 17rem;
+    left: 11rem;
     right: 0;
     right: auto;
     min-width: 360px;
@@ -4104,4 +4104,91 @@ img {
         width: 100%;
     }
     .sd-addr { max-width: 120px; }
+}
+/* ═══════════════════════════════════════════════════════════════
+   Listing page — Rich Description content (.listing-rich-desc)
+   Renders stored HTML (bold, lists, paragraphs) properly on the
+   public listing page, matching the admin preview appearance.
+═══════════════════════════════════════════════════════════════ */
+.listing-rich-desc {
+  line-height: 1.85;
+  font-size: 0.97rem;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.listing-rich-desc p {
+  margin-bottom: 0.85rem;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.listing-rich-desc b,
+.listing-rich-desc strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+.listing-rich-desc i,
+.listing-rich-desc em {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.listing-rich-desc u {
+  text-decoration-color: rgba(82, 183, 136, 0.6);
+}
+
+.listing-rich-desc ul,
+.listing-rich-desc ol {
+  padding-left: 1.4rem;
+  margin-bottom: 0.85rem;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.listing-rich-desc ul {
+  list-style: disc;
+}
+
+.listing-rich-desc ol {
+  list-style: decimal;
+}
+
+.listing-rich-desc li {
+  margin-bottom: 0.3rem;
+  color: rgba(255, 255, 255, 0.82);
+  padding-left: 0.25rem;
+}
+
+.listing-rich-desc li b,
+.listing-rich-desc li strong {
+  color: #fff;
+}
+
+.listing-rich-desc h1,
+.listing-rich-desc h2,
+.listing-rich-desc h3,
+.listing-rich-desc h4 {
+  color: #fff;
+  font-weight: 700;
+  margin-top: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.listing-rich-desc blockquote {
+  border-left: 3px solid rgba(82, 183, 136, 0.55);
+  padding-left: 1rem;
+  margin-left: 0;
+  color: rgba(255, 255, 255, 0.65);
+  font-style: italic;
+}
+
+.listing-rich-desc br + br {
+  display: block;
+  margin-top: 0.4rem;
+  content: "";
+}
+/* ══════════════════════════════════════════════════════
+   BARANGAY INFO ROWS — public listing.php
+   ══════════════════════════════════════════════════════ */
+.info-row .ir-icon.fa-road,
+.info-row .ir-icon.fa-users {
+    color: var(--accent, #40916c);
 }

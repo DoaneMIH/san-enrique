@@ -42,7 +42,7 @@ function getListing($slug)
 {
     $db = getDB();
     $slug = $db->real_escape_string($slug);
-    $result = $db->query("SELECT l.*, c.name as category_name, c.icon, c.color FROM listings l JOIN categories c ON l.category_id = c.id WHERE l.slug = '$slug' AND l.status = 'active' LIMIT 1");
+    $result = $db->query("SELECT l.*, c.name as category_name, c.icon, c.color, c.slug as cat_slug FROM listings l JOIN categories c ON l.category_id = c.id WHERE l.slug = '$slug' AND l.status = 'active' LIMIT 1");
     if ($result && $result->num_rows > 0) {
         $listing = $result->fetch_assoc();
         $db->query("UPDATE listings SET views = views + 1 WHERE slug = '$slug'");

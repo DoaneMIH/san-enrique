@@ -465,7 +465,15 @@ $pageTitle = $selectedCat ? ucfirst($selectedCat) : ($search ? "Search: $search"
                   </a>
                   <div class="listing-card-body">
                     <h3 class="listing-card-title"><?= htmlspecialchars($listing['name']) ?></h3>
-                    <p class="listing-card-desc"><?= htmlspecialchars($listing['description']) ?></p>
+                    <?php
+                      // Strip all HTML tags, decode entities, then truncate to 120 chars
+                      $rawDesc = html_entity_decode(strip_tags($listing['description'] ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                      $rawDesc = preg_replace('/\s+/', ' ', trim($rawDesc)); // collapse whitespace
+                      $shortDesc = mb_strlen($rawDesc) > 120
+                        ? mb_substr($rawDesc, 0, 120) . '...'
+                        : $rawDesc;
+                    ?>
+                    <p class="listing-card-desc"><?= htmlspecialchars($shortDesc) ?></p>
                     <div class="listing-card-meta">
                       <?php if ($listing['barangay']): ?>
                         <span><i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($listing['barangay']) ?></span>

@@ -959,10 +959,37 @@ $categories = getCategories();
         <?php endif; ?>
 
         <!-- Description -->
+        <?php
+        function publicCleanRichContent(string $html): string {
+          $html = preg_replace('#</?o:[^>]*>#i', '', $html);
+          $html = preg_replace('#<font[^>]*>(.*?)</font>#is', '$1', $html);
+          $html = preg_replace('/\s*color\s*:\s*[^;"\s][^;"]*;?/i', '', $html);
+          $html = preg_replace('/\s*background-color\s*:\s*[^;"\s][^;"]*;?/i', '', $html);
+          $html = preg_replace('/\s+class="[^"]*Mso[^"]*"/i', '', $html);
+          $html = preg_replace('/\s+lang="[^"]*"/i', '', $html);
+          $html = preg_replace('/\bmso-[^;"\s][^;"]*;?\s*/i', '', $html);
+          $html = preg_replace('/\s*font-size\s*:\s*[^;"\s][^;"]*;?/i', '', $html);
+          $html = preg_replace('/\s+style="\s*"/i', '', $html);
+          $html = preg_replace('/\s+color="[^"]*"/i', '', $html);
+          $html = preg_replace('#<span\s*>([^<]*)</span>#i', '$1', $html);
+          $html = preg_replace('/(\s*&nbsp;\s*)+/', ' ', $html);
+          $html = preg_replace('#<p[^>]*>\s*</p>#i', '', $html);
+          // Strip dangerous tags but keep formatting ones
+          $allowed = '<p><br><b><strong><i><em><u><ul><ol><li><div><h1><h2><h3><h4><span><blockquote>';
+          $html = strip_tags($html, $allowed);
+          return trim($html);
+        }
+        $pubDesc = publicCleanRichContent($listing['description'] ?? '');
+        ?>
         <div class="listing-info-box mb-4">
           <h3 style="font-size:1.3rem;color:var(--primary);margin-bottom:1rem;">About</h3>
-          <p style="color:var(--text-muted);line-height:1.8;"><?= nl2br(htmlspecialchars($listing['description'])) ?>
-          </p>
+          <div class="listing-rich-desc">
+            <?php if ($pubDesc): ?>
+              <?= $pubDesc ?>
+            <?php else: ?>
+              <p style="color:var(--text-muted);">No description available.</p>
+            <?php endif; ?>
+          </div>
         </div>
 
         <!-- Amenities -->
@@ -1082,6 +1109,23 @@ $categories = getCategories();
               <div class="ir-label">Barangay</div>
               <div class="ir-value"><?= htmlspecialchars($listing['barangay']) ?></div>
             </div>
+          <?php endif; ?>
+
+          <?php if (($listing['cat_slug'] ?? '') === 'barangays'): ?>
+            <?php if (!empty($listing['distance_from_town'])): ?>
+            <div class="info-row">
+              <i class="fas fa-road ir-icon"></i>
+              <div class="ir-label">Distance</div>
+              <div class="ir-value"><?= htmlspecialchars($listing['distance_from_town']) ?> from town</div>
+            </div>
+            <?php endif; ?>
+            <?php if (!empty($listing['population'])): ?>
+            <div class="info-row">
+              <i class="fas fa-users ir-icon"></i>
+              <div class="ir-label">Population</div>
+              <div class="ir-value"><?= htmlspecialchars($listing['population']) ?></div>
+            </div>
+            <?php endif; ?>
           <?php endif; ?>
 
           <?php if ($listing['operating_hours']): ?>

@@ -441,3 +441,8 @@ INSERT INTO events (title, description, event_date, end_date, location, latitude
 ('San Enrique Fiesta Festival', 'Annual town fiesta celebrating the feast of San Enrique with cultural shows, parades, and traditional food fair. Join thousands of locals and visitors in this grand celebration!',          '2025-07-15', '2025-07-17', 'Poblacion Plaza, San Enrique',           10.9178, 122.8845, 'active'),
 ('Harvest Festival 2025',       'Celebrate the abundance of San Enrique with a colorful harvest festival featuring agricultural exhibits, cooking competitions, and agri-tourism tours.',                                 '2025-10-20', '2025-10-21', 'Verde Organic Farm, San Enrique',        10.9289, 122.8956, 'active'),
 ('Beach Clean-Up & Fun Day',    'Community beach clean-up activity followed by beach games, water sports, and environmental awareness programs at Paradise Cove Resort.',                                               '2025-08-05', '2025-08-05', 'Paradise Cove Resort, San Enrique',      10.9234, 122.8901, 'active');
+
+
+ALTER TABLE listings
+ADD COLUMN distance_from_town VARCHAR(100) DEFAULT NULL AFTER amenities,
+ADD COLUMN population VARCHAR(100) DEFAULT NULL AFTER distance_from_town;

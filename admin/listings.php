@@ -13,7 +13,7 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $name = sanitize($_POST['name'] ?? '');
   $category_id = (int) ($_POST['category_id'] ?? 0);
-  $description = sanitize($_POST['description'] ?? '');
+  $description = $db->real_escape_string($_POST['description'] ?? ''); // raw HTML — escape for SQL only, do NOT sanitize
   $address = sanitize($_POST['address'] ?? '');
   $barangay = sanitize($_POST['barangay'] ?? '');
   $contact = sanitize($_POST['contact'] ?? '');
@@ -25,6 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $lng = $showMap ? (float) ($_POST['longitude'] ?? 0) : 'NULL';
   $hours = sanitize($_POST['operating_hours'] ?? '');
   $fee = sanitize($_POST['entrance_fee'] ?? '');
+  $distance   = sanitize($_POST['distance_from_town'] ?? '');
+  $population = sanitize($_POST['population'] ?? '');
   $amenities = sanitize($_POST['amenities'] ?? '');
   $status = sanitize($_POST['status'] ?? 'active');
   $featured = isset($_POST['is_featured']) ? 1 : 0;
@@ -155,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $i++;
     }
     $videoEsc = $db->real_escape_string($video);
-    $sql = "INSERT INTO listings (category_id, name, slug, description, address, barangay, contact, email, website, latitude, longitude, featured_image, gallery, video, operating_hours, entrance_fee, amenities, status, is_featured) VALUES ($category_id, '$name', '$slug', '$description', '$address', '$barangay', '$contact', '$email', '$website', $lat, $lng, '$img', '$galleryJson', '$videoEsc', '$hours', '$fee', '$amenities', '$status', $featured)";
+    $sql = "INSERT INTO listings (category_id, name, slug, description, address, barangay, contact, email, website, latitude, longitude, featured_image, gallery, video, operating_hours, entrance_fee, amenities, distance_from_town, population, status, is_featured) VALUES ($category_id, '$name', '$slug', '$description', '$address', '$barangay', '$contact', '$email', '$website', $lat, $lng, '$img', '$galleryJson', '$videoEsc', '$hours', '$fee', '$amenities', '$distance', '$population', '$status', $featured)";
     if ($db->query($sql)) {
       $message = 'Listing added successfully!';
       $action = 'list';
@@ -172,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $i++;
     }
     $videoEsc = $db->real_escape_string($video);
-    $sql = "UPDATE listings SET category_id=$category_id, name='$name', slug='$slug', description='$description', address='$address', barangay='$barangay', contact='$contact', email='$email', website='$website', latitude=$lat, longitude=$lng, featured_image='$img', gallery='$galleryJson', video='$videoEsc', operating_hours='$hours', entrance_fee='$fee', amenities='$amenities', status='$status', is_featured=$featured WHERE id=$editId";
+    $sql = "UPDATE listings SET category_id=$category_id, name='$name', slug='$slug', description='$description', address='$address', barangay='$barangay', contact='$contact', email='$email', website='$website', latitude=$lat, longitude=$lng, featured_image='$img', gallery='$galleryJson', video='$videoEsc', operating_hours='$hours', entrance_fee='$fee', amenities='$amenities', distance_from_town='$distance', population='$population', status='$status', is_featured=$featured WHERE id=$editId";
     if ($db->query($sql)) {
       $message = 'Listing updated successfully!';
       $action = 'list';
@@ -372,11 +374,68 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.slug as cat_slug, c.co
                   </select>
                 </div>
 
-                <!-- Description -->
+                <!-- Description — Rich Text Editor -->
                 <div class="col-12">
                   <label class="admin-label">Description</label>
-                  <textarea name="description" class="admin-input" rows="4"
-                    placeholder="Describe this place..."><?= htmlspecialchars($editListing['description'] ?? '') ?></textarea>
+                  <div class="rte-wrapper">
+                    <!-- Toolbar -->
+                    <div class="rte-toolbar" id="rteToolbar">
+                      <!-- Formatting group -->
+                      <div class="rte-group">
+                        <button type="button" class="rte-btn" data-cmd="bold" title="Bold (Ctrl+B)">
+                          <i class="fas fa-bold"></i>
+                        </button>
+                        <button type="button" class="rte-btn" data-cmd="italic" title="Italic (Ctrl+I)">
+                          <i class="fas fa-italic"></i>
+                        </button>
+                        <button type="button" class="rte-btn" data-cmd="underline" title="Underline (Ctrl+U)">
+                          <i class="fas fa-underline"></i>
+                        </button>
+                      </div>
+                      <div class="rte-divider"></div>
+                      <!-- Lists group -->
+                      <div class="rte-group">
+                        <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="Bullet List">
+                          <i class="fas fa-list-ul"></i>
+                        </button>
+                        <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="Numbered List">
+                          <i class="fas fa-list-ol"></i>
+                        </button>
+                      </div>
+                      <div class="rte-divider"></div>
+                      <!-- Layout group -->
+                      <div class="rte-group">
+                        <button type="button" class="rte-btn" id="rteTwoCol" title="Toggle 2-Column Layout" onclick="rteToggleTwoCol()">
+                          <i class="fas fa-columns"></i>
+                        </button>
+                      </div>
+                      <div class="rte-divider"></div>
+                      <!-- Alignment group -->
+                      <div class="rte-group">
+                        <button type="button" class="rte-btn" data-cmd="justifyLeft" title="Align Left">
+                          <i class="fas fa-align-left"></i>
+                        </button>
+                        <button type="button" class="rte-btn" data-cmd="justifyCenter" title="Align Center">
+                          <i class="fas fa-align-center"></i>
+                        </button>
+                        <button type="button" class="rte-btn" data-cmd="justifyRight" title="Align Right">
+                          <i class="fas fa-align-right"></i>
+                        </button>
+                      </div>
+                      <div class="rte-divider"></div>
+                      <!-- Clear formatting -->
+                      <div class="rte-group">
+                        <button type="button" class="rte-btn" data-cmd="removeFormat" title="Clear Formatting">
+                          <i class="fas fa-remove-format"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <!-- Editable area -->
+                    <div class="rte-editor" id="rteEditor" contenteditable="true"
+                      data-placeholder="Describe this place..."></div>
+                    <!-- Hidden textarea synced on submit -->
+                    <textarea name="description" id="rteHidden" style="display:none;"><?= $editListing['description'] ?? '' ?></textarea>
+                  </div>
                 </div>
 
                 <!-- Address & Barangay -->
@@ -429,6 +488,41 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.slug as cat_slug, c.co
                   <input type="text" name="amenities" class="admin-input"
                     value="<?= htmlspecialchars($editListing['amenities'] ?? '') ?>"
                     placeholder="Swimming Pool, Restaurant, WiFi, Parking, Cottage">
+                </div>
+
+                <!-- Barangay-only fields — shown when category is Barangays -->
+                <?php
+                  // Find if selected category is barangays (check all categories)
+                  $isBrgySelected = false;
+                  foreach ($categories as $_c) {
+                    if ($_c['slug'] === 'barangays' && $_c['id'] == ($editListing['category_id'] ?? 0)) {
+                      $isBrgySelected = true; break;
+                    }
+                  }
+                ?>
+                <div id="brgyExtraFields" class="col-12 brgy-extra-fields" style="<?= $isBrgySelected ? '' : 'display:none;' ?>">
+                  <div class="brgy-extra-header">
+                    <i class="fas fa-home me-2"></i>Barangay Information
+                    <span class="brgy-extra-sub">Only shown when category is Barangays</span>
+                  </div>
+                  <div class="row g-3 mt-0">
+                    <div class="col-md-6">
+                      <label class="admin-label">
+                        <i class="fas fa-road me-1"></i> Distance from Town Proper
+                      </label>
+                      <input type="text" name="distance_from_town" class="admin-input"
+                        value="<?= htmlspecialchars($editListing['distance_from_town'] ?? '') ?>"
+                        placeholder="e.g. 3.5 km">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="admin-label">
+                        <i class="fas fa-users me-1"></i> No. of Population
+                      </label>
+                      <input type="text" name="population" class="admin-input"
+                        value="<?= htmlspecialchars($editListing['population'] ?? '') ?>"
+                        placeholder="e.g. 1,250">
+                    </div>
+                  </div>
                 </div>
 
                 <!-- Featured Photo (Upload or URL) -->
@@ -739,6 +833,41 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.slug as cat_slug, c.co
       $('#adminSidebar').toggleClass('open');
       $('#sidebarOverlay').toggleClass('d-none');
     }
+
+    // ── Show/hide barangay-only fields based on selected category ──────────
+    function updateBrgyFields() {
+      var sel = document.querySelector('select[name="category_id"]');
+      if (!sel) return;
+      var opt = sel.options[sel.selectedIndex];
+      var catName = opt ? opt.textContent.trim().toLowerCase() : '';
+      var wrap = document.getElementById('brgyExtraFields');
+      if (!wrap) return;
+      // Match by text OR by value matching any known barangays category id
+      if (catName.indexOf('barangay') !== -1) {
+        wrap.style.display = '';
+        wrap.style.animation = 'none'; // reset animation so it replays
+        void wrap.offsetWidth;
+        wrap.style.animation = '';
+      } else {
+        wrap.style.display = 'none';
+      }
+    }
+
+    // Run after jQuery + all scripts are loaded (window load is safer than DOMContentLoaded
+    // when scripts are at bottom of body)
+    $(window).on('load', function () {
+      var sel = $('select[name="category_id"]');
+      if (sel.length) {
+        sel.on('change', updateBrgyFields);
+        updateBrgyFields(); // show on load if editing a barangay
+      }
+    });
+
+    // Also run immediately in case window.load already fired
+    $(function () {
+      updateBrgyFields();
+      $('select[name="category_id"]').off('change.brgy').on('change.brgy', updateBrgyFields);
+    });
 
     // Auto-dismiss success alert after 3 seconds
     (function () {
@@ -1108,6 +1237,136 @@ $listings = $db->query("SELECT l.*, c.name as cat_name, c.slug as cat_slug, c.co
   <?php if ($action === 'add' || $action === 'edit'): ?>
     <script src="https://maps.googleapis.com/maps/api/js?key=<?= GOOGLE_MAPS_API_KEY ?>&callback=initMap" defer></script>
   <?php endif; ?>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       RICH TEXT EDITOR — Description field
+       ══════════════════════════════════════════════════════════════════ -->
+  <script>
+  (function () {
+    var editor   = document.getElementById('rteEditor');
+    var hidden   = document.getElementById('rteHidden');
+    var toolbar  = document.getElementById('rteToolbar');
+    if (!editor) return;
+
+    // ── Word/HTML paste cleaner + execCommand output cleaner ────────────
+    function cleanPastedHtml(html) {
+      // Remove Office namespace tags
+      html = html.replace(/<\/?o:[^>]*>/gi, '');
+      // Unwrap <font> tags (execCommand bold/color injects these)
+      html = html.replace(/<font[^>]*>([\s\S]*?)<\/font>/gi, '$1');
+      // Strip color: and background-color: from inline styles
+      html = html.replace(/\s*color\s*:\s*[^;";]+;?\s*/gi, '');
+      html = html.replace(/\s*background-color\s*:\s*[^;";]+;?\s*/gi, '');
+      // Strip color="" attributes (old-style font color)
+      html = html.replace(/\s+color="[^"]*"/gi, '');
+      // Remove MsoNormal classes and lang attributes
+      html = html.replace(/\s+class="[^"]*Mso[^"]*"/gi, '');
+      html = html.replace(/\s+lang="[^"]*"/gi, '');
+      // Remove mso-* style properties
+      html = html.replace(/\bmso-[^;";]+;?\s*/gi, '');
+      // Remove font-size inline styles
+      html = html.replace(/\s*font-size\s*:\s*[^;";]+;?\s*/gi, '');
+      // Remove empty style attributes
+      html = html.replace(/\s+style="\s*"/gi, '');
+      // Unwrap bare <span> with no attributes
+      html = html.replace(/<span\s*>([^<]*)<\/span>/gi, '$1');
+      // Collapse &nbsp; runs
+      html = html.replace(/(\s*&nbsp;\s*)+/g, ' ');
+      // Remove empty <p> tags
+      html = html.replace(/<p[^>]*>\s*<\/p>/gi, '');
+      return html.trim();
+    }
+
+    // ── Load existing content — also clean if it was saved dirty ────────
+    var stored = hidden ? hidden.value.trim() : '';
+    if (stored) {
+      var cleaned = cleanPastedHtml(stored);
+      editor.innerHTML = cleaned.indexOf('<') === -1
+        ? '<p>' + cleaned.replace(/\n\n+/g, '</p><p>').replace(/\n/g, '<br>') + '</p>'
+        : cleaned;
+      // Write the cleaned version back to hidden so the next save is already clean
+      if (hidden) hidden.value = editor.innerHTML;
+    }
+
+    // ── Intercept paste — strip Word junk before inserting ──────────────
+    editor.addEventListener('paste', function (e) {
+      e.preventDefault();
+      var html = '';
+      if (e.clipboardData.types.indexOf('text/html') !== -1) {
+        html = cleanPastedHtml(e.clipboardData.getData('text/html'));
+      } else {
+        // Plain text fallback — wrap lines in <p>
+        var text = e.clipboardData.getData('text/plain') || '';
+        html = '<p>' + text.replace(/\n\n+/g, '</p><p>').replace(/\n/g, '<br>') + '</p>';
+      }
+      document.execCommand('insertHTML', false, html);
+      syncHidden();
+    });
+
+    // ── Sync editor → hidden on every input (NO cleaning mid-edit) ────────
+    editor.addEventListener('input', function () {
+      if (hidden) hidden.value = editor.innerHTML;
+    });
+    function syncHidden() {
+      if (hidden) hidden.value = editor.innerHTML;
+    }
+
+    // Clean only once on form submit, right before saving
+    var form = editor.closest('form');
+    if (form) form.addEventListener('submit', function () {
+      if (hidden) hidden.value = cleanPastedHtml(editor.innerHTML);
+    });
+
+    // ── Toolbar button clicks ────────────────────────────────────────────
+    if (toolbar) {
+      toolbar.addEventListener('mousedown', function (e) {
+        var btn = e.target.closest('.rte-btn[data-cmd]');
+        if (!btn) return;
+        e.preventDefault(); // keep editor focus
+        document.execCommand(btn.dataset.cmd, false, null);
+        updateActiveStates();
+        syncHidden();
+      });
+    }
+
+    // ── Update active state on toolbar buttons ──────────────────────────
+    editor.addEventListener('keyup', updateActiveStates);
+    editor.addEventListener('mouseup', updateActiveStates);
+    editor.addEventListener('selectionchange', updateActiveStates);
+
+    function updateActiveStates() {
+      if (!toolbar) return;
+      toolbar.querySelectorAll('.rte-btn[data-cmd]').forEach(function (btn) {
+        try {
+          var active = document.queryCommandState(btn.dataset.cmd);
+          btn.classList.toggle('rte-btn--active', active);
+        } catch (e) {}
+      });
+    }
+
+    // ── Two-column layout toggle ─────────────────────────────────────────
+    window.rteToggleTwoCol = function () {
+      var is2col = editor.classList.toggle('rte-two-col');
+      var colBtn = document.getElementById('rteTwoCol');
+      if (colBtn) colBtn.classList.toggle('rte-btn--active', is2col);
+      syncHidden();
+    };
+
+    // ── Placeholder logic ────────────────────────────────────────────────
+    editor.addEventListener('focus', function () {
+      editor.classList.remove('rte-placeholder-visible');
+    });
+    editor.addEventListener('blur', function () {
+      checkPlaceholder();
+      syncHidden();
+    });
+    function checkPlaceholder() {
+      var empty = editor.innerHTML.replace(/<br\s*\/?>/gi, '').trim() === '' || editor.textContent.trim() === '';
+      editor.classList.toggle('rte-placeholder-visible', empty);
+    }
+    checkPlaceholder();
+  })();
+  </script>
 </body>
 
 </html>
