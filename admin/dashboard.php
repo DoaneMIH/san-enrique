@@ -209,8 +209,8 @@ $isSuperAdmin   = ($admin['role'] === 'superadmin');
                            onerror="this.src='https://placehold.co/48x38/dcfce7/0f5132?text=?'">
                       <div class="listing-info-text">
                         <div class="listing-name"><?= htmlspecialchars($listing['name']) ?></div>
-                        <div class="listing-slug"><?= htmlspecialchars($listing['slug']) ?></div>
-                      </div>
+						<div class="listing-slug"><?= htmlspecialchars($listing['slug']) ?></div>
+                        </div>
                     </div>
                   </td>
                   <td>

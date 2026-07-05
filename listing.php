@@ -23,7 +23,7 @@ $categories = getCategories();
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" type="x-icon" href="assets/images/san-enrique-logo.jpg">
   <title><?= htmlspecialchars($listing['name']) ?> - <?= SITE_NAME ?></title>
-  <meta name="description" content="<?= htmlspecialchars(substr($listing['description'], 0, 155)) ?>">
+  <meta name="description" content="<?= htmlspecialchars(richExcerpt($listing['description'], 155)) ?>">
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">

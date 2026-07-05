@@ -1570,7 +1570,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
                   <!-- SINGLE IMAGE -->
                   <div class="event-card-img">
                     <img src="<?= htmlspecialchars($evAllImgs[0]) ?>" alt="<?= htmlspecialchars($event['title']) ?>"
-                        onerror="this.parentElement.innerHTML='<div class=\'event-card-img-placeholder\'><i class=\'fas fa-calendar-alt\'></i></div>'">
+                         onerror="this.parentElement.innerHTML='<div class=\'event-card-img-placeholder\'><i class=\'fas fa-calendar-alt\'></i></div>'">
                     <?php if ($isPinned): ?>
                       <div class="event-pinned-badge-sm"><i class="fas fa-thumbtack"></i> Pinned</div>
                     <?php endif; ?>
@@ -1732,7 +1732,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
               </div>
               <div class="listing-card-body">
                 <h3 class="listing-card-title"><?= htmlspecialchars($listing['name']) ?></h3>
-                <p class="listing-card-desc"><?= htmlspecialchars(strip_tags($listing['description'])) ?></p>
+                <p class="listing-card-desc"><?= htmlspecialchars(richExcerpt($listing['description'], 120)) ?></p>
                 <div class="listing-card-meta">
                   <?php if ($listing['barangay']): ?>
                     <span><i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($listing['barangay']) ?></span>
@@ -1954,7 +1954,7 @@ foreach (['listings', 'categories', 'events'] as $_t) {
               <strong> Jesus Palmerola Prudente.</strong> Together with local leaders and professionals, they organized 
               meetings and gathered support from the people. On July 12, 1957, <em> Carlos P. Garcia </em>signed
               <strong> Executive Order No. 259</strong> creating the Municipality of San Enrique once again.
-              Jesus Prudente became the first mayor of the restored municipality.</p>
+               Jesus Prudente became the first mayor of the restored municipality.</p>
           </div>
         </div>
 

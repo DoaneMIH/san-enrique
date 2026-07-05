@@ -17,7 +17,7 @@ foreach ($listings as $listing) {
         'id' => $listing['id'],
         'name' => htmlspecialchars($listing['name']),
         'slug' => urlencode($listing['slug']),
-        'description' => htmlspecialchars(substr($listing['description'], 0, 100)) . (strlen($listing['description']) > 100 ? '...' : ''),
+        'description' => htmlspecialchars(richExcerpt($listing['description'], 100)),
         'image' => $img,
         'category_name' => htmlspecialchars($listing['category_name']),
         'icon' => htmlspecialchars($listing['icon']),

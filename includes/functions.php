@@ -42,7 +42,7 @@ function getListing($slug)
 {
     $db = getDB();
     $slug = $db->real_escape_string($slug);
-    $result = $db->query("SELECT l.*, c.name as category_name, c.icon, c.color, c.slug as cat_slug FROM listings l JOIN categories c ON l.category_id = c.id WHERE l.slug = '$slug' AND l.status = 'active' LIMIT 1");
+    $result = $db->query("SELECT l.*, c.name as category_name, c.icon, c.color FROM listings l JOIN categories c ON l.category_id = c.id WHERE l.slug = '$slug' AND l.status = 'active' LIMIT 1");
     if ($result && $result->num_rows > 0) {
         $listing = $result->fetch_assoc();
         $db->query("UPDATE listings SET views = views + 1 WHERE slug = '$slug'");
@@ -113,6 +113,34 @@ function getStats()
 function placeholderImage($name = 'Place', $w = 600, $h = 400)
 {
     return "https://placehold.co/{$w}x{$h}/2d6a4f/ffffff?text=" . urlencode($name);
+}
+
+/**
+ * Converts a rich-text (HTML) field like `listings.description` into a
+ * clean, plain-text excerpt safe to echo with htmlspecialchars() on
+ * listing cards, meta tags, and API responses.
+ *
+ * Strips all HTML tags/entities first, THEN truncates on a word boundary,
+ * so raw tags such as <p>, <div>, <span style="..."> never leak into the
+ * output and words are never cut in half.
+ */
+function richExcerpt($html, $length = 150)
+{
+    $html = (string) ($html ?? '');
+    // Turn block-level tags into spaces first so words don't get jammed
+    // together (e.g. "</p><p>" would otherwise become "wordword").
+    $html = preg_replace('#</(p|div|li|h[1-6]|br)\s*>#i', ' ', $html);
+    $text = strip_tags($html);
+    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $text = preg_replace('/\s+/u', ' ', $text);
+    $text = trim($text);
+
+    if ($length > 0 && mb_strlen($text) > $length) {
+        $text = mb_substr($text, 0, $length);
+        // Trim back to the last full word so we don't cut mid-word
+        $text = preg_replace('/\s+?(\S+)?$/u', '', $text) . '...';
+    }
+    return $text;
 }
 
 /**

@@ -54,33 +54,8 @@ function getListing($slug)
 function getUpcomingEvents($limit = 3)
 {
     $db = getDB();
-
-    // Pinned events always show first regardless of date
-    $pinned = [];
-    $upcoming = [];
-
-    $pResult = $db->query("SELECT * FROM events WHERE status='active' AND is_pinned=1 ORDER BY event_date ASC");
-    if ($pResult) $pinned = $pResult->fetch_all(MYSQLI_ASSOC);
-
-    // Fill remaining slots with upcoming non-pinned events
-    $pinnedIds = array_column($pinned, 'id');
-    $excludeStr = implode(',', array_map('intval', $pinnedIds)) ?: '0';
-    $remaining = max(0, $limit - count($pinned));
-
-    if ($remaining > 0) {
-        $uResult = $db->query("SELECT * FROM events WHERE status='active' AND is_pinned=0 AND event_date >= CURDATE() AND id NOT IN ($excludeStr) ORDER BY event_date ASC LIMIT $remaining");
-        if ($uResult) $upcoming = $uResult->fetch_all(MYSQLI_ASSOC);
-    }
-
-    $events = array_merge($pinned, $upcoming);
-
-    // Fallback: if is_pinned column doesn't exist yet, use original query
-    if ($db->errno) {
-        $result = $db->query("SELECT * FROM events WHERE status='active' AND event_date >= CURDATE() ORDER BY event_date ASC LIMIT $limit");
-        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
-    }
-
-    return $events ?: [];
+    $result = $db->query("SELECT * FROM events WHERE status = 'active' AND event_date >= CURDATE() ORDER BY event_date ASC LIMIT $limit");
+    return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
 
 function getAllListingsForMap()
@@ -104,9 +79,7 @@ function getStats()
     $stats['listings'] = $db->query("SELECT COUNT(*) as c FROM listings WHERE status='active'")->fetch_assoc()['c'];
     $stats['categories'] = $db->query("SELECT COUNT(*) as c FROM categories")->fetch_assoc()['c'];
     $stats['events'] = $db->query("SELECT COUNT(*) as c FROM events WHERE status='active'")->fetch_assoc()['c'];
-    // Count listings in the 'barangays' category (matches admin panel display)
-    $brgyResult = $db->query("SELECT COUNT(l.id) as c FROM listings l JOIN categories c ON l.category_id=c.id WHERE c.slug='barangays' AND l.status='active'");
-    $stats['barangays'] = $brgyResult ? (int)$brgyResult->fetch_assoc()['c'] : 0;
+    $stats['barangays'] = $db->query("SELECT COUNT(DISTINCT barangay) as c FROM listings WHERE status='active'")->fetch_assoc()['c'];
     return $stats;
 }
 
@@ -147,29 +120,21 @@ function convertGdriveUrl($url)
     $url = trim($url);
     if (empty($url)) return $url;
 
-    // Not a Drive link at all — return as-is
-    if (strpos($url, 'drive.google.com') === false &&
-        strpos($url, 'googleusercontent.com') === false) {
-        return $url;
-    }
+    // Already a direct link
+    if (strpos($url, 'lh3.googleusercontent.com') !== false) return $url;
+    if (preg_match('#drive\.google\.com/uc\?.*id=#i', $url)) return $url;
 
-    // Extract file ID from all known Drive URL formats
+    // Extract file ID from various Drive URL formats
     $fileId = '';
-
-    // /file/d/FILE_ID/
-    if (preg_match('#/file/d/([a-zA-Z0-9_-]{10,})#i', $url, $m)) {
+    if (preg_match('#drive\.google\.com/file/d/([a-zA-Z0-9_-]+)#i', $url, $m)) {
         $fileId = $m[1];
-    // ?id=FILE_ID or &id=FILE_ID (uc?export=view style)
-    } elseif (preg_match('#[?&]id=([a-zA-Z0-9_-]{10,})#i', $url, $m)) {
-        $fileId = $m[1];
-    // open?id=FILE_ID
-    } elseif (preg_match('#open\?id=([a-zA-Z0-9_-]{10,})#i', $url, $m)) {
+    } elseif (preg_match('#drive\.google\.com/open\?id=([a-zA-Z0-9_-]+)#i', $url, $m)) {
         $fileId = $m[1];
     }
 
     if ($fileId) {
-        // thumbnail endpoint works reliably for ALL public Drive images
-        return 'https://drive.google.com/thumbnail?id=' . $fileId . '&sz=w1200';
+        // Use lh3.googleusercontent.com — most reliable for direct image display
+        return 'https://lh3.googleusercontent.com/d/' . $fileId;
     }
 
     return $url;
