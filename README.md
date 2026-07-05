@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/images/San_Enrique_Municipal_Hall.jpg" alt="San Enrique, Iloilo Municipal Hall" width="100%">
+  <img src="assets/images/landingPage.png" alt="San Enrique, Iloilo Municipal Hall" width="100%">
 </p>
 
 <h1 align="center">San Enrique Tourism</h1>
